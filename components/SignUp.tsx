@@ -1,0 +1,32 @@
+"use client";
+import React from "react";
+import { Auth } from "@supabase/auth-ui-react";
+import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
+import "@/app/globals.css";
+import Image from "next/image";
+
+export const SignUp = () => {
+  return (
+    <div className="w-96 items-center p-10 flex flex-col border rounded-md">
+        <Image src={"https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/logo/logo.jpg"} width={100} height={100} alt="logo" className="border rounded-full absolute top-24" />
+      <Auth
+    supabaseClient={supabase}
+    appearance={{ theme: ThemeSupa }}
+    theme="dark"
+    providers={['google', 'github']}
+    localization={{
+        variables: {
+          sign_in: {
+            email_label: 'E-Mail',
+            password_label: 'Password',
+          },
+        },
+      }}
+      socialLayout="horizontal"
+      view="sign_up"
+  />
+    </div>
+  );
+};

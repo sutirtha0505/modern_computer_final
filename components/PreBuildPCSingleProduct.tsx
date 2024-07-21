@@ -1,0 +1,423 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch } from "@/lib/hooks/redux";
+import { addToCart } from "@/redux/cartSlice";
+import { Heart } from "lucide-react";
+import Image from "next/image";
+import { Carousel } from "react-responsive-carousel";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useParams } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+
+const PreBuildPCSingleProduct: React.FC = () => {
+  const { id } = useParams();
+  const [isHeartFilled, setIsHeartFilled] = useState(false);
+  const [product, setProduct] = useState<any>(null);
+  const [products, setProducts] = useState<any[]>([]);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const fetchPreBuilds = async () => {
+      try {
+        const { data: preBuildData, error: preBuildError } = await supabase
+          .from("pre_build")
+          .select("*")
+          .eq("id", id)
+          .single();
+
+        if (preBuildError) {
+          throw preBuildError;
+        }
+
+        const { data: productsData, error: productsError } = await supabase
+          .from("products")
+          .select("product_id, product_image, product_name");
+
+        if (productsError) {
+          throw productsError;
+        }
+
+        setProduct(preBuildData);
+        setProducts(productsData);
+      } catch (error) {
+        console.error("Error fetching data:", (error as Error).message);
+      }
+    };
+
+    if (id) {
+      fetchPreBuilds();
+    }
+  }, [id]);
+
+  const getProductNameById = (productId: string) => {
+    const product = products.find(
+      (product) => product.product_id === productId
+    );
+    return product
+      ? truncateProductName(product.product_name)
+      : "No product is added";
+  };
+  const getProductImageByID = (productId: string) => {
+    const product = products.find(
+      (product) => product.product_id === productId
+    );
+    if (product) {
+      const imageUrl = product.product_image.find((img: { url: string }) =>
+        img.url.includes("_first")
+      )?.url;
+      return imageUrl ? imageUrl : "";
+    } else {
+      return ""; // replace with your default image URL
+    }
+  };
+
+  const truncateProductName = (productName: string, wordLimit: number = 6) => {
+    const words = productName.split(" ");
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(" ") + "..."
+      : productName;
+  };
+
+  const handleHeartClick = () => {
+    setIsHeartFilled(!isHeartFilled);
+  };
+
+  const handleAddToCart = () => {
+    if (product) {
+      dispatch(addToCart(product));
+    }
+  };
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+
+  const productImages = product.image_urls || [];
+  const router = useRouter();
+
+  return (
+    <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center mb-14">
+      <div className="w-full md:w-1/2 flex p-6 flex-col justify-center items-center relative">
+        <div
+          className="absolute top-2 right-2 z-10 rounded-full bg-white/50 p-2 custom-backdrop-filter cursor-pointer"
+          onClick={handleHeartClick}
+        >
+          <Heart
+            className={
+              isHeartFilled ? "text-red-500 fill-current" : "text-red-500"
+            }
+          />
+        </div>
+        {productImages && productImages.length > 0 && (
+          <Carousel
+            showThumbs={true}
+            autoPlay={true}
+            interval={3000}
+            infiniteLoop={true}
+            showStatus={false}
+          >
+            {productImages.map((image: any, index: number) => (
+              <div key={index} className="relative">
+                <Image
+                  src={image.url}
+                  alt={`Product Image ${index}`}
+                  width={1000}
+                  height={1000}
+                  className="rounded-lg"
+                />
+              </div>
+            ))}
+          </Carousel>
+        )}
+      </div>
+      <div className="w-full md:w-1/2 flex flex-col justify-center gap-6 p-6">
+        <h1 className="font-extrabold bg-gradient-to-br from-pink-500 to-orange-400 text-center text-transparent inline-block text-3xl bg-clip-text">
+          {product.build_name}
+        </h1>
+
+        <div className="flex gap-4 items-center">
+          <div className="flex justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
+              className="w-8 h-8"
+            />
+            <h1 className="text-xl font-bold">Processor: </h1>
+          </div>
+          <div
+            onClick={() => {
+              router.push(`/product/${product.processor}`);
+            }}
+            className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+          >
+            <img
+              src={getProductImageByID(product.processor)}
+              className="w-8 h-8 rounded-full"
+            />
+            <p className="text-sm font-semibold hover:text-indigo-600">
+              {getProductNameById(product.processor)}
+            </p>
+          </div>
+        </div>
+
+        {product.motherboard && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Motherboard: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.motherboard}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.motherboard)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.motherboard)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.ram && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">RAM: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.ram}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.ram)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.ram)}
+              </p>
+            </div>
+            <p className="text-medium font-bold">X{product.ram_quantity}</p>
+          </div>
+        )}
+        {product.ssd && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">SSD: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.ssd}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.ssd)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.ssd)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.hdd && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
+                className="w-8 h-8"
+              />
+            <h1 className="text-xl font-bold">Hard Disk: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.hdd}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.hdd)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.hdd)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.graphics_card && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Graphics Card: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.graphics_card}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.graphics_card)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.graphics_card)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.psu && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Power Supply: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.psu}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.psu)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.psu)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.cabinet && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Cabinet: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.cabinet}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.cabinet)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.cabinet)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.cooling_system && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cooler/cooler.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Cooling System: </h1>
+            </div>
+            <div
+              onClick={() => {
+                router.push(`/product/${product.cooling_system}`);
+              }}
+              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+            >
+              <img
+                src={getProductImageByID(product.cooling_system)}
+                className="w-8 h-8 rounded-full"
+              />
+              <p className="text-sm font-semibold hover:text-indigo-600">
+                {getProductNameById(product.cooling_system)}
+              </p>
+            </div>
+          </div>
+        )}
+        {product.additional_products && (
+          <div className="flex gap-4 items-center">
+            <div className="flex justify-center items-center gap-2">
+              <img
+                src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/gifts/gift_box.png"
+                className="w-8 h-8"
+              />
+              <h1 className="text-xl font-bold">Gift Items: </h1>
+            </div>
+            {product.additional_products &&
+            product.additional_products.length > 0 ? (
+              product.additional_products.map((item: any, index: number) => (
+                <div
+                  onClick={() => {
+                    router.push(`/product/${item}`);
+                  }}
+                  className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+                >
+                  <img
+                    src={getProductImageByID(item)}
+                    className="w-8 h-8 rounded-full"
+                  />
+                  <p
+                    key={index}
+                    className="text-sm font-semibold hover:text-indigo-600"
+                  >
+                    {getProductNameById(item)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <p>No additional products</p>
+            )}
+          </div>
+        )}
+        <div className="flex gap-5">
+          <p className="font-extrabold text-xl">
+            &#x20B9;{product.selling_price}
+          </p>
+        </div>
+        <div className="w-full flex gap-10">
+          <button
+            className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+            onClick={handleAddToCart}
+          >
+            Add to Cart
+          </button>
+          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200">
+            Buy Now
+          </button>
+        </div>
+      </div>
+      <ToastContainer position="bottom-center" />
+    </div>
+  );
+};
+
+export default PreBuildPCSingleProduct;
