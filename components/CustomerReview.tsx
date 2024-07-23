@@ -3,12 +3,14 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import CharacterCounterInput from './CharacterCounterInput';
 import { supabase } from '@/lib/supabaseClient';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Rating from './Rating';
 
 const CustomerReview: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [rating, setRating] = useState<number>(0);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -37,14 +39,15 @@ const CustomerReview: React.FC = () => {
       <h1 className='font-bold text-3xl'>Share <span className='text-indigo-600'>Your Experience</span> with Us</h1>
       <div className='flex gap-4 justify-center items-center flex-wrap'>
         <Image 
-          src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Review/call-center-7040784_1920.png" 
+          src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Review/bendy-person-rates-a-product-or-service.gif" 
           width={1000} 
           height={1000} 
           alt="Review Image" 
           className='w-64 h-64 md:w-96 md:h-96' 
         />
-        <div className='flex flex-col p-4 w-96 h-64 md:w-96 md:h-96 rounded-md'>
-          <CharacterCounterInput user={user} />
+        <div className='flex flex-col p-4 w-full gap-3 h-64 md:w-96 md:h-96 rounded-md'>
+          <Rating onRatingChange={setRating} />
+          <CharacterCounterInput user={user} rating={rating} />
         </div>
       </div>
     </div>
@@ -52,4 +55,3 @@ const CustomerReview: React.FC = () => {
 }
 
 export default CustomerReview;
-    

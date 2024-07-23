@@ -7,10 +7,12 @@ import "react-toastify/dist/ReactToastify.css";
 
 interface CharacterCounterInputProps {
   user: any;
+  rating: number;
 }
 
 const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
   user,
+  rating,
 }) => {
   const [inputValue, setInputValue] = useState("");
   const maxChars = 300;
@@ -34,7 +36,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
     try {
       const { error } = await supabase
         .from("profile")
-        .update({ comment: inputValue })
+        .update({ comment: inputValue, UX_star: rating })
         .eq("id", user.id);
 
       if (error) {
@@ -55,15 +57,15 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative gap-4 p-4 justify-center items-center h-full flex flex-col"
+      className="relative gap-4 w-full p-10 md:p-4 justify-center items-center h-full flex flex-col"
     >
       <div className="relative h-full w-full justify-center items-center flex flex-col">
         <textarea
           value={inputValue}
           onChange={handleChange}
-          rows={10}
+          rows={8}
           className="w-full h-full p-2 bg-transparent border rounded-md resize-none"
-          placeholder="Type here ..."
+          placeholder="Type here ..." required
         />
         <div className="absolute bottom-2 right-2 text-gray-500 text-sm">
           {inputValue.length}/{maxChars}
