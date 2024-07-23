@@ -8,11 +8,13 @@ import "react-toastify/dist/ReactToastify.css";
 interface CharacterCounterInputProps {
   user: any;
   rating: number;
+  onResetRating: () => void;
 }
 
 const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
   user,
   rating,
+  onResetRating,
 }) => {
   const [inputValue, setInputValue] = useState("");
   const maxChars = 300;
@@ -45,6 +47,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
       } else {
         toast.success("Your comment is added successfully.");
         setInputValue("");
+        onResetRating(); // Reset the rating
       }
     } catch (error: any) {
       console.error("Catch Error:", error); // Debug: Log any caught errors
@@ -64,7 +67,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
           value={inputValue}
           onChange={handleChange}
           rows={8}
-          className="w-full h-full p-2 bg-transparent border rounded-md resize-none"
+          className="w-full h-full p-2 bg-transparent border rounded-md resize-none outline-none"
           placeholder="Type here ..." required
         />
         <div className="absolute bottom-2 right-2 text-gray-500 text-sm">
