@@ -57,7 +57,7 @@ const CustomerReview: React.FC = () => {
           alt="Review Image" 
           className='w-64 h-64 md:w-96 md:h-96' 
         />
-        <div className='flex flex-col p-4 w-full gap-3 h-64 md:w-96 md:h-96 rounded-md'>
+        <div className='flex flex-col p-4 w-full gap-3 h-64 md:w-96 md:h-96 rounded-md justify-between items-center'>
           <Rating onRatingChange={setRating} resetRating={resetRating} />
           <CharacterCounterInput user={user} rating={rating} onResetRating={handleResetRating} />
         </div>

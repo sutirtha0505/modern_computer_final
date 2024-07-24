@@ -45,7 +45,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
         console.error("Supabase Error:", error); // Debug: Log any Supabase errors
         toast.error("Error adding comment: " + error.message);
       } else {
-        toast.success("Your comment is added successfully.");
+        toast.success("Thanks for your feedback.");
         setInputValue("");
         onResetRating(); // Reset the rating
       }
@@ -67,7 +67,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
           value={inputValue}
           onChange={handleChange}
           rows={8}
-          className="w-full h-full p-2 bg-transparent border rounded-md resize-none outline-none"
+          className="w-full h-full p-2 bg-transparent border-2 border-indigo-600 rounded-md resize-none outline-none focus:border-white focus:shadow-lg focus:shadow-indigo-600"
           placeholder="Type here ..." required
         />
         <div className="absolute bottom-2 right-2 text-gray-500 text-sm">
@@ -85,3 +85,4 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
 };
 
 export default CharacterCounterInput;
+    

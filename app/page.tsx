@@ -1,3 +1,4 @@
+import About from "@/components/About";
 import BestSellerSlider from "@/components/BestSellerSlider";
 import CustomBuildPCINHomePage from "@/components/CustomBuildPCINHomePage";
 import CustomerReview from "@/components/CustomerReview";
@@ -13,6 +14,7 @@ export default function Home() {
       <ProductByCategoriesSlider />
       <PreBuildPCINHomePage />
       <CustomBuildPCINHomePage />
+      <About />
       <CustomerReview />
 
       
