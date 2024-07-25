@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { Sparkles, TableProperties } from "lucide-react";
 import { FaComputer } from "react-icons/fa6";
 import { MdOutlineCategory } from "react-icons/md";
+import { TiInfoLargeOutline } from "react-icons/ti";
 
 const Admin = () => {
   const router = useRouter();
@@ -75,6 +76,12 @@ const Admin = () => {
           }} className="p-4 rounded-sm flex flex-col justify-center items-center bg-fuchsia-900 border-fuchsia-900 border-2 hover:bg-transparent hover:text-fuchsia-900 gap-2 cursor-pointer h-24">
             <MdOutlineCategory size={30}/>
             <p className="text-center font-semibold text-xs">Product by Categories</p>
+          </div>
+          <div onClick={()=>{
+            router.push("/admin/edit-about-section");
+          }} className="p-4 rounded-sm flex flex-col justify-center items-center bg-emerald-500 border-emerald-500 border-2 hover:bg-transparent hover:text-emerald-500 gap-2 cursor-pointer h-24">
+            <TiInfoLargeOutline size={30}/>
+            <p className="text-center font-semibold text-xs">About Section</p>
           </div>
         </div>
       </div>
