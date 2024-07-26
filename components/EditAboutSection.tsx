@@ -2,10 +2,11 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/lib/supabaseClient";
 import { ImageUp } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const EditAboutSection: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [yt1, setYt1] = useState("");
   const [yt2, setYt2] = useState("");
@@ -54,12 +55,13 @@ const EditAboutSection: React.FC = () => {
     if (error) {
       console.error("Error inserting data:", error);
     } else {
-      console.log("Data saved:", data);
+      toast.success("Updated Successfully");
     }
   };
 
   return (
     <div className="flex flex-col p-4 rounded-md bg-white/50 custom-backdrop-filter w-96 h-[550px] items-center justify-between">
+      <ToastContainer />
       <h1 className="text-xl font-extrabold text-center">
         Edit the <span className="text-indigo-600">About </span>section
       </h1>
@@ -87,7 +89,7 @@ const EditAboutSection: React.FC = () => {
         </label>
         <textarea
           rows={4}
-          className="resize-none border rounded-md p-2 w-full bg-transparent"
+          className="resize-none border rounded-md p-2 w-full bg-transparent text-sm outline-none"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Add business description"
@@ -97,7 +99,7 @@ const EditAboutSection: React.FC = () => {
         </label>
         <input
           type="text"
-          className="border rounded-md p-2 bg-transparent w-full"
+          className="border rounded-md p-2 bg-transparent w-full text-sm outline-none"
           value={yt1}
           onChange={(e) => setYt1(e.target.value)}
           placeholder="YouTube video 1 URL"
@@ -107,7 +109,7 @@ const EditAboutSection: React.FC = () => {
         </label>
         <input
           type="text"
-          className="border rounded-md p-2 bg-transparent w-full"
+          className="border rounded-md p-2 bg-transparent w-full text-sm outline-none"
           value={yt2}
           onChange={(e) => setYt2(e.target.value)}
           placeholder="YouTube video 2 URL"
@@ -119,7 +121,7 @@ const EditAboutSection: React.FC = () => {
             </label>
             <input
               type="text"
-              className="border rounded-md p-2 bg-transparent"
+              className="border rounded-md p-2 bg-transparent text-sm outline-none"
               value={location.lat}
               onChange={(e) =>
                 setLocation({ ...location, lat: e.target.value })
@@ -128,18 +130,18 @@ const EditAboutSection: React.FC = () => {
             />
           </div>
           <div className="flex flex-col gap-1 w-1/2">
-            <label htmlFor="lat" className="text-left text-xs font-bold">
-              Latitude:
+            <label htmlFor="long" className="text-left text-xs font-bold">
+              Longitude:
             </label>
             <input
               type="text"
-              className="border rounded-md p-2 bg-transparent"
+              className="border rounded-md p-2 bg-transparent text-sm outline-none"
               value={location.long}
               onChange={(e) =>
                 setLocation({ ...location, long: e.target.value })
               }
               placeholder="Longitude"
-            />            
+            />
           </div>
         </div>
         <button
