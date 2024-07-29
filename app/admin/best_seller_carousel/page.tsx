@@ -47,7 +47,7 @@ const BestSellerPage = () => {
 
   if (user && role === 'admin') {
     return (
-      <div className='pt-16 w-full h-screen pl-4 pr-4 pb-4 flex flex-col justify-center items-center'>
+      <div className='pt-16 w-full h-full flex flex-col justify-center items-center'>
         <BestSeller/>
       </div>
     );

@@ -158,7 +158,9 @@ const BestSeller = () => {
                   alt={product.product_name}
                   className="w-full h-44 rounded-lg hover:scale-[110%] transition duration-300 ease-in-out"
                 />
-                <p className='text-wrap'>{product.product_name}</p>
+                <p className='text-wrap'>
+                  {product.product_name.length > 30 ? `${product.product_name.substring(0, 30)}...` : product.product_name}
+                </p>
               </div>
             </div>
           );

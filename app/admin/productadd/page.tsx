@@ -8,7 +8,7 @@ const ProductUploadPage: React.FC = () => {
       <Head>
         <title>Product Upload</title>
       </Head>
-      <main className='flex flex-col items-center justify-center min-h-screen py-2'>
+      <main className='flex flex-col items-center justify-center min-h-screen py-2 pt-16'>
         <ProductUploadForm />
       </main>
     </div>
