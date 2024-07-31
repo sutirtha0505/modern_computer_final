@@ -10,7 +10,6 @@ const EditAboutSection: React.FC = () => {
   const [description, setDescription] = useState("");
   const [yt1, setYt1] = useState("");
   const [yt2, setYt2] = useState("");
-  const [location, setLocation] = useState({ lat: "", long: "" });
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -29,38 +28,66 @@ const EditAboutSection: React.FC = () => {
     let imageUrl: string | null = null;
 
     if (image) {
+      // Check if the image already exists in the About folder
+      const { data: listData, error: listError } = await supabase.storage
+        .from("product-image")
+        .list("About");
+
+      if (listError) {
+        toast.error("Error listing images: " + listError.message);
+        return;
+      }
+
+      const existingImage = listData?.find((img) => img.name === image.name);
+
+      if (existingImage) {
+        // Delete the existing image
+        const { error: deleteError } = await supabase.storage
+          .from("product-image")
+          .remove([`About/${existingImage.name}`]);
+
+        if (deleteError) {
+          toast.error("Error deleting existing image: " + deleteError.message);
+          return;
+        }
+      }
+
+      // Upload the new image
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("About")
-        .upload(`public/${image.name}`, image);
+        .from("product-image")
+        .upload(`About/${image.name}`, image);
 
       if (uploadError) {
-        console.error("Error uploading image:", uploadError);
+        toast.error("Error uploading image: " + uploadError.message);
         return;
       }
 
       const { data: publicUrlData } = supabase.storage
-        .from("About")
-        .getPublicUrl(`public/${image.name}`);
+        .from("product-image")
+        .getPublicUrl(`About/${image.name}`);
       imageUrl = publicUrlData.publicUrl;
     }
 
     const { data, error } = await supabase.from("about").insert({
       about_image: imageUrl,
       about_description: description,
-      about_location: `(${location.lat}, ${location.long})`,
       about_yt_1: yt1,
       about_yt_2: yt2,
     });
 
     if (error) {
-      console.error("Error inserting data:", error);
+      toast.error("Error inserting data: " + error.message);
     } else {
-      toast.success("Updated Successfully");
+      toast.success("Uploaded Successfully");
+      setImage(null);
+      setDescription("");
+      setYt1("");
+      setYt2("");
     }
   };
 
   return (
-    <div className="flex flex-col p-4 rounded-md bg-white/50 custom-backdrop-filter w-96 h-[550px] items-center justify-between">
+    <div className="flex flex-col p-4 rounded-md bg-white/50 custom-backdrop-filter w-96 h-[550px] items-center justify-center gap-3">
       <ToastContainer />
       <h1 className="text-xl font-extrabold text-center">
         Edit the <span className="text-indigo-600">About </span>section
@@ -68,7 +95,7 @@ const EditAboutSection: React.FC = () => {
       <div className="flex flex-col gap-2 justify-center items-center w-full">
         <div
           {...getRootProps({ className: "dropzone" })}
-          className="w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center"
+          className="w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center outline-none"
         >
           <input {...getInputProps()} />
           {image ? (
@@ -99,7 +126,7 @@ const EditAboutSection: React.FC = () => {
         </label>
         <input
           type="text"
-          className="border rounded-md p-2 bg-transparent w-full text-sm outline-none"
+          className="border-b p-2 bg-transparent w-full text-sm outline-none"
           value={yt1}
           onChange={(e) => setYt1(e.target.value)}
           placeholder="YouTube video 1 URL"
@@ -109,44 +136,14 @@ const EditAboutSection: React.FC = () => {
         </label>
         <input
           type="text"
-          className="border rounded-md p-2 bg-transparent w-full text-sm outline-none"
+          className="border-b p-2 bg-transparent w-full text-sm outline-none"
           value={yt2}
           onChange={(e) => setYt2(e.target.value)}
           placeholder="YouTube video 2 URL"
         />
-        <div className="flex gap-2 w-full">
-          <div className="flex flex-col gap-1 w-1/2">
-            <label htmlFor="lat" className="text-left text-xs font-bold">
-              Latitude:
-            </label>
-            <input
-              type="text"
-              className="border rounded-md p-2 bg-transparent text-sm outline-none"
-              value={location.lat}
-              onChange={(e) =>
-                setLocation({ ...location, lat: e.target.value })
-              }
-              placeholder="Latitude"
-            />
-          </div>
-          <div className="flex flex-col gap-1 w-1/2">
-            <label htmlFor="long" className="text-left text-xs font-bold">
-              Longitude:
-            </label>
-            <input
-              type="text"
-              className="border rounded-md p-2 bg-transparent text-sm outline-none"
-              value={location.long}
-              onChange={(e) =>
-                setLocation({ ...location, long: e.target.value })
-              }
-              placeholder="Longitude"
-            />
-          </div>
-        </div>
         <button
           onClick={handleSave}
-          className="bg-indigo-600 text-white rounded-md p-2"
+          className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
         >
           Save
         </button>

@@ -56,7 +56,7 @@ function Hero() {
         </p>
         
       )}
-    <div className="w-screen flex justify-center items-center flex-wrap">
+    <div className="w-full flex justify-center items-center flex-wrap">
       <div className="flex justify-center items-center h-[800px] rounded-md">
         <div className="w-[400px] h-[400px] md:w-[600px] flex items-center justify-center backdrop-blur-sm rounded-3xl md:h-[600px]">
           <div ref={tiltRef} className="relative">
@@ -68,7 +68,7 @@ function Hero() {
               height={500}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Hero/Hero_Photoroom.png"
               alt="Hero Image"
-              className="z-20"
+              className="z-20 w-auto h-auto"
             />
           </div>
         </div>

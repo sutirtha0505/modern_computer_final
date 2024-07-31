@@ -39,7 +39,7 @@ const PreBuildPCINHomePage = () => {
   const router = useRouter();
 
   return (
-    <div className="w-screen flex gap-28 justify-center items-center flex-col mb-40">
+    <div className="w-full flex gap-28 justify-center items-center flex-col mb-40">
       <h1 className="text-4xl font-bold text-wrap text-indigo-500">
         Pre-Build <span className="text-white">PC</span>
       </h1>

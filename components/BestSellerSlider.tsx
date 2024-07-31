@@ -82,7 +82,7 @@ const BestSellerSlider = () => {
   };
 
   return (
-    <div className="w-screen flex flex-col items-center justify-center pt-10" ref={sliderRef}>
+    <div className="w-full flex flex-col items-center justify-center pt-10" ref={sliderRef}>
       <h1 className=" text-center font-extrabold text-4xl">Our <span className="text-indigo-500 mx-2"> Best Selling </span> Products</h1>
       <div className="container overflow-hidden scale-90 md:scale-100">
         <div className="container-wrapper">
