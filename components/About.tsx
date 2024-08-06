@@ -35,14 +35,16 @@ const About: React.FC = () => {
         About <span className="text-indigo-600">Us</span>
       </h1>
 
-      <div className="text-center">
-        {aboutData.about_image && (
-          <img
-            src={aboutData.about_image}
-            alt="About"
-            className="mx-auto mb-4 w-60 h-60 rounded-full"
-          />
-        )}
+      <div className="text-center flex flex-col justify-center items-center">
+        <div className="w-80 h-80 flex justify-center items-center rounded-full rotator">
+          {aboutData.about_image && (
+            <img
+              src={aboutData.about_image}
+              alt="About"
+              className="mx-auto w-60 h-60 rounded-full absolute z-[3]"
+            />
+          )}
+        </div>
         <p className="mb-4 w-full text-center p-4">
           {aboutData.about_description}
         </p>

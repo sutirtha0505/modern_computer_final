@@ -1,6 +1,7 @@
 "use client"
 import EditAboutSection from '@/components/EditAboutSection';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
+import ShopPhotoGallery from '@/components/ShopPhotoGallery';
 import { supabase } from '@/lib/supabaseClient';
 import React, { useState, useEffect } from 'react';
 
@@ -47,8 +48,9 @@ const EditAboutSectionPage = () => {
 
   if (user && role === 'admin') {
     return (
-      <div className='pt-16 w-full h-screen pl-4 pr-4 pb-4 flex flex-col justify-center items-center'>
+      <div className='p-24 w-full h-full flex flex-wrap justify-center items-center gap-4'>
         <EditAboutSection />
+        <ShopPhotoGallery />
       </div>
     );
   } else {

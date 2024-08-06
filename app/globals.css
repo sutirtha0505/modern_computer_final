@@ -275,3 +275,36 @@ body {
     text-wrap: balance;
   }
 }
+.rotator{
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+.rotator::before{
+  content: "";
+  position: absolute;
+  inset: -10px 100px;
+  background: linear-gradient(315deg, red, cyan);
+  transition: 0.5s;
+  animation: animate 4s linear infinite;
+}
+
+.rotator:hover::before{
+  inset: -20px 0px;
+}
+@keyframes animate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.rotator::after{
+  content: '';
+  position: absolute;
+  inset: 6px;
+  background-color: black;
+  border-radius: 50%;
+  z-index: 1;
+}
