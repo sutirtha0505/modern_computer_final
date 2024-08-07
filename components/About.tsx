@@ -48,7 +48,14 @@ const About: React.FC = () => {
         <p className="mb-4 w-full text-center p-4">
           {aboutData.about_description}
         </p>
-        <h1 className="text-2xl font-bold">
+        <div className="flex flex-wrap justify-center items-center gap-10 p-6">
+          <div className="flex flex-col justify-center items-center p-4">
+            <h1 className="text-2xl font-bold">Check our <span className="text-indigo-600">Gallery</span></h1>
+            {/* Add the carousel here from fetching the image from gallery folder of product-image bucket of supabase storage */}
+          </div>
+          <div className="flex flex-col justify-center items-center p-4">
+            <div className="flex flex-col justify-center items-center p-4">
+            <h1 className="text-2xl font-bold">
           Find us in <span className="text-green-400">Google Maps</span>
         </h1>
         <div className="p-4 flex justify-center items-center w-full md:px-28">
@@ -59,6 +66,9 @@ const About: React.FC = () => {
             allowFullScreen
             loading="lazy"
           ></iframe>
+        </div>
+          </div>
+          </div>
         </div>
         <h1 className="text-2xl font-bold">
           Check <span className="text-red-500">YouTube</span> for{" "}

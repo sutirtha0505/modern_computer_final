@@ -1,13 +1,14 @@
+
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
 import { supabase } from "@/lib/supabaseClient";
-import { ImageUp, X } from "lucide-react";
+import { ImageUp, X, Trash2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 const ShopPhotoGallery: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [galleryImages, setGalleryImages] = useState<{ name: string; url: string }[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
@@ -68,10 +69,26 @@ const ShopPhotoGallery: React.FC = () => {
           .from("product-image")
           .getPublicUrl(`gallery/${file.name}`);
         const publicUrl = publicUrlData.publicUrl;
-        console.log("Image URL:", publicUrl);  // Log the URL for debugging
-        return publicUrl;
+        return { name: file.name, url: publicUrl };
       });
       setGalleryImages(imageUrls);
+    }
+  };
+
+  const handleDelete = async (fileName: string) => {
+    const { error } = await supabase.storage
+      .from("product-image")
+      .remove([`gallery/${fileName}`]);
+
+    if (error) {
+      toast.error("Error deleting image: " + error.message, {
+        position: "bottom-center",
+      });
+    } else {
+      toast.success("Image is deleted successfully!", {
+        position: "bottom-center",
+      });
+      fetchGalleryImages();
     }
   };
 
@@ -80,7 +97,7 @@ const ShopPhotoGallery: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-between items-center w-96 h-[550px] rounded-md bg-slate-800 p-4">
+    <div className="flex flex-col justify-center items-center w-96 h-[550px] rounded-md bg-slate-800 p-4">
       <ToastContainer />
       <h1 className="text-xl font-extrabold text-center">
         Add images of <span className="text-indigo-600">your shop</span>
@@ -119,9 +136,17 @@ const ShopPhotoGallery: React.FC = () => {
           </button>
         </>
       )}
-      <div className="mt-4 h-30 flex justify-start items-center overflow-x-scroll w-full gap-2 p-2">
-        {galleryImages.map((url, index) => (
-          <img key={index} src={url} alt={`Gallery image ${index}`} className="w-20 h-20 object-cover rounded-md" />
+      <div className="h-30 flex justify-start items-center w-full gap-2 p-2 overflow-x-scroll">
+        {galleryImages.map((image, index) => (
+          <div key={index} className="relative flex-shrink-0 w-320 h-32">
+            <img src={image.url} alt={`Gallery image ${index}`} className="w-full h-full object-cover rounded-md" />
+            <button
+              className="absolute bottom-0 right-0 bg-red-500 text-white rounded-full p-1"
+              onClick={() => handleDelete(image.name)}
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
         ))}
       </div>
     </div>
