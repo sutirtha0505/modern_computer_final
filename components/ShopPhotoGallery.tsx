@@ -1,14 +1,15 @@
-
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone, DropzoneOptions } from "react-dropzone";
 import { supabase } from "@/lib/supabaseClient";
 import { ImageUp, X, Trash2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 const ShopPhotoGallery: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const [galleryImages, setGalleryImages] = useState<{ name: string; url: string }[]>([]);
+  const [galleryImages, setGalleryImages] = useState<
+    { name: string; url: string }[]
+  >([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
@@ -34,19 +35,19 @@ const ShopPhotoGallery: React.FC = () => {
 
     const results = await Promise.all(uploads);
 
-    if (results.every(result => result !== null)) {
+    if (results.every((result) => result !== null)) {
       toast.success("The images are uploaded successfully!", {
         position: "bottom-center",
       });
       setSelectedFiles([]);
-      fetchGalleryImages();  // Fetch the updated list of images after upload
+      fetchGalleryImages(); // Fetch the updated list of images after upload
     }
   };
 
   const dropzoneOptions: DropzoneOptions = {
     onDrop,
     accept: {
-      'image/*': [],
+      "image/*": [],
     },
     multiple: true,
   };
@@ -64,7 +65,7 @@ const ShopPhotoGallery: React.FC = () => {
     }
 
     if (data) {
-      const imageUrls = data.map(file => {
+      const imageUrls = data.map((file) => {
         const { data: publicUrlData } = supabase.storage
           .from("product-image")
           .getPublicUrl(`gallery/${file.name}`);
@@ -138,8 +139,12 @@ const ShopPhotoGallery: React.FC = () => {
       )}
       <div className="h-30 flex justify-start items-center w-full gap-2 p-2 overflow-x-scroll">
         {galleryImages.map((image, index) => (
-          <div key={index} className="relative flex-shrink-0 w-320 h-32">
-            <img src={image.url} alt={`Gallery image ${index}`} className="w-full h-full object-cover rounded-md" />
+          <div key={index} className="relative flex-shrink-0 w-32 h-32">
+            <img
+              src={image.url}
+              alt={`Gallery image ${index}`}
+              className="w-full h-full object-cover rounded-md"
+            />
             <button
               className="absolute bottom-0 right-0 bg-red-500 text-white rounded-full p-1"
               onClick={() => handleDelete(image.name)}
