@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { X } from "lucide-react";
 
 const About: React.FC = () => {
   const [aboutData, setAboutData] = useState<any>(null);
@@ -8,6 +9,7 @@ const About: React.FC = () => {
   const [galleryImages, setGalleryImages] = useState<
     { name: string; url: string }[]
   >([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // To store the selected image URL
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const scrollIntervalRef = useRef<number | null>(null);
 
@@ -106,7 +108,7 @@ const About: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5 justify-center items-center w-full h-full mt-12">
+    <div className="relative flex flex-col gap-5 justify-center items-center w-full h-full mt-12">
       <h1 className="text-3xl font-extrabold ">
         About <span className="text-indigo-600">Us</span>
       </h1>
@@ -125,7 +127,7 @@ const About: React.FC = () => {
           {aboutData.about_description}
         </p>
         <div className="flex md:flex-row flex-col justify-between items-center p-6">
-          <div className=" md:w-1/2 w-full gap-4 flex flex-col justify-center items-center p-4 md:p-0">
+          <div className="md:w-1/2 w-full gap-4 flex flex-col justify-center items-center p-4 md:p-0">
             <h1 className="text-2xl font-bold">
               Check our <span className="text-indigo-600">Gallery</span>
             </h1>
@@ -139,11 +141,12 @@ const About: React.FC = () => {
                   src={image.url}
                   alt={image.name}
                   className="w-96 h-96 rounded-md cursor-pointer"
+                  onClick={() => setSelectedImage(image.url)} // Set the selected image on click
                 />
               ))}
             </div>
           </div>
-          <div className=" md:w-1/2 w-full flex flex-col justify-center items-center p-4 md:p-0">
+          <div className="md:w-1/2 w-full flex flex-col justify-center items-center p-4 md:p-0">
             <h1 className="text-2xl font-bold">
               Find us in <span className="text-green-400">Google Maps</span>
             </h1>
@@ -183,6 +186,25 @@ const About: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Modal for displaying the large image */}
+      {selectedImage && (
+        <div className="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
+          <div className="relative">
+            <img
+              src={selectedImage}
+              alt="Selected"
+              className="w-auto h-[90vh] max-w-[90vw] rounded-md object-cover "
+            />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-2 right-2 text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-red-600"
+            >
+              <X />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -52,7 +52,7 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
     } catch (error: any) {
       console.error("Catch Error:", error); // Debug: Log any caught errors
       toast.error(
-        "Error adding comment: " + (error.message || "Unknown error")
+        "Error adding comment: " + (error.message || "Unknown error"),
       );
     }
   };
@@ -67,8 +67,9 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
           value={inputValue}
           onChange={handleChange}
           rows={8}
-          className="w-full h-full p-2 bg-transparent border-2 border-indigo-600 rounded-md resize-none outline-none focus:border-white focus:shadow-lg focus:shadow-indigo-600"
-          placeholder="Type here ..." required
+          className="w-full h-full p-2 bg-transparent border-2 border-indigo-600 rounded-md resize-none outline-none focus:shadow-lg focus:shadow-indigo-600"
+          placeholder="Type here ..."
+          required
         />
         <div className="absolute bottom-2 right-2 text-gray-500 text-sm">
           {inputValue.length}/{maxChars}
@@ -85,4 +86,3 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
 };
 
 export default CharacterCounterInput;
-    
