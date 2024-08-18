@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import ReduxProvider from "@/components/ReduxProvider";
 import Menu from "@/components/Menu";
+import DraggableCircularNav from "@/components/DraggableCircularNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <ReduxProvider>
           <Header />
           {children}
+          
           <Menu />
         </ReduxProvider>
       </body>
