@@ -24,7 +24,7 @@ export default function RootLayout({
         <ReduxProvider>
           <Header />
           {children}
-          
+          <DraggableCircularNav />
           <Menu />
         </ReduxProvider>
       </body>
