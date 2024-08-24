@@ -14,7 +14,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { getCart } from "@/redux/cartSlice";
 import { supabase } from "@/lib/supabaseClient";
-import "@/app/globals.css"
+import "@/app/globals.css";
 const Header = () => {
   const [query, setQuery] = useState<string>("");
   const router = useRouter();
@@ -87,7 +87,6 @@ const Header = () => {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
-      
 
       if (user) {
         const { data: profile, error } = await supabase
@@ -98,7 +97,7 @@ const Header = () => {
 
         if (profile) {
           setRole(profile.role);
-        } 
+        }
         // else if (error) {
         //   console.error("Error fetching profile:", error);
         // }
@@ -106,8 +105,6 @@ const Header = () => {
     };
     getUserData();
   }, []);
-
-  
 
   return (
     <>
@@ -170,16 +167,24 @@ const Header = () => {
                   {user ? (
                     <>
                       <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl">
-                        <p className="block px-4 py-2 text-sm font-medium hover:text-indigo-600 cursor-pointer">
+                        <p
+                          className="block px-4 py-2 text-sm font-medium hover:text-indigo-600 cursor-pointer"
+                          onClick={() => {
+                            if (user && user.id) {
+                              // Navigate to a user profile page or perform an action with the user ID
+                              router.push(`/profile/${user.id}`);
+                            }
+                          }}
+                        >
                           {user.user_metadata.name}
                         </p>
                       </div>
                       {role === "admin" && (
                         <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">
                           <p
-                            onClick={()=>{
+                            onClick={() => {
                               toggleProfileMenu();
-                              router.push("/admin")
+                              router.push("/admin");
                             }}
                             className="text-white cursor-pointer hover:text-indigo-600"
                           >
@@ -193,7 +198,6 @@ const Header = () => {
                             toggleProfileMenu();
                             const { error } = await supabase.auth.signOut();
                             window.location.reload();
-                            
                           }}
                           className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-xs hover:text-l hover:font-bold duration-200"
                         >

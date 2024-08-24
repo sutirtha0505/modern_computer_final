@@ -356,8 +356,8 @@ nav .nav-content {
 .nav-content span .planets:hover {
   transition: 0.5s;
   background-color: transparent;
-  backdrop-filter: 50px !important;
-  -webkit-backdrop-filter: 50px;
+  backdrop-filter: blur(50px) !important;
+  -webkit-backdrop-filter: blur(50px);
 }
 .first-planet {
   border: 2px solid #21c45d;
@@ -381,6 +381,19 @@ nav .nav-content {
 }
 .fifth-planet {
   border: 2px solid #2462eb;
+}
+.sixth-planet {
+  background: linear-gradient(white, white) padding-box,
+    linear-gradient(to right, blue, red, yellow, green) border-box;
+  border-radius: 50%;
+  border: 2px solid transparent;
+}
+.sixth-planet:hover {
+  background: transparent;
+  border: 2px solid yellow;
+}
+.gmail{
+  transform: rotate(134deg);
 }
 .nav-content .toggle-btn {
   font-size: 35px;
@@ -407,7 +420,7 @@ nav.open .toggle-btn {
 }
 
 nav.open .nav-content span {
-  transform: rotate(calc(var(--i) * (360deg / 8))) translateY(120px);
+  transform: rotate(calc(var(--i) * (360deg / 9.5))) translateY(120px);
   opacity: 1;
 }
 
@@ -419,7 +432,7 @@ nav.open .nav-content span {
 .nav-content span .planets .icons {
   font-size: 24px;
   opacity: 1;
-  transform: rotate(calc(var(--i) * (360deg / -8)));
+  transform: rotate(calc(var(--i) * (360deg / -9.5)));
   transition: 0.2s;
   cursor: pointer;
 }

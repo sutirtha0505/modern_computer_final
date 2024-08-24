@@ -2,8 +2,6 @@
 import { useState } from "react";
 import { FaFacebook, FaWhatsapp, FaYoutube } from "react-icons/fa";
 import { IoCall } from "react-icons/io5";
-import { Plus } from "lucide-react";
-import SupportAgentTwoToneIcon from "@mui/icons-material/SupportAgentTwoTone";
 
 const DraggableCircularNav: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -85,6 +83,17 @@ const DraggableCircularNav: React.FC = () => {
         <span style={{ "--i": 5 } as React.CSSProperties}>
           <div className="planets fifth-planet">
             <FaFacebook className="text-blue-600 icons" />
+          </div>
+        </span>
+        <span style={{ "--i": 6 } as React.CSSProperties}>
+          <div className="planets sixth-planet">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gmail.png"
+              className="gmail"
+              alt=""
+              width={30}
+              height={30}
+            />
           </div>
         </span>
       </div>
