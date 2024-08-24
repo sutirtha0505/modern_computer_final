@@ -9,8 +9,8 @@ import Image from "next/image";
 
 export const SignUp = () => {
   return (
-    <div className="w-96 items-center p-10 flex flex-col border rounded-md">
-        <Image src={"https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/logo/logo.jpg"} width={100} height={100} alt="logo" className="border rounded-full absolute top-24" />
+    <div className="w-96 relative items-center p-10 flex flex-col border rounded-md">
+        <Image src={"https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/logo/logo.jpg"} width={100} height={100} alt="logo" className="border rounded-full absolute -top-20" />
       <Auth
     supabaseClient={supabase}
     appearance={{ theme: ThemeSupa }}

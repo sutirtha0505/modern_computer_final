@@ -24,6 +24,7 @@ const Header = () => {
   const [isMouseInside, setIsMouseInside] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -91,12 +92,13 @@ const Header = () => {
       if (user) {
         const { data: profile, error } = await supabase
           .from("profile")
-          .select("role")
+          .select("role, profile_photo")
           .eq("id", user.id)
           .single();
 
         if (profile) {
           setRole(profile.role);
+          setProfilePhoto(profile.profile_photo);
         }
         // else if (error) {
         //   console.error("Error fetching profile:", error);
@@ -166,7 +168,19 @@ const Header = () => {
                 <div className="absolute right-0 w-52 bg-white/50 rounded-md shadow-lg z-10 custom-backdrop-filter backdrop-blur-md mt-2">
                   {user ? (
                     <>
-                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl">
+                      <div className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl">
+                        {/* image here by matching the id from profile table */}
+                        {profilePhoto ? (
+                          <Image
+                            src={profilePhoto}
+                            alt="Profile Photo"
+                            width={30}
+                            height={30}
+                            className="rounded-full w-10 h-10"
+                          />
+                        ) : (
+                          <CircleUser className="w-7 h-7" />
+                        )}
                         <p
                           className="block px-4 py-2 text-sm font-medium hover:text-indigo-600 cursor-pointer"
                           onClick={() => {
@@ -192,7 +206,7 @@ const Header = () => {
                           </p>
                         </div>
                       )}
-                      <div className="flex justify-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">
+                      <div className="flex justify-center gap-3 px-4 py-2">
                         <button
                           onClick={async () => {
                             toggleProfileMenu();

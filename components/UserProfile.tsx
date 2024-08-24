@@ -78,9 +78,12 @@ const UserProfile = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: "image/*",
+    accept: {
+      'image/*': []
+    },
     maxFiles: 1,
   });
+  
 
   const handleSave = async () => {
     if (id && name) {
@@ -138,11 +141,11 @@ const UserProfile = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col relative items-center justify-center">
       {/* Circular react dropzone here */}
       <div
         {...getRootProps()}
-        className="w-28 h-28 rounded-full border-2 border-dashed border-white flex items-center justify-center cursor-pointer mb-4 overflow-hidden absolute top-2 snap-center z-10 backdrop-blur-lg"
+        className="w-28 h-28 rounded-full border-2 border-dashed border-white flex items-center justify-center cursor-pointer mb-4 overflow-hidden absolute -top-12 snap-center z-10 backdrop-blur-lg"
       >
         <input {...getInputProps()} />
         {profilePhoto ? (
@@ -203,7 +206,7 @@ const UserProfile = () => {
             type="text"
             value={name || ""}
             onChange={(e) => setName(e.target.value)}
-            className="border-b bg-transparent text-white p-2 w-full outline-none"
+            className="border-b bg-transparent text-white p-2 w-full outline-none" required
           />
         </div>
         <div className="w-full">
@@ -221,7 +224,7 @@ const UserProfile = () => {
             id="phoneNo"
             type="number"
             value={phoneNo || ""}
-            onChange={(e) => setPhoneNo(e.target.value)}
+            onChange={(e) => setPhoneNo(e.target.value)} required
             className="border-b bg-transparent text-white p-2 w-full outline-none"
           />
         </div>
@@ -242,7 +245,7 @@ const UserProfile = () => {
               type="text"
               value={houseNo || ""}
               onChange={(e) => setHouseNo(e.target.value)}
-              className="border-b bg-transparent text-white p-2 w-full outline-none"
+              className="border-b bg-transparent text-white p-2 w-full outline-none" required
             />
           </div>
           <div className="w-2/3">
@@ -260,7 +263,7 @@ const UserProfile = () => {
               id="streetName"
               type="text"
               value={streetName || ""}
-              onChange={(e) => setStreetName(e.target.value)}
+              onChange={(e) => setStreetName(e.target.value)} required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>
@@ -282,7 +285,7 @@ const UserProfile = () => {
               type="text"
               value={landmark || ""}
               onChange={(e) => setLandmark(e.target.value)}
-              className="border-b bg-transparent text-white p-2 w-full outline-none"
+              className="border-b bg-transparent text-white p-2 w-full outline-none" required
             />
           </div>
           <div className="w-1/3">
@@ -300,7 +303,7 @@ const UserProfile = () => {
               id="city"
               type="text"
               value={city || ""}
-              onChange={(e) => setCity(e.target.value)}
+              onChange={(e) => setCity(e.target.value)} required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>
@@ -319,14 +322,14 @@ const UserProfile = () => {
               id="pinCode"
               type="number"
               value={pinCode || ""}
-              onChange={(e) => setPinCode(e.target.value)}
+              onChange={(e) => setPinCode(e.target.value)} required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>
         </div>
         <button
           onClick={handleSave}
-          className="bg-indigo-500 text-white p-2 rounded hover:bg-indigo-600"
+          className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
         >
           Save
         </button>
