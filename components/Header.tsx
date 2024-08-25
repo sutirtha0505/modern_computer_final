@@ -111,7 +111,7 @@ const Header = () => {
   return (
     <>
       <div className="relative" id="mouse-region">
-        <div className="flex items-center backdrop-blur-3xl bg-white/50 w-full h-16 fixed justify-between px-4 z-10 custom-backdrop-filter">
+        <div className="flex items-center backdrop-blur-3xl bg-white/50 w-full h-16 fixed justify-between px-4 z-20 custom-backdrop-filter">
           <Link href="/">
             <Image
               src="/logo.jpg"
@@ -244,7 +244,7 @@ const Header = () => {
                 </div>
               )}
             </div>
-            <div className="relative">
+            <div className="relative z-20">
               <div
                 className="flex gap-1 hover:text-indigo-500 cursor-pointer"
                 onClick={navigateToCart}
