@@ -79,6 +79,7 @@ const DraggableCircularNav: React.FC = () => {
               alt=""
               width={50}
               height={50}
+              className="insta"
             />
           </div>
         </span>

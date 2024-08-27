@@ -373,6 +373,9 @@ nav .nav-content {
   background: transparent;
   border: 2px solid magenta;
 }
+.insta{
+  transform: rotate(-78deg);
+}
 .third-planet {
   border: 2px solid red;
 }
