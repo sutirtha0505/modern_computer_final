@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { X } from "lucide-react";
+import {Planet} from "react-planet"; 
 
 const About: React.FC = () => {
   const [aboutData, setAboutData] = useState<any>(null);
@@ -205,6 +206,11 @@ const About: React.FC = () => {
           </div>
         </div>
       )}
+      <h1 className="text-3xl font-extrabold ">
+        Reviews from <span className="text-indigo-600">Our Customers</span>
+      </h1>
+
+
     </div>
   );
 };

@@ -25,6 +25,7 @@ const Header = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+  const [customerName, setCustomerName] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -92,13 +93,14 @@ const Header = () => {
       if (user) {
         const { data: profile, error } = await supabase
           .from("profile")
-          .select("role, profile_photo")
+          .select("role, profile_photo, customer_name")
           .eq("id", user.id)
           .single();
 
         if (profile) {
           setRole(profile.role);
           setProfilePhoto(profile.profile_photo);
+          setCustomerName(profile.customer_name);
         }
         // else if (error) {
         //   console.error("Error fetching profile:", error);
@@ -168,7 +170,15 @@ const Header = () => {
                 <div className="absolute right-0 w-52 bg-white/50 rounded-md shadow-lg z-10 custom-backdrop-filter backdrop-blur-md mt-2">
                   {user ? (
                     <>
-                      <div className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl overflow-x-clip">
+                      <div
+                        className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl"
+                        onClick={() => {
+                          if (user && user.id) {
+                            // Navigate to a user profile page or perform an action with the user ID
+                            router.push(`/profile/${user.id}`);
+                          }
+                        }}
+                      >
                         {/* image here by matching the id from profile table */}
                         {profilePhoto ? (
                           <Image
@@ -181,19 +191,13 @@ const Header = () => {
                         ) : (
                           <CircleUser className="w-7 h-7" />
                         )}
-                        <p
-                          className="block text-sm font-medium hover:text-indigo-600 cursor-pointer text-wrap"
-                          onClick={() => {
-                            if (user && user.id) {
-                              // Navigate to a user profile page or perform an action with the user ID
-                              router.push(`/profile/${user.id}`);
-                            }
-                          }}
-                        >
-                          {user?.user_metadata?.name
+                        <h1 className="text-sm font-medium hover:text-indigo-600 cursor-pointer block w-fit text-center overflow-hidden break-all text-wrap">
+                          {customerName
+                            ? customerName // Render customer_name if it exists
+                            : user?.user_metadata?.name
                             ? user.user_metadata.name
                             : user.email}
-                        </p>
+                        </h1>
                       </div>
                       {role === "admin" && (
                         <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">

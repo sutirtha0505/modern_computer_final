@@ -22,6 +22,7 @@ function Hero() {
   const [heroImage, setHeroImage] = useState<string | null>(null);
   const [heroParagraph, setHeroParagraph] = useState<string>("");
   const [heroButtonLink, setHeroButtonLink] = useState<string>("");
+  const [customerName, setCustomerName] = useState<string | null>(null);
 
   useEffect(() => {
     if (tiltRef.current) {
@@ -61,6 +62,21 @@ function Hero() {
         data: { user },
       } = await supabase.auth.getUser();
       setUser(user);
+
+      if (user) {
+        const { data: profile, error } = await supabase
+          .from("profile")
+          .select("customer_name")
+          .eq("id", user.id)
+          .single();
+
+        if (profile) {
+          setCustomerName(profile.customer_name); // Set customer name if it exists
+        }
+        // else if (error) {
+        //   console.error("Error fetching profile:", error);
+        // }
+      }
     };
     getUserData();
   }, []);
@@ -71,7 +87,12 @@ function Hero() {
         <p className="text-4xl md:text-6xl font-extrabold text-center pt-20 pb-0 w-full">
           Welcome,{" "}
           <span className="text-indigo-500">
-            {user.user_metadata.name || user.email}
+            {customerName // Render customer_name if it exists
+              ? customerName
+              : user.user_metadata.name // Otherwise, render user_metadata.name if it exists
+              ? user.user_metadata.name
+              : user.email}{" "}
+            {/* Finally, fall back to user.email */}
           </span>
         </p>
       ) : (
