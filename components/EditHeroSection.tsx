@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer here
 import { supabase } from "@/lib/supabaseClient";
-import { ImageUp } from "lucide-react";
+import { ImageUp, X } from "lucide-react";
+import 'react-toastify/dist/ReactToastify.css'; // Make sure this is imported
 
 const EditHeroSection: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -24,51 +25,64 @@ const EditHeroSection: React.FC = () => {
     maxFiles: 1,
   });
 
+  const handleRemoveImage = () => {
+    setImage(null);
+  };
+
   const handleUpload = async () => {
-    if (!image || !paragraph || !link) {
-      toast.error("All fields are required");
+    if (!paragraph || !link) {
+      toast.error("Paragraph and link are required");
       return;
     }
 
     try {
-      // Upload image to Supabase storage
-      const { data, error: uploadError } = await supabase.storage
-        .from("product-image")
-        .upload(`Hero/${image.name}`, image);
+      let imageUrl = null;
 
-      if (uploadError) {
-        throw uploadError;
+      // Upload image to Supabase storage if an image is selected
+      if (image) {
+        const { data, error: uploadError } = await supabase.storage
+          .from("product-image")
+          .upload(`Hero/${image.name}`, image);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("product-image")
+          .getPublicUrl(`Hero/${image.name}`);
+
+        if (!publicUrlData) {
+          throw new Error("Unable to get public URL");
+        }
+
+        imageUrl = publicUrlData.publicUrl;
       }
 
-      // Get public URL of the uploaded image
-      const { data: publicUrlData } = supabase.storage
-        .from("product-image")
-        .getPublicUrl(`Hero/${image.name}`);
-
-      if (!publicUrlData) {
-        throw new Error("Unable to get public URL");
-      }
-
-      const imageUrl = publicUrlData.publicUrl;
-
-      // Save data to Supabase table
-      const { error: dbError } = await supabase.from("hero_section").upsert({
-        hero_image: imageUrl,
+      // Prepare the data to be saved
+      const dataToSave: any = {
         hero_paragraph: paragraph,
         hero_button_link: link,
-      });
+      };
+
+      if (imageUrl) {
+        dataToSave.hero_image = imageUrl;
+      }
+
+      // Save data to Supabase table
+      const { error: dbError } = await supabase.from("hero_section").upsert(dataToSave);
 
       if (dbError) {
         throw dbError;
       }
 
-      // Clear the form
+      // Show success toast
+      toast.success("Hero section updated perfectly");
+
+      // Clear the form after showing the toast
       setImage(null);
       setParagraph("");
       setLink("");
-
-      // Show success toast
-      toast.success("Hero section updated perfectly");
     } catch (error) {
       console.error("Error updating hero section:", error);
       toast.error("Failed to update hero section");
@@ -76,21 +90,33 @@ const EditHeroSection: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen flex justify-center items-center">
-      <div className="w-80 h-96 flex flex-col justify-center items-center gap-5 rounded-lg bg-slate-700 p-4">
+    <div className="w-full h-screen flex flex-col justify-center items-center gap-4">
+      <h1 className="font-bold text-3xl">
+        Update <span className="text-indigo-600">Hero section</span> from here
+      </h1>
+      <div className="w-80 h-[400px] flex flex-col justify-center items-center gap-5 rounded-lg bg-slate-700 p-4 relative">
         <div
           {...getRootProps()}
-          className="w-28 h-28 border-2 border-dashed border-white rounded-lg flex justify-center items-center cursor-pointer"
+          className="w-28 h-28 border-2 border-dashed border-white rounded-lg flex justify-center items-center cursor-pointer relative"
         >
           <input {...getInputProps()} />
           {isDragActive ? (
             <p>Drop the image here...</p>
           ) : image ? (
-            <img
-              src={URL.createObjectURL(image)}
-              alt="Preview"
-              className="h-full w-full object-cover rounded-lg"
-            />
+            <>
+              <img
+                src={URL.createObjectURL(image)}
+                alt="Preview"
+                className="h-full w-full object-cover rounded-lg"
+              />
+              <button
+                onClick={handleRemoveImage}
+                className="absolute top-0 right-0 p-1 text-red-500 hover:bg-red-500 hover:text-white rounded-full"
+                aria-label="Remove image"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </>
           ) : (
             <ImageUp className="h-6 w-6 text-white" />
           )}
@@ -127,6 +153,8 @@ const EditHeroSection: React.FC = () => {
           Save
         </button>
       </div>
+      {/* Render ToastContainer here */}
+      <ToastContainer />
     </div>
   );
 };

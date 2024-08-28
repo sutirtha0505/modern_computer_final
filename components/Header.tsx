@@ -168,7 +168,7 @@ const Header = () => {
                 <div className="absolute right-0 w-52 bg-white/50 rounded-md shadow-lg z-10 custom-backdrop-filter backdrop-blur-md mt-2">
                   {user ? (
                     <>
-                      <div className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl">
+                      <div className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl overflow-x-clip">
                         {/* image here by matching the id from profile table */}
                         {profilePhoto ? (
                           <Image
@@ -182,7 +182,7 @@ const Header = () => {
                           <CircleUser className="w-7 h-7" />
                         )}
                         <p
-                          className="block px-4 py-2 text-sm font-medium hover:text-indigo-600 cursor-pointer"
+                          className="block text-sm font-medium hover:text-indigo-600 cursor-pointer text-wrap"
                           onClick={() => {
                             if (user && user.id) {
                               // Navigate to a user profile page or perform an action with the user ID
@@ -190,7 +190,9 @@ const Header = () => {
                             }
                           }}
                         >
-                          {user.user_metadata.name}
+                          {user?.user_metadata?.name
+                            ? user.user_metadata.name
+                            : user.email}
                         </p>
                       </div>
                       {role === "admin" && (
