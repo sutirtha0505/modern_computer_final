@@ -9,6 +9,8 @@ import { Sparkles, TableProperties } from "lucide-react";
 import { FaComputer, FaHouseChimney } from "react-icons/fa6";
 import { MdOutlineCategory } from "react-icons/md";
 import { TiInfoLargeOutline } from "react-icons/ti";
+import { BiCarousel } from "react-icons/bi";
+import { TbBuildingCarousel } from "react-icons/tb";
 
 const Admin = () => {
   const router = useRouter();
@@ -65,7 +67,7 @@ const Admin = () => {
           <div onClick={()=>{
             router.push("/admin/best_seller_carousel");
           }} className="p-4 rounded-sm flex flex-col justify-center items-center  bg-orange-500 border-orange-500 border-2 hover:bg-transparent hover:text-orange-500 gap-2 cursor-pointer h-24">
-            <Sparkles size={30} />
+            <BiCarousel size={30} />
             <p className="text-center font-semibold text-xs">Best Seller Carousel</p>
           </div>
           <div onClick={()=>{
@@ -91,6 +93,15 @@ const Admin = () => {
           }} className="p-4 rounded-sm flex flex-col justify-center items-center bg-emerald-500 border-emerald-500 border-2 hover:bg-transparent hover:text-emerald-500 gap-2 cursor-pointer h-24">
             <TiInfoLargeOutline size={30}/>
             <p className="text-center font-semibold text-xs">About Section</p>
+          </div>
+          <div
+            onClick={() => {
+              router.push("/admin/edit_review_section");
+            }}
+            className="p-4 rounded-sm flex flex-col justify-center items-center bg-rose-800 border-rose-800 border-2 hover:bg-transparent hover:text-rose-800 cursor-pointer h-24 gap-2"
+          >
+            <TbBuildingCarousel size={30} />
+            <p className="text-center font-semibold text-xs">Edit Review Carousel</p>
           </div>
         </div>
       </div>
