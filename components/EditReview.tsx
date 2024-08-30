@@ -1,45 +1,43 @@
-import React, { useEffect } from 'react'
-import { supabase } from '@/lib/supabaseClient' // Import your Supabase client
+"use client";
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabaseClient';
 
-interface Profile {
-  id: string
-  email: string
-  role: string
+interface Review {
+  UX_star: number;
+  comment: string;
 }
 
 const EditReview: React.FC = () => {
+  const [reviews, setReviews] = useState<Review[]>([]);
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('profile')
-          .select('email, role')
+    const fetchReviews = async () => {
+      const { data, error } = await supabase
+        .from('profile')
+        .select('UX_star, comment')
+        .not('UX_star', 'is', null)
 
-        if (error) {
-          throw error
-        }
-
-        // Log the number of rows and selected columns
-        console.log('Number of rows:', data.length)
-
-        // Extract and log the email and user_role columns
-        const rows = data.map(row => ({
-          email: row.email,
-          role: row.role
-        }))
-
-        console.log('Selected rows:', rows)
-      } catch (error) {
-        console.error('Error fetching data:', error)
+      if (error) {
+        console.error('Error fetching reviews:', error);
+      } else {
+        console.log('Fetched data:', data); // Debugging line
+        setReviews(data || []);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchReviews();
+  }, []);
 
   return (
-    <div>EditReview</div>
-  )
-}
+    <div>
+      {reviews.map((review, index) => (
+        <div key={index} className="review-box">
+          <div className="star-box">Rating: {review.UX_star}</div>
+          <div className="comment-box">Comment: {review.comment}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-export default EditReview
+export default EditReview;
