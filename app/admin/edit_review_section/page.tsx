@@ -47,7 +47,7 @@ const EditreviewSection = () => {
 
   if (user && role === 'admin') {
     return (
-      <div className='p-24 w-full h-full flex flex-wrap justify-center items-center gap-4'>
+      <div className='p-20 w-full h-full flex flex-wrap justify-center items-center gap-4'>
         <EditReview />
       </div>
     );
