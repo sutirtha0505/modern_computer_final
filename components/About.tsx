@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { X } from "lucide-react";
-import { Planet } from "react-planet";
 
 const About: React.FC = () => {
   const [aboutData, setAboutData] = useState<any>(null);
@@ -11,7 +10,15 @@ const About: React.FC = () => {
     { name: string; url: string }[]
   >([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [profilePhotos, setProfilePhotos] = useState<string[]>([]); // To store profile photos
+  const [profilePhotos, setProfilePhotos] = useState<
+    {
+      profile_photo: string;
+      email: string;
+      customer_name: string;
+      UX_star: number;
+      comment: string;
+    }[]
+  >([]); // Updated to store profile photo and details
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const scrollIntervalRef = useRef<number | null>(null);
 
@@ -37,13 +44,21 @@ const About: React.FC = () => {
   const fetchProfilePhotos = async () => {
     const { data, error } = await supabase
       .from("profile")
-      .select("profile_photo, email")
+      .select("profile_photo, email, customer_name, UX_star, comment")
       .eq("show_in_carousel", true);
 
     if (error) {
       console.error("Error fetching profile photos:", error);
     } else if (data) {
-      setProfilePhotos(data.map((profile) => profile.profile_photo));
+      setProfilePhotos(
+        data.map((profile) => ({
+          profile_photo: profile.profile_photo,
+          email: profile.email,
+          customer_name: profile.customer_name,
+          UX_star: profile.UX_star,
+          comment: profile.comment,
+        }))
+      );
     }
   };
 
@@ -221,35 +236,47 @@ const About: React.FC = () => {
         </div>
       )}
 
-      <h1 className="text-3xl font-extrabold">
-        Reviews from
-        <span className="text-indigo-600"> Our Customers</span>
-      </h1>
-
-      <div className="w-screen h-[600px] justify-center items-center flex">
-        <Planet
-          centerContent={
-            <div className="rounded-full p-4 text-white bg-blue-500 ">
-              Team
-            </div>
-          }
-          open
-          autoClose={true}
-          orbitRadius={200}
-          rotation={0}
-        >
-          {profilePhotos.map((photoUrl, index) => (
-            
-              <img key={index}
-                src={photoUrl} // Correctly set the src to the profile photo URL
+      <div className="w-full p-6">
+        <h1 className="text-3xl font-extrabold text-center">
+          Reviews from
+          <span className="text-indigo-600"> Our Customers</span>
+        </h1>
+        <div className="flex flex-wrap justify-center items-center gap-10 mt-16">
+          {profilePhotos.map((profile, index) => (
+            <div
+              key={index}
+              className="w-96 h-96 p-6 bg-slate-900 rounded-md shadow-lg flex flex-col justify-center gap-6 items-center relative"
+            >
+              <img
+                src={profile.profile_photo}
                 alt={`Profile ${index}`}
-                className="w-12 h-12 rounded-full border-white"
+                className="w-24 h-24 rounded-full mx-auto absolute -top-9"
               />
-            
+              <h2 className="text-xl font-semibold text-center">
+                {profile.customer_name}
+              </h2>
+              <div className="flex justify-center items-center gap-2">
+                {[...Array(5)].map((_, starIndex) => (
+                  <svg
+                    key={starIndex}
+                    className={`w-6 h-6 ${
+                      starIndex < profile.UX_star
+                        ? "text-yellow-500"
+                        : "text-gray-400"
+                    }`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
+                ))}
+              </div>
+              <p className="text-center h-36 overflow-x-scroll hide-scrollbar">
+                {profile.comment}
+              </p>
+            </div>
           ))}
-        </Planet>
-
-
+        </div>
       </div>
     </div>
   );
