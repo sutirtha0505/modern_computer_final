@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { X } from "lucide-react";
-import {Planet} from "react-planet"; 
+import { Planet } from "react-planet";
 
 const About: React.FC = () => {
   const [aboutData, setAboutData] = useState<any>(null);
@@ -10,11 +10,12 @@ const About: React.FC = () => {
   const [galleryImages, setGalleryImages] = useState<
     { name: string; url: string }[]
   >([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null); // To store the selected image URL
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [profilePhotos, setProfilePhotos] = useState<string[]>([]); // To store profile photos
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const scrollIntervalRef = useRef<number | null>(null);
 
-  const fetchgalleryImages = async () => {
+  const fetchGalleryImages = async () => {
     const { data, error } = await supabase.storage
       .from("product-image")
       .list("gallery/");
@@ -33,9 +34,22 @@ const About: React.FC = () => {
     }
   };
 
+  const fetchProfilePhotos = async () => {
+    const { data, error } = await supabase
+      .from("profile")
+      .select("profile_photo, email")
+      .eq("show_in_carousel", true);
+
+    if (error) {
+      console.error("Error fetching profile photos:", error);
+    } else if (data) {
+      setProfilePhotos(data.map((profile) => profile.profile_photo));
+    }
+  };
+
   useEffect(() => {
     const fetchAboutData = async () => {
-      const { data, error } = await supabase.from("about").select("*").single(); // Fetches a single row
+      const { data, error } = await supabase.from("about").select("*").single();
 
       if (error) {
         console.error("Error fetching about data:", error);
@@ -46,24 +60,25 @@ const About: React.FC = () => {
     };
 
     fetchAboutData();
-    fetchgalleryImages();
+    fetchGalleryImages();
+    fetchProfilePhotos();
   }, []);
 
   useEffect(() => {
     const startAutoScroll = () => {
       const gallery = galleryRef.current;
       if (gallery && galleryImages.length > 0) {
-        const scrollSpeed = 2; // Adjust the scroll speed
+        const scrollSpeed = 2;
 
         const autoScroll = () => {
           if (gallery.scrollWidth - gallery.clientWidth <= gallery.scrollLeft) {
-            gallery.scrollLeft = 0; // Reset scroll position when reaching the end
+            gallery.scrollLeft = 0;
           } else {
             gallery.scrollLeft += scrollSpeed;
           }
         };
 
-        scrollIntervalRef.current = window.setInterval(autoScroll, 30); // Adjust the interval for smoother scrolling
+        scrollIntervalRef.current = window.setInterval(autoScroll, 30);
       }
     };
 
@@ -75,12 +90,12 @@ const About: React.FC = () => {
     };
 
     const handleMouseEnter = () => {
-      stopAutoScroll(); // Stop scrolling on mouse enter
+      stopAutoScroll();
     };
 
     const handleMouseLeave = () => {
       if (!scrollIntervalRef.current) {
-        startAutoScroll(); // Restart scrolling on mouse leave
+        startAutoScroll();
       }
     };
 
@@ -92,7 +107,7 @@ const About: React.FC = () => {
     startAutoScroll();
 
     return () => {
-      stopAutoScroll(); // Cleanup on component unmount
+      stopAutoScroll();
       if (galleryRef.current) {
         galleryRef.current.removeEventListener("mouseenter", handleMouseEnter);
         galleryRef.current.removeEventListener("mouseleave", handleMouseLeave);
@@ -142,7 +157,7 @@ const About: React.FC = () => {
                   src={image.url}
                   alt={image.name}
                   className="w-96 h-96 rounded-md cursor-pointer"
-                  onClick={() => setSelectedImage(image.url)} // Set the selected image on click
+                  onClick={() => setSelectedImage(image.url)}
                 />
               ))}
             </div>
@@ -188,7 +203,6 @@ const About: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal for displaying the large image */}
       {selectedImage && (
         <div className="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
           <div className="relative">
@@ -206,11 +220,37 @@ const About: React.FC = () => {
           </div>
         </div>
       )}
-      <h1 className="text-3xl font-extrabold ">
-        Reviews from <span className="text-indigo-600">Our Customers</span>
+
+      <h1 className="text-3xl font-extrabold">
+        Reviews from
+        <span className="text-indigo-600"> Our Customers</span>
       </h1>
 
+      <div className="w-screen h-[600px] justify-center items-center flex">
+        <Planet
+          centerContent={
+            <div className="rounded-full p-4 text-white bg-blue-500 ">
+              Team
+            </div>
+          }
+          open
+          autoClose={true}
+          orbitRadius={200}
+          rotation={0}
+        >
+          {profilePhotos.map((photoUrl, index) => (
+            
+              <img key={index}
+                src={photoUrl} // Correctly set the src to the profile photo URL
+                alt={`Profile ${index}`}
+                className="w-12 h-12 rounded-full border-white"
+              />
+            
+          ))}
+        </Planet>
 
+
+      </div>
     </div>
   );
 };

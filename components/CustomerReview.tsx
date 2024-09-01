@@ -46,7 +46,7 @@ const CustomerReview: React.FC = () => {
   }
 
   return (
-    <div className='w-full h-screen gap-0 md:gap-10 text-center flex justify-center items-center flex-col'>
+    <div className='w-full h-full gap-0 md:gap-10 text-center flex justify-center items-center flex-col'>
       <ToastContainer position="bottom-center" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
       <h1 className='font-bold text-3xl'>Share <span className='text-indigo-600'>Your Experience</span> with Us</h1>
       <div className='flex gap-4 justify-center items-center flex-wrap'>
