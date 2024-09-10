@@ -91,7 +91,7 @@ const ProductTable: React.FC = () => {
       const updatedProductSP =
         editingProduct.product_MRP -
         (editingProduct.product_MRP * editingProduct.product_discount) / 100;
-
+  
       // Upload new images
       const imageUrls = [...editingProduct.product_image];
       const uploadPromises = newImages.map(async (image) => {
@@ -101,12 +101,12 @@ const ProductTable: React.FC = () => {
         const { error: uploadError } = await supabase.storage
           .from("product-image")
           .upload(filePath, image);
-
+  
         if (uploadError) {
           console.error("Error uploading image:", uploadError.message);
           return;
         }
-
+  
         const { data: publicUrlData } = await supabase.storage
           .from("product-image")
           .getPublicUrl(filePath);
@@ -116,9 +116,9 @@ const ProductTable: React.FC = () => {
           console.error("Error getting public URL");
         }
       });
-
+  
       await Promise.all(uploadPromises);
-
+  
       const { error } = await supabase
         .from("products")
         .update({
@@ -130,9 +130,10 @@ const ProductTable: React.FC = () => {
           product_image: imageUrls,
           product_amount: editingProduct.product_amount,
           product_category: editingProduct.product_category,
+          show_product: editingProduct.show_product, // Include show_product field here
         })
         .eq("product_id", editingProduct.product_id);
-
+  
       if (error) {
         console.error("Error updating product:", error.message);
       } else {
@@ -142,6 +143,7 @@ const ProductTable: React.FC = () => {
       }
     }
   };
+  
 
   const onDrop = (acceptedFiles: File[]) => {
     setNewImages([...newImages, ...acceptedFiles]);
@@ -244,6 +246,7 @@ const ProductTable: React.FC = () => {
               <th className="py-2 px-4 border">Amount</th>
               <th className="py-2 px-4 border">Category</th>
               <th className="py-2 px-4 border">Images</th>
+              <th className="py-2 px-4 border">Sellable</th>
               <th className="py-2 px-4 border">Action</th>
             </tr>
           </thead>
@@ -373,6 +376,28 @@ const ProductTable: React.FC = () => {
                     </div>
                   )}
                 </td>
+                <td className="py-2 px-4 border hover:bg-[#283c4f]">
+                  {editingProduct?.product_id === product.product_id ? (
+                    <select
+                      value={editingProduct.show_product ? "true" : "false"}
+                      onChange={(e) =>
+                        setEditingProduct({
+                          ...editingProduct,
+                          show_product: e.target.value === "true",
+                        })
+                      }
+                      className="py-2 border bg-black border-white text-wrap w-full"
+                    >
+                      <option value="true">True</option>
+                      <option value="false">False</option>
+                    </select>
+                  ) : product.show_product ? (
+                    "True"
+                  ) : (
+                    "False"
+                  )}
+                </td>
+
                 <td className="py-2 px-4 border hover:bg-[#283c4f]">
                   {editingProduct?.product_id === product.product_id ? (
                     <button
