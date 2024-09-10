@@ -15,7 +15,7 @@ interface VanillaTiltOptions {
   "max-glare": number;
 }
 
-function Hero() {
+function  Hero() {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement | null>(null);
   const [user, setUser] = useState<any>(null);

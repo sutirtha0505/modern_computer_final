@@ -11,6 +11,7 @@ interface Product {
   product_amount: number;
   product_image: { url: string }[];
   product_name: string;
+  show_product: boolean;
 }
 
 const ProductByCategoriesItemListPage = () => {
@@ -23,8 +24,11 @@ const ProductByCategoriesItemListPage = () => {
     const fetchProducts = async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("product_id ,product_image, product_name, product_MRP, product_SP, product_amount")
-        .eq("product_main_category", decodedCategory);
+        .select(
+          "product_id, product_image, product_name, product_MRP, product_SP, product_amount, show_product"
+        )
+        .eq("product_main_category", decodedCategory)
+        .eq("show_product", true); // Filter products where show_product is true
 
       if (error) {
         console.error("Error fetching products:", error);
@@ -39,7 +43,9 @@ const ProductByCategoriesItemListPage = () => {
 
   return (
     <div className="pt-16 w-full h-full flex flex-col justify-center items-center">
-      <h1 className="font-extrabold bg-gradient-to-br from-pink-500 to-orange-400 text-center text-transparent inline-block text-3xl bg-clip-text m-10">{decodedCategory}</h1>
+      <h1 className="font-extrabold bg-gradient-to-br from-pink-500 to-orange-400 text-center text-transparent inline-block text-3xl bg-clip-text m-10">
+        {decodedCategory}
+      </h1>
       <ProductByCategoriesItemList products={products} />
     </div>
   );

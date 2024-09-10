@@ -16,6 +16,7 @@ interface Product {
   product_amount: number;
   product_image: { url: string }[];
   product_category: string;
+  show_product: boolean;
 }
 
 const ProductTable: React.FC = () => {
@@ -188,7 +189,7 @@ const ProductTable: React.FC = () => {
   };
 
   return (
-    <div className=" w-screen items-center flex flex-col gap-3 p-4">
+    <div className=" w-full items-center flex flex-col gap-3 p-4">
       <h1 className="text-center text-indigo-500 font-extrabold text-3xl select-text">
         Product table
       </h1>
@@ -230,7 +231,7 @@ const ProductTable: React.FC = () => {
           <TextSearch />
         </button>
       </div>
-      <div className="text-center scale-x-[0.4] md:scale-x-100">
+      <div className="text-center w-full overflow-x-auto">
         <table className="border">
           <thead className="text-indigo-500">
             <tr>
