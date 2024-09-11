@@ -146,12 +146,12 @@ const PreBuildTable = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 flex flex-col">
       <h1 className="text-2xl mb-4 text-center font-extrabold ">
         <span className="text-indigo-500">Pre-Build</span> PC Table
       </h1>
-      <div className="flex items-center justify-center">
-        <table className="md:scale-x-80 scale-x-[0.35]">
+      <div className="w-full overflow-x-auto">
+        <table className="border">
           <thead>
             <tr>
               <th className="py-2 border">Build Type</th>

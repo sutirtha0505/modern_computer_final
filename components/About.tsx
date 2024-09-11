@@ -64,12 +64,16 @@ const About: React.FC = () => {
 
   useEffect(() => {
     const fetchAboutData = async () => {
-      const { data, error } = await supabase.from("about").select("*").single();
+      const { data, error } = await supabase
+        .from("about")
+        .select("*")
+        .order("id", { ascending: false }) // Order by 'id' in descending order
+        .limit(1); // Limit to the first row
 
       if (error) {
         console.error("Error fetching about data:", error);
       } else {
-        setAboutData(data);
+        setAboutData(data?.[0] || null); // Safely access the first item if it exists
       }
       setLoading(false);
     };
