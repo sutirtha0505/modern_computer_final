@@ -48,7 +48,7 @@ const PreBuildTablePage = () => {
 
   if (user && role === 'admin') {
     return (
-      <div className='pt-16 w-screen overflow-x-hidden pl-4 pr-4 pb-4 flex flex-col justify-center items-center'>
+      <div className='pt-16 w-screen overflow-x-hidden pl-4 pr-4 pb-4 flex flex-col'>
         <PreBuildTable/>
       </div>
     );
