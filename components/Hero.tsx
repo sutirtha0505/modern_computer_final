@@ -100,7 +100,7 @@ function  Hero() {
           Welcome, <span className="text-indigo-500">Viewer</span>
         </p>
       )}
-      <div className="w-full flex justify-center items-center flex-wrap">
+      <div className="w-full flex justify-center items-center flex-wrap" id="hero">
         <div className="flex justify-center items-center h-[800px] rounded-md w-full md:w-1/2">
           <div className="w-[400px] h-[400px] md:w-[600px] flex items-center justify-center backdrop-blur-sm rounded-3xl md:h-[600px]">
             <div ref={tiltRef} className="relative">

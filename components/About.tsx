@@ -139,7 +139,7 @@ const About: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col gap-5 justify-center items-center w-full h-full mt-12">
+    <div className="relative flex flex-col gap-5 justify-center items-center w-full h-full mt-12" id="about">
       <h1 className="text-3xl font-extrabold ">
         About <span className="text-indigo-600">Us</span>
       </h1>

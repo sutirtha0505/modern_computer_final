@@ -82,7 +82,7 @@ const ProductByCategoriesSlider: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center gap-36 flex-col p-9">
+    <div className="w-full h-screen flex items-center justify-center gap-36 flex-col p-9" id="productbycategoriesslider">
       <h1 className="text-center text-3xl font-extrabold">
         Product By <span className="text-indigo-600">Categories</span>
       </h1>

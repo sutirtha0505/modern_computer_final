@@ -39,7 +39,7 @@ const CustomBuildPCINHomePage = () => {
   const router = useRouter();
 
   return (
-    <div className="w-full flex gap-28 justify-center items-center flex-col">
+    <div className="w-full flex gap-28 justify-center items-center flex-col" id="cbpc">
       <h1 className="text-4xl font-bold text-wrap text-indigo-500">
         Custom-Build <span className="text-white">PC</span>
       </h1>
