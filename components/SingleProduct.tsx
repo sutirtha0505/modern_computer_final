@@ -7,8 +7,10 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
 import { ToastContainer, toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for react-toastify
+import { useRouter } from "next/navigation";
 
 const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
+  const router = useRouter();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -91,7 +93,9 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           >
             Add to Cart
           </button>
-          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200">
+          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200" onClick={()=>{
+            router.push('/checkout');
+          }}>
             Buy Now
           </button>
         </div>

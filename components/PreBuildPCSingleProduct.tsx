@@ -18,6 +18,7 @@ const PreBuildPCSingleProduct: React.FC = () => {
   const [product, setProduct] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useAppDispatch();
+  
 
   useEffect(() => {
     const fetchPreBuilds = async () => {
@@ -85,11 +86,11 @@ const PreBuildPCSingleProduct: React.FC = () => {
     setIsHeartFilled(!isHeartFilled);
   };
 
-  const handleAddToCart = () => {
-    if (product) {
-      dispatch(addToCart(product));
-    }
-  };
+  // const handleAddToCart = () => {
+  //   if (product) {
+  //     dispatch(addToCart(product));
+  //   }
+  // };
 
   if (!product) {
     return <div>Loading...</div>;
@@ -404,13 +405,15 @@ const PreBuildPCSingleProduct: React.FC = () => {
           </p>
         </div>
         <div className="w-full flex gap-10">
-          <button
+          {/* <button
             className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
             onClick={handleAddToCart}
           >
             Add to Cart
-          </button>
-          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200">
+          </button> */}
+          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200" onClick={()=>{
+            router.push("/checkout");
+          }}>
             Buy Now
           </button>
         </div>
