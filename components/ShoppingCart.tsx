@@ -166,7 +166,7 @@ const ShoppingCart = () => {
               <button
                 className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
                 onClick={() => {
-                  router.push("/checkout");
+                  router.push("/checkout-cart");
                 }}
               >
                 Proceed to Buy
