@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 const CheckOutCart = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const router = useRouter();  // Initialize router
+  const router = useRouter();
 
   useEffect(() => {
     const getUserData = async () => {
@@ -16,13 +16,12 @@ const CheckOutCart = () => {
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        
-        // If no user is found, redirect to /SignIn
+
         if (!user) {
           router.push('/SignIn');
         } else {
           setUser(user);
-          console.log('User ID:', user.id);
+          console.log('User ID:', user.id);  // Print user ID
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -32,10 +31,10 @@ const CheckOutCart = () => {
     };
 
     getUserData();
-  }, [router]); // Added router as a dependency
+  }, [router]);
 
   if (loading) {
-    return <div>Loading...</div>;  // Optionally display loading state
+    return <div>Loading...</div>;
   }
 
   return (
@@ -45,7 +44,7 @@ const CheckOutCart = () => {
         <h1 className='text-2xl font-bold text-center'>
           Checkout for <span className='text-indigo-500'>Cart Items</span>
         </h1>
-        <CustomerDetails />
+        {user && <CustomerDetails userId={user.id} />} {/* Pass user.id to CustomerDetails */}
       </div>
     </div>
   )
