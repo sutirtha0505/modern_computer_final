@@ -13,27 +13,6 @@ const ShoppingCart = () => {
   const dispatch = useAppDispatch();
   const tiltRefs = useRef<any[]>([]); // Ref to store tilt instances
 
-  // useEffect(() => {
-  //   // Initialize VanillaTilt on each item after they are rendered
-  //   tiltRefs.current.forEach((itemRef) => {
-  //     VanillaTilt.init(itemRef.current, {
-  //       max: 1,
-  //       speed: 100,
-  //       glare: true,
-  //       "max-glare": 0.5,
-  //     });
-  //   });
-
-  //   return () => {
-  //     // Clean up on unmount
-  //     tiltRefs.current.forEach((itemRef) => {
-  //       if (itemRef.current) {
-  //         itemRef.current.vanillaTilt.destroy();
-  //       }
-  //     });
-  //   };
-  // }, []);
-
   const handleQuantityChange = (productId: any, quantity: string) => {
     dispatch(updateQuantity({ productId, quantity: Number(quantity) }));
   };
@@ -54,6 +33,26 @@ const ShoppingCart = () => {
 
   // Calculate the total savings
   const totalSavings = (parseFloat(totalMRP) - parseFloat(totalSum)).toFixed(2);
+  const handleProceedToCheckout = () => {
+    // Update the cart data to include the image URLs
+    const updatedCart = cart.map((product: any) => {
+      const imageUrl = product.product_image?.find((img: any) =>
+        img.url.includes("_first")
+      )?.url;
+  
+      return {
+        ...product,
+        imageUrl, // Add the image URL to each product object
+      };
+    });
+  
+    // Convert cart array (with imageUrl) to a query-friendly string
+    const cartString = encodeURIComponent(JSON.stringify(updatedCart));
+  
+    // Navigate to the checkout page with cart and totalSum in the query
+    router.push(`/checkout-cart?cart=${cartString}&totalSum=${totalSum}`);
+  };
+  
 
   return (
     <div className="flex flex-col gap-6 mt-5">
@@ -165,9 +164,7 @@ const ShoppingCart = () => {
             <div className="flex justify-center">
               <button
                 className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
-                onClick={() => {
-                  router.push("/checkout-cart");
-                }}
+                onClick={handleProceedToCheckout}
               >
                 Proceed to Buy
               </button>

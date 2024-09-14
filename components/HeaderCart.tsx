@@ -5,7 +5,7 @@ import { LockIcon } from "lucide-react";
 
 const HeaderCart = () => {
   return (
-    <div className="fixed w-full flex justify-between items-center bg-white/50 custom-backdrop-filter p-4 top-0">
+    <div className="fixed w-full flex justify-between items-center bg-white/50 custom-backdrop-filter p-4 top-0 z-50">
       <Link href="/">
         <Image
           src="/logo.jpg"

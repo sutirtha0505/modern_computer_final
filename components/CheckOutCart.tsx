@@ -4,6 +4,7 @@ import HeaderCart from './HeaderCart'
 import CustomerDetails from './CustomerDetails'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
+import CartFinalCheckOut from './CartFinalCheckOut'
 
 const CheckOutCart = () => {
   const [user, setUser] = useState<any>(null);
@@ -45,6 +46,7 @@ const CheckOutCart = () => {
           Checkout for <span className='text-indigo-500'>Cart Items</span>
         </h1>
         {user && <CustomerDetails userId={user.id} />} {/* Pass user.id to CustomerDetails */}
+        <CartFinalCheckOut />
       </div>
     </div>
   )
