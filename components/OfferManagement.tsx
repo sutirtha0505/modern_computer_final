@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TableProperties } from "lucide-react";
+import { Pen, TableProperties } from "lucide-react";
 import { MdOutlineDashboardCustomize, MdPostAdd } from "react-icons/md";
+import DensitySmallIcon from "@mui/icons-material/DensitySmall";
+import CategoryIcon from "@mui/icons-material/Category";
 
 const OfferManagement = () => {
   const [selectedDiv, setSelectedDiv] = useState<number | null>(null); // Track which div is selected
@@ -12,14 +14,17 @@ const OfferManagement = () => {
       // Subdivs for "Offer on the Products"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer">
-            All Products
+          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+            <DensitySmallIcon />
+            <p className="text-xs text-center">All Products offer</p>
           </div>
-          <div className="p-4 rounded-sm bg-yellow-400 border-yellow-400 border-2 cursor-pointer">
-            Categorized Offer
+          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+            <CategoryIcon />
+            <p className="text-xs text-center">Categorized Offer</p>
           </div>
-          <div className="p-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer">
-            Single Product Offer
+          <div className="p-8 gap-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-blue-400 justify-center items-center">
+            <Pen />
+            <p className="text-xs text-center">Single Product Offer</p>
           </div>
         </div>
       );
@@ -27,14 +32,25 @@ const OfferManagement = () => {
       // Subdivs for "Offer on Pre-Build PC"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer">
-            All Prebuild PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+            <DensitySmallIcon />
+            <p className="text-xs text-center">All Prebuild PC Offers</p>
           </div>
-          <div className="p-4 rounded-sm bg-yellow-400 border-yellow-400 border-2 cursor-pointer">
-            Intel Prebuild PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
+              alt=""
+              className="w-6 h-6"
+            />
+            <p className="text-xs text-center">Intel Prebuild PC Offers</p>
           </div>
-          <div className="p-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer">
-            AMD Prebuild PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
+              alt=""
+              className="w-6 h-6"
+            />
+            <p className="text-xs text-center">AMD Prebuild PC Offers</p>
           </div>
         </div>
       );
@@ -42,14 +58,25 @@ const OfferManagement = () => {
       // Subdivs for "Offer on Custom Build PC"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer">
-            All Custom Build PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+            <DensitySmallIcon />
+            <p className="text-xs text-center">All Custom Build PC Offers</p>
           </div>
-          <div className="p-4 rounded-sm bg-yellow-400 border-yellow-400 border-2 cursor-pointer">
-            Intel Custom Build PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
+              alt=""
+              className="w-6 h-6"
+            />
+            <p className="text-xs text-center">Intel Custom Build PC Offers</p>
           </div>
-          <div className="p-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer">
-            AMD Custom Build PC Offers
+          <div className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
+              alt=""
+              className="w-6 h-6"
+            />
+            <p className="text-xs text-center">AMD Custom Build PC Offers</p>
           </div>
         </div>
       );
@@ -71,7 +98,9 @@ const OfferManagement = () => {
             onClick={() => setSelectedDiv(1)}
           >
             <MdPostAdd size={30} />
-            <p className="text-center font-semibold text-xs">Offer on the Products</p>
+            <p className="text-center font-semibold text-xs">
+              Offer on the Products
+            </p>
           </div>
         )}
 
@@ -82,7 +111,9 @@ const OfferManagement = () => {
             onClick={() => setSelectedDiv(2)}
           >
             <TableProperties size={30} />
-            <p className="text-center font-semibold text-xs">Offer on Pre-Build PC</p>
+            <p className="text-center font-semibold text-xs">
+              Offer on Pre-Build PC
+            </p>
           </div>
         )}
 
@@ -93,7 +124,9 @@ const OfferManagement = () => {
             onClick={() => setSelectedDiv(3)}
           >
             <MdOutlineDashboardCustomize size={30} />
-            <p className="text-center font-semibold text-xs">Offer on Custom Build PC</p>
+            <p className="text-center font-semibold text-xs">
+              Offer on Custom Build PC
+            </p>
           </div>
         )}
       </div>
