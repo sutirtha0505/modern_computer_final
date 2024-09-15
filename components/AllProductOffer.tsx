@@ -60,7 +60,7 @@ const AllProductOffer = () => {
       </p>
 
       <div className='w-96 rounded-md flex flex-col justify-center items-center p-4 bg-gray-900 gap-6'>
-        <h1>Offer Management System</h1>
+        <h1 className='font-bold'>Offer Management System</h1>
         <div className='w-full flex gap-2 justify-between items-center'>
           <TicketPercent />
           <label htmlFor='amount' className='text-sm font-bd text-indigo-500'>Coupon Code:</label>
