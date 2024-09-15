@@ -1,28 +1,55 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pen, TableProperties } from "lucide-react";
-import { MdOutlineDashboardCustomize, MdPostAdd } from "react-icons/md";
+import { MdOutlineDashboardCustomize } from "react-icons/md";
 import DensitySmallIcon from "@mui/icons-material/DensitySmall";
 import CategoryIcon from "@mui/icons-material/Category";
+import AllProductOffer from "./AllProductOffer"; // Import the component
+import CategorizedProductOffer from "./CategorisedProductOffer"; // Import the component
+import SingleProductOffer from "./SingleProductOffer"; // Import the component
+import AllPBPCOffer from "./AllPBPCOffer"; // Import the component
+import IntelPBPCOffer from "./IntelPBPCOffer"; // Import the component
+import AMDPBPCOffer from "./AMDPBPCOffer"; // Import the component
+import AllCBPCOffer from "./AllCBPCOffer"; // Import the component
+import IntelCBPCOffer from "./IntelCBPCOffer"; // Import the component
+import AMDCBPCOffer from "./AMDCBPCOffer"; // Import the component
 
 const OfferManagement = () => {
   const [selectedDiv, setSelectedDiv] = useState<number | null>(null); // Track which div is selected
+  const [showAllProductOffer, setShowAllProductOffer] = useState<boolean>(false); // State for AllProductOffer component
+  const [showCategorizedProductOffer, setShowCategorizedProductOffer] = useState<boolean>(false); // State for CategorizedProductOffer component
+  const [showSingleProductOffer, setShowSingleProductOffer] = useState<boolean>(false); // State for SingleProductOffer component
+  const [showAllPBPCOffer, setShowAllPBPCOffer] = useState<boolean>(false); // State for AllPBPCOffer component
+  const [showIntelPBPCOffer, setShowIntelPBPCOffer] = useState<boolean>(false); // State for IntelPBPCOffer component
+  const [showAMDPBPCOffer, setShowAMDPBPCOffer] = useState<boolean>(false); // State for AMDPBPCOffer component
+  const [showAllCBPCOffer, setShowAllCBPCOffer] = useState<boolean>(false); // State for AllCBPCOffer component
+  const [showIntelCBPCOffer, setShowIntelCBPCOffer] = useState<boolean>(false); // State for IntelCBPCOffer component
+  const [showAMDCBPCOffer, setShowAMDCBPCOffer] = useState<boolean>(false); // State for AMDCBPCOffer component
   const router = useRouter();
 
   const renderSubDivs = () => {
-    if (selectedDiv === 1) {
+    if (selectedDiv === 1 && !showAllProductOffer && !showCategorizedProductOffer && !showSingleProductOffer && !showAllPBPCOffer && !showIntelPBPCOffer && !showAMDPBPCOffer && !showAllCBPCOffer && !showIntelCBPCOffer && !showAMDCBPCOffer) {
       // Subdivs for "Offer on the Products"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center"
+            onClick={() => setShowAllProductOffer(true)} // Show AllProductOffer component
+          >
             <DensitySmallIcon />
             <p className="text-xs text-center">All Products offer</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center"
+            onClick={() => setShowCategorizedProductOffer(true)} // Show CategorizedProductOffer component
+          >
             <CategoryIcon />
             <p className="text-xs text-center">Categorized Offer</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-blue-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-blue-400 border-blue-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-blue-400 justify-center items-center"
+            onClick={() => setShowSingleProductOffer(true)} // Show SingleProductOffer component
+          >
             <Pen />
             <p className="text-xs text-center">Single Product Offer</p>
           </div>
@@ -32,11 +59,17 @@ const OfferManagement = () => {
       // Subdivs for "Offer on Pre-Build PC"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center"
+            onClick={() => setShowAllPBPCOffer(true)} // Show AllPBPCOffer component
+          >
             <DensitySmallIcon />
             <p className="text-xs text-center">All Prebuild PC Offers</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center"
+            onClick={() => setShowIntelPBPCOffer(true)} // Show IntelPBPCOffer component
+          >
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
               alt=""
@@ -44,7 +77,10 @@ const OfferManagement = () => {
             />
             <p className="text-xs text-center">Intel Prebuild PC Offers</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center"
+            onClick={() => setShowAMDPBPCOffer(true)} // Show AMDPBPCOffer component
+          >
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
               alt=""
@@ -58,11 +94,17 @@ const OfferManagement = () => {
       // Subdivs for "Offer on Custom Build PC"
       return (
         <div className="w-full flex gap-5 justify-center items-center mt-4">
-          <div className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-green-400 border-green-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-green-400 justify-center items-center"
+            onClick={() => setShowAllCBPCOffer(true)} // Show AllCBPCOffer component
+          >
             <DensitySmallIcon />
             <p className="text-xs text-center">All Custom Build PC Offers</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center"
+            onClick={() => setShowIntelCBPCOffer(true)} // Show IntelCBPCOffer component
+          >
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
               alt=""
@@ -70,7 +112,10 @@ const OfferManagement = () => {
             />
             <p className="text-xs text-center">Intel Custom Build PC Offers</p>
           </div>
-          <div className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center">
+          <div
+            className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center"
+            onClick={() => setShowAMDCBPCOffer(true)} // Show AMDCBPCOffer component
+          >
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
               alt=""
@@ -86,63 +131,155 @@ const OfferManagement = () => {
 
   return (
     <div className="w-full h-screen flex flex-col gap-6 p-6 items-center">
-      <h1 className="font-bold text-2xl text-center">
-        <span className="text-indigo-500">Offer</span> Management System
-      </h1>
+      {/* Conditionally render based on the state */}
+      {!showAllProductOffer && !showCategorizedProductOffer && !showSingleProductOffer && !showAllPBPCOffer && !showIntelPBPCOffer && !showAMDPBPCOffer && !showAllCBPCOffer && !showIntelCBPCOffer && !showAMDCBPCOffer ? (
+        <>
+          <h1 className="font-bold text-2xl text-center">
+            <span className="text-indigo-500">Offer</span> Management System
+          </h1>
+          <div className="flex flex-wrap gap-6 justify-center items-center">
+            {/* Offer on Products */}
+            {(selectedDiv === null || selectedDiv === 1) && (
+              <div
+                className="p-4 rounded-sm flex flex-col justify-center items-center bg-yellow-400 border-yellow-400 border-2 hover:bg-transparent hover:text-yellow-400 cursor-pointer h-24 gap-2"
+                onClick={() => setSelectedDiv(1)}
+              >
+                <TableProperties size={30} />
+                <p className="text-center font-semibold text-xs">
+                  Offer on Products
+                </p>
+              </div>
+            )}
 
-      <div className="w-full flex gap-5 p-10 justify-center items-center">
-        {/* Offer on the Products */}
-        {(selectedDiv === null || selectedDiv === 1) && (
-          <div
-            className="p-4 rounded-sm flex flex-col justify-center items-center bg-cyan-400 border-cyan-400 border-2 hover:bg-transparent hover:text-cyan-400 cursor-pointer h-24 gap-2"
-            onClick={() => setSelectedDiv(1)}
-          >
-            <MdPostAdd size={30} />
-            <p className="text-center font-semibold text-xs">
-              Offer on the Products
-            </p>
+            {/* Offer on Pre-Build PC */}
+            {(selectedDiv === null || selectedDiv === 2) && (
+              <div
+                className="p-4 rounded-sm flex flex-col justify-center items-center bg-orange-400 border-orange-400 border-2 hover:bg-transparent hover:text-orange-400 cursor-pointer h-24 gap-2"
+                onClick={() => setSelectedDiv(2)}
+              >
+                <TableProperties size={30} />
+                <p className="text-center font-semibold text-xs">
+                  Offer on Pre-Build PC
+                </p>
+              </div>
+            )}
+
+            {/* Offer on Custom Build PC */}
+            {(selectedDiv === null || selectedDiv === 3) && (
+              <div
+                className="p-4 rounded-sm flex flex-col justify-center items-center bg-teal-400 border-teal-400 border-2 hover:bg-transparent hover:text-teal-400 cursor-pointer h-24 gap-2"
+                onClick={() => setSelectedDiv(3)}
+              >
+                <MdOutlineDashboardCustomize size={30} />
+                <p className="text-center font-semibold text-xs">
+                  Offer on Custom Build PC
+                </p>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Offer on Pre-Build PC */}
-        {(selectedDiv === null || selectedDiv === 2) && (
-          <div
-            className="p-4 rounded-sm flex flex-col justify-center items-center bg-rose-500 border-rose-500 border-2 hover:bg-transparent hover:text-rose-500 cursor-pointer h-24 gap-2"
-            onClick={() => setSelectedDiv(2)}
+          {/* Render Subdivs */}
+          {renderSubDivs()}
+          {selectedDiv !== null && (
+            <button
+              onClick={() => setSelectedDiv(null)}
+              className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+            >
+              Back
+            </button>
+          )}
+        </>
+      ) : showAllProductOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <AllProductOffer />
+          <button
+            onClick={() => setShowAllProductOffer(false)} // Hide AllProductOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600 w-36"
           >
-            <TableProperties size={30} />
-            <p className="text-center font-semibold text-xs">
-              Offer on Pre-Build PC
-            </p>
-          </div>
-        )}
-
-        {/* Offer on Custom Build PC */}
-        {(selectedDiv === null || selectedDiv === 3) && (
-          <div
-            className="p-4 rounded-sm flex flex-col justify-center items-center bg-red-500 border-red-500 border-2 hover:bg-transparent hover:text-red-500 cursor-pointer h-24 gap-2"
-            onClick={() => setSelectedDiv(3)}
+            Back
+          </button>
+        </div>
+      ) : showCategorizedProductOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <CategorizedProductOffer />
+          <button
+            onClick={() => setShowCategorizedProductOffer(false)} // Hide CategorizedProductOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
           >
-            <MdOutlineDashboardCustomize size={30} />
-            <p className="text-center font-semibold text-xs">
-              Offer on Custom Build PC
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Render Sub Divs based on the selected main div */}
-      {renderSubDivs()}
-
-      {/* Back button */}
-      {selectedDiv !== null && (
-        <button
-          onClick={() => setSelectedDiv(null)}
-          className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
-        >
-          Back
-        </button>
-      )}
+            Back
+          </button>
+        </div>
+      ) : showSingleProductOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <SingleProductOffer />
+          <button
+            onClick={() => setShowSingleProductOffer(false)} // Hide SingleProductOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showAllPBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <AllPBPCOffer />
+          <button
+            onClick={() => setShowAllPBPCOffer(false)} // Hide AllPBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showIntelPBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <IntelPBPCOffer />
+          <button
+            onClick={() => setShowIntelPBPCOffer(false)} // Hide IntelPBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showAMDPBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <AMDPBPCOffer />
+          <button
+            onClick={() => setShowAMDPBPCOffer(false)} // Hide AMDPBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showAllCBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <AllCBPCOffer />
+          <button
+            onClick={() => setShowAllCBPCOffer(false)} // Hide AllCBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showIntelCBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <IntelCBPCOffer />
+          <button
+            onClick={() => setShowIntelCBPCOffer(false)} // Hide IntelCBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : showAMDCBPCOffer ? (
+        <div className="w-screen flex flex-col justify-center items-center">
+          <AMDCBPCOffer />
+          <button
+            onClick={() => setShowAMDCBPCOffer(false)} // Hide AMDCBPCOffer and go back
+            className="px-4 py-2 mt-4 bg-gray-800 text-white rounded hover:bg-gray-600"
+          >
+            Back
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 };

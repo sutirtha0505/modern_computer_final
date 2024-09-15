@@ -443,6 +443,16 @@ nav.open .nav-content span {
 .nav-content span .planets:hover .icons {
   opacity: 1;
 }
+select {
+  height: 2.5rem; /* Adjust height if necessary */
+  padding: 0.5rem; /* Add padding for better appearance */
+  border-radius: 0.25rem; /* Rounded corners */
+  border: 1px solid #ddd; /* Border color */
+  background-color: #fff; /* Background color */
+  color: #333; /* Text color */
+  font-size: 0.875rem; /* Font size */
+}
+
 
 /* Styles for small screens */
 @media (max-width: 768px) {
