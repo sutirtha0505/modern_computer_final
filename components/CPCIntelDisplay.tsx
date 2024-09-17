@@ -57,6 +57,8 @@ const CPCIntelDisplay = () => {
   >([]);
   const [coolerOptions, setCoolerOptions] = useState<DropdownOption[]>([]);
   const [resetDropdown, setResetDropdown] = useState(false);
+  const [customBuildId, setCustomBuildId] = useState<string | null>(null);
+
 
   const [processorSP, setProcessorSP] = useState("");
   const [motherboardSP, setMotherboardSP] = useState("");
@@ -69,6 +71,35 @@ const CPCIntelDisplay = () => {
   const [hddSP, setHddSP] = useState("");
   const [coolerSP, setCoolerSP] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
+  const excludeProductId = (options: DropdownOption[]) => {
+    return options.map(({ id, name, price, image }) => ({
+      name,
+      price,
+      image,
+    }));
+  };
+
+  const handleBuyNow = () => {
+    // Create a query string with serialized data, excluding `product_id`
+    const queryString = new URLSearchParams({
+      customBuildId: customBuildId ?? '',
+      totalPrice: totalPrice.toString(),
+      processor: JSON.stringify(excludeProductId(selectedProcessorOptions)),
+      motherboard: JSON.stringify(excludeProductId(selectedMotherboardOptions)),
+      ram: JSON.stringify(excludeProductId(selectedRAMOptions)),
+      ramQuantity: ramQuantity.toString(),
+      ssd: JSON.stringify(excludeProductId(selectedSSDOptions)),
+      graphicsCard: JSON.stringify(
+        excludeProductId(selectedGraphicsCardOptions)
+      ),
+      cabinet: JSON.stringify(excludeProductId(selectedCabinetOptions)),
+      psu: JSON.stringify(excludeProductId(selectedPSUOptions)),
+      hdd: JSON.stringify(excludeProductId(selectedHDDOptions)),
+      cooler: JSON.stringify(excludeProductId(selectedCoolerOptions)),
+    }).toString();
+    // Redirect to the checkout page with the query string
+    router.push(`/checkout-custom-build?${queryString}`);
+  };
 
   useEffect(() => {
     fetchProcessorProducts();
@@ -151,7 +182,9 @@ const CPCIntelDisplay = () => {
       if (error) {
         throw error;
       }
-
+      // Log the id from the custom_build table
+      console.log("Custom build ID:", data.id);
+      setCustomBuildId(data.id);
       fetchProductsByUUIDs(data.motherboards, setMotherboardOptions);
       fetchProductsByUUIDs(data.ram, setRamOptions);
       fetchProductsByUUIDs(data.ssd, setSsdOptions);
@@ -506,6 +539,12 @@ const CPCIntelDisplay = () => {
           <div className="text-xl font-bold">
             Total Price: ₹{totalPrice.toLocaleString()}
           </div>
+          <button
+            onClick={handleBuyNow}
+            className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+          >
+            Buy Now
+          </button>
         </div>
       </div>
     </div>

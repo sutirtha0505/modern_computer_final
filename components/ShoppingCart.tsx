@@ -49,9 +49,10 @@ const ShoppingCart = () => {
     // Convert cart array (with imageUrl) to a query-friendly string
     const cartString = encodeURIComponent(JSON.stringify(updatedCart));
   
-    // Navigate to the checkout page with cart and totalSum in the query
-    router.push(`/checkout-cart?cart=${cartString}&totalSum=${totalSum}`);
+    // Navigate to the checkout page without totalSum in the query
+    router.push(`/checkout-cart?cart=${cartString}`);
   };
+  
   
 
   return (

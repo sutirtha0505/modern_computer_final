@@ -88,7 +88,7 @@ const CategorisedProductOffer = () => {
   return (
     <div className="w-full pt-6 flex flex-col items-center p-6 gap-6">
       <h1 className="text-2xl font-bold">
-        Offer for <span className="text-indigo-500">All the products</span>
+        Offer for <span className="text-indigo-500">Selected Categorised Products</span>
       </h1>
       <p className="text-medium p-6 text-center">
         From this Section, you can apply a{" "}

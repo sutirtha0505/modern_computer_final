@@ -18,7 +18,6 @@ const PreBuildPCSingleProduct: React.FC = () => {
   const [product, setProduct] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const dispatch = useAppDispatch();
-  
 
   useEffect(() => {
     const fetchPreBuilds = async () => {
@@ -246,7 +245,7 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
                 className="w-8 h-8"
               />
-            <h1 className="text-xl font-bold">Hard Disk: </h1>
+              <h1 className="text-xl font-bold">Hard Disk: </h1>
             </div>
             <div
               onClick={() => {
@@ -411,9 +410,16 @@ const PreBuildPCSingleProduct: React.FC = () => {
           >
             Add to Cart
           </button> */}
-          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200" onClick={()=>{
-            router.push("/checkout");
-          }}>
+          <button
+            className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+            onClick={() => {
+              if (product) {
+                router.push(
+                  `/checkout-pre-build?id=${product.id}&selling_price=${product.selling_price}`
+                );
+              }
+            }}
+          >
             Buy Now
           </button>
         </div>

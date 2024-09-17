@@ -29,9 +29,13 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
     dispatch(addToCart(singleProduct));
   };
 
+  const handleBuyNow = () => {
+    router.push(`/checkout-single-product?product_id=${singleProduct.product_id}`);
+  };
+
   return (
     <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center pb-20 pt-16">
-      <div className="flex p-6 flex-col justify-center items-center relative">
+      <div className="md:w-1/2 w-full flex p-6 flex-col justify-center items-center relative">
         <div
           className="absolute top-2 right-2 z-10 rounded-full bg-white/50 p-2 custom-backdrop-filter cursor-pointer"
           onClick={handleHeartClick}
@@ -65,7 +69,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           </Carousel>
         )}
       </div>
-      <div className="flex flex-col justify-center gap-6 p-6">
+      <div className="md:w-1/2 w-full flex flex-col justify-center gap-6 p-6">
         <h1 className="font-extrabold text-2xl">
           {singleProduct.product_name}
         </h1>
@@ -93,9 +97,10 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           >
             Add to Cart
           </button>
-          <button className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200" onClick={()=>{
-            router.push('/checkout');
-          }}>
+          <button 
+            className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+            onClick={handleBuyNow}
+          >
             Buy Now
           </button>
         </div>
