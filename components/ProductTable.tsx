@@ -18,7 +18,6 @@ interface Product {
   product_category: string;
   show_product: boolean;
 }
-
 const ProductTable: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -150,6 +149,8 @@ const ProductTable: React.FC = () => {
   };
 
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
+
+  //Seraching logic
 
   const handleSearch = () => {
     const lowercasedFilter = searchTerm.toLowerCase();

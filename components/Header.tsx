@@ -9,6 +9,13 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
+
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_image: { string: string }[];
+  show_product: boolean;
+}
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
@@ -16,6 +23,8 @@ import { getCart } from "@/redux/cartSlice";
 import { supabase } from "@/lib/supabaseClient";
 import "@/app/globals.css";
 const Header = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>("");
   const router = useRouter();
   const cart = useAppSelector(getCart);
@@ -56,10 +65,51 @@ const Header = () => {
     };
   }, []);
 
+  // Fetch product data
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data: products, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("show_product", true); // Filter for products where show_product is true
+
+      if (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]); // Set an empty array in case of error
+      } else if (products) {
+        setProducts(products); // Set the products if fetched successfully
+      } else {
+        setProducts([]); // Fallback to an empty array if the data is null
+      }
+    };
+    fetchProducts();
+  }, []);
+
   const searchHandler = () => {
     if (query.trim()) {
       router.push(`/search/${query}`);
     }
+  };
+
+  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value) {
+      const lowercasedValue = value.toLowerCase();
+      const suggestionData = products.filter((product) =>
+        product.product_name.toLowerCase().startsWith(lowercasedValue)
+      );
+      setSuggestions(suggestionData);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (product: Product) => {
+    setQuery(product.product_name);
+    setSuggestions([]);
+    searchHandler(); // Trigger search after clicking on a suggestion
   };
 
   useEffect(() => {
@@ -147,11 +197,27 @@ const Header = () => {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown} // Added key down handler here
+              onChange={handleSearchTermChange}
+              onKeyDown={handleKeyDown}
               placeholder="Search..."
               className="pl-11 py-2 rounded-full border border-gray-300 w-[220px] focus:outline-none text-black"
             />
+            {suggestions.length > 0 && (
+              <ul
+                className="absolute bg-slate-900 border border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide
+              "
+              >
+                {suggestions.map((product) => (
+                  <li
+                    key={product.product_id}
+                    onClick={() => handleSuggestionClick(product)}
+                    className="cursor-pointer p-2 hover:bg-gray-700 text-xs"
+                  >
+                    {product.product_name}
+                  </li>
+                ))}
+              </ul>
+            )}
             <button
               onClick={searchHandler}
               className="absolute right-0 top-0 bottom-0 p-[9px] bg-indigo-500 rounded-full hover:bg-indigo-600"
