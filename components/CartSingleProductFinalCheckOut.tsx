@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Razorpay from "razorpay";
 
 const CartSingleProductFinalCheckOut = () => {
   const searchParams = useSearchParams();
@@ -39,13 +40,25 @@ const CartSingleProductFinalCheckOut = () => {
             img.url.includes("_first")
           );
           setProductData({ ...data, product_image: productImage?.url || "" });
-          setDiscountedTotal(data.product_SP); // Initially set the total to product_SP
+          setDiscountedTotal(data.product_SP);
         }
       }
     };
 
     fetchProductDetails();
   }, [productId]);
+
+  // Load the Razorpay script
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handleApplyCoupon = () => {
     if (couponCode === productData.coupon_code) {
@@ -68,18 +81,44 @@ const CartSingleProductFinalCheckOut = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: discountedTotal,
-          currency: "INR", // Adjust the currency as needed
+          amount: discountedTotal*100,
+          currency: "INR",
         }),
       });
 
       const data = await response.json();
+
       if (data.error) {
         toast.error("Payment failed!");
-      } else {
-        toast.success("Order created successfully!");
-        // Redirect to Razorpay Checkout (or handle success accordingly)
+        return;
       }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: productData.product_name,
+        description: "Purchase Description",
+        order_id: data.id,
+        handler: (response: any) => {
+          toast.success("Payment successful!");
+          console.log("Payment Response:", response);
+        },
+        prefill: {
+          name: "Customer Name",
+          email: "customer@example.com",
+          contact: "1234567890",
+        },
+        notes: {
+          address: "Customer Address",
+        },
+        theme: {
+          color: "#F37254",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
       console.error("Error during payment:", error);
       toast.error("Payment failed!");
