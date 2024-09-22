@@ -92,8 +92,8 @@ const CustomBuildSingleProductFinalCheckOut = () => {
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
         <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-slate-800">
-          <h1 className="text-xl font-bold">Your Configuration</h1>
-          <div className="flex justify-center gap-4 items-center w-full">
+          <h1 className="text-xl font-bold">Your <span className="text-indigo-500">Configuration</span></h1>
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
               className="w-6 h-6"
@@ -103,19 +103,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {processor.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
               className="w-6 h-6"
@@ -125,19 +125,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {motherboard.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
               className="w-6 h-6"
@@ -147,20 +147,20 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {ram.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
-            <p>X {ramQuantity}</p>
+            <p className="text-nowrap">X {ramQuantity}</p>
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
               className="w-6 h-6"
@@ -170,19 +170,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {ssd.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
               className="w-6 h-6"
@@ -192,19 +192,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {graphicsCard.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
               className="w-6 h-6"
@@ -214,18 +214,18 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {cabinet.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
               className="w-6 h-6"
@@ -235,19 +235,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {psu.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_intel/INTEL_Custom.png"
               className="w-6 h-6"
@@ -257,19 +257,19 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {hdd.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>
             ))}
           </div>
 
-          <div className="flex justify-center gap-4 items-center w-full">
+          <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
               className="w-6 h-6"
@@ -279,12 +279,12 @@ const CustomBuildSingleProductFinalCheckOut = () => {
             {cooler.map((item, index) => (
               <div
                 key={index}
-                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md "
+                className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
-                <p className="text-xs font-bold">{item.name.slice(0, 10)}...</p>
+                <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
                 <img
                   src={item.image}
-                  alt={item.name.slice(0, 10)}
+                  alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
                 />
               </div>

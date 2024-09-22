@@ -53,8 +53,8 @@ const Dropdown = ({ options, onSelect, multiple = true, reset }: DropdownProps) 
   // Function to truncate the name to the first 5 words
   const truncateName = (name: string) => {
     const words = name.split(' ');
-    if (words.length > 5) {
-      return words.slice(0, 5).join(' ') + '...';
+    if (words.length > 10) {
+      return words.slice(0, 10).join(' ') + '...';
     }
     return name;
   };
@@ -85,13 +85,13 @@ const Dropdown = ({ options, onSelect, multiple = true, reset }: DropdownProps) 
   );
 
   return (
-    <div className="w-[40%] bg-transparent border-2 flex justify-center rounded-md flex-col">
+    <div className="w-full bg-transparent border-2 flex justify-center rounded-md flex-col">
       <div className="p-2" onClick={toggleDropdown}>
         {selectedOptions.length > 0 ? (
           <div>
             {selectedOptions.map((option) => (
               <div key={option.id} className="flex items-center justify-between cursor-pointer">
-                <div className="flex flex-wrap justify-center items-center">
+                <div className="flex justify-center items-center">
                   <img
                     src={option.image}
                     alt={option.name}

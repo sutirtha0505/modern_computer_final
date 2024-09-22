@@ -4,8 +4,8 @@ import React from "react";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 const Footer = () => {
   return (
-    <div className="w-full p-4 px-20 flex justify-between items-center bg-slate-900">
-      <h1 className="text-lg font-bold text-center">
+    <div className="w-full p-4 px-20 mb-16 md:mb-0 flex justify-between items-center bg-slate-900">
+      <h1 className="text-sm md:text-lg font-bold text-center">
         All Rights Reseved by{" "}
         <span className="text-indigo-500">&copy;Modern Computer</span>, 2024
       </h1>

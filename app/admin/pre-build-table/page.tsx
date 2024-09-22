@@ -1,5 +1,4 @@
 "use client"
-import BestSeller from '@/components/BestSeller';
 import PreBuildTable from '@/components/PreBuildTable';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
 import { supabase } from '@/lib/supabaseClient';

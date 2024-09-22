@@ -10,13 +10,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 const ProductUploadForm: React.FC = () => {
   const [productName, setProductName] = useState<string>("");
+  const [productSP, setProductSP] = useState<number>(0);
   const [productDescription, setProductDescription] = useState<string>("");
   const [productMRP, setProductMRP] = useState<number>(0);
-  const [productDiscount, setProductDiscount] = useState<number>(0);
   const [productCategory, setProductCategory] = useState<string>(""); // New state for category
   const [images, setImages] = useState<File[]>([]);
   const [isTooltipVisible, setIsTooltipVisible] = useState<boolean>(false);
-  const [isSuggestionVisible, setIsSuggestionVisible] = useState<boolean>(false); // State for tooltip visibility
+  const [isSuggestionVisible, setIsSuggestionVisible] =
+    useState<boolean>(false); // State for tooltip visibility
 
   const onDrop = (acceptedFiles: File[]) => {
     setImages([...images, ...acceptedFiles]);
@@ -32,96 +33,97 @@ const ProductUploadForm: React.FC = () => {
     event.preventDefault();
 
     if (
-      !productName ||
-      !productDescription ||
-      productMRP === 0 ||
-      productDiscount === 0 ||
-      !productCategory ||
-      images.length === 0
+        !productName ||
+        !productDescription ||
+        productMRP === 0 ||
+        productSP === 0 ||
+        !productCategory ||
+        images.length === 0
     ) {
-      toast.error("Please fill all the fields and upload at least one image");
-      return;
+        toast.error("Please fill all the fields and upload at least one image");
+        return;
     }
+
+    const productDiscount = ((productMRP - productSP) / productMRP) * 100;
 
     // Check for duplicate product name
     const { data: existingProducts, error: checkError } = await supabase
-      .from("products")
-      .select("product_name")
-      .eq("product_name", productName);
+        .from("products")
+        .select("product_name")
+        .eq("product_name", productName);
 
     if (checkError) {
-      console.error("Error checking product name:", checkError.message);
-      toast.error(`Error checking product name: ${checkError.message}`);
-      return;
+        console.error("Error checking product name:", checkError.message);
+        toast.error(`Error checking product name: ${checkError.message}`);
+        return;
     }
 
     if (existingProducts && existingProducts.length > 0) {
-      toast.error("Already this product is listed");
-      return;
+        toast.error("Already this product is listed");
+        return;
     }
 
     const productId = uuidv4();
     const imageUrls: any[] = [];
     const uploadPromises = images.map(async (image) => {
-      const filePath = `${productId}/${uuidv4()}_${image.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("product-image")
-        .upload(filePath, image);
+        const filePath = `${productId}/${uuidv4()}_${image.name}`;
+        const { error: uploadError } = await supabase.storage
+            .from("product-image")
+            .upload(filePath, image);
 
-      if (uploadError) {
-        console.error("Error uploading image:", uploadError.message);
-        toast.error(`Error uploading image: ${uploadError.message}`);
-        return;
-      }
+        if (uploadError) {
+            console.error("Error uploading image:", uploadError.message);
+            toast.error(`Error uploading image: ${uploadError.message}`);
+            return;
+        }
 
-      const { data: publicUrlData } = await supabase.storage
-        .from("product-image")
-        .getPublicUrl(filePath);
+        const { data: publicUrlData } = await supabase.storage
+            .from("product-image")
+            .getPublicUrl(filePath);
 
-      if (publicUrlData) {
-        imageUrls.push({ url: publicUrlData.publicUrl });
-      } else {
-        console.error("Error getting public URL");
-        toast.error("Error getting public URL");
-      }
+        if (publicUrlData) {
+            imageUrls.push({ url: publicUrlData.publicUrl });
+        } else {
+            console.error("Error getting public URL");
+            toast.error("Error getting public URL");
+        }
     });
 
     await Promise.all(uploadPromises);
 
-    const productSP =
-      Number(productMRP) - (Number(productMRP) * Number(productDiscount)) / 100;
+    const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
 
     const { data, error: insertError } = await supabase
-      .from("products")
-      .insert([
-        {
-          product_id: productId,
-          product_image: imageUrls,
-          product_name: productName,
-          product_description: productDescription,
-          product_MRP: Number(productMRP),
-          product_discount: Number(productDiscount),
-          product_SP: productSP,
-          product_amount: 100, // Initial amount, can be adjusted later
-          product_category: productCategory, // Include the category
-        },
-      ]);
+        .from("products")
+        .insert([
+            {
+                product_id: productId,
+                product_image: imageUrls,
+                product_name: productName,
+                product_description: productDescription,
+                product_MRP: Number(productMRP),
+                product_discount: Number(productDiscount),
+                product_SP: Number(calculatedSP), // Use calculatedSP here
+                product_amount: 100, // Initial amount, can be adjusted later
+                product_category: productCategory, // Include the category
+            },
+        ]);
 
     if (insertError) {
-      console.error("Error adding product:", insertError.message);
-      toast.error(`Error adding product: ${insertError.message}`);
-      return;
+        console.error("Error adding product:", insertError.message);
+        toast.error(`Error adding product: ${insertError.message}`);
+        return;
     }
 
-    console.log("Product added:", data);
     toast.success("Product added successfully!");
     setProductName("");
     setProductDescription("");
     setProductMRP(0); // Reset to 0
-    setProductDiscount(0); // Reset to 0
+    setProductSP(0); // Reset product selling price
     setProductCategory(""); // Reset category
     setImages([]);
-  };
+};
+
 
   return (
     <div className="w-full h-[100vh] flex gap-2 flex-col justify-center items-center">
@@ -142,7 +144,9 @@ const ProductUploadForm: React.FC = () => {
           </div>
           {isTooltipVisible && (
             <div className="absolute z-[2] top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter">
-              <h1 className="text-center text-indigo-500 font-bold">Cheatlist for Product Category</h1>
+              <h1 className="text-center text-indigo-500 font-bold">
+                Cheatlist for Product Category
+              </h1>
               <table className="border-black text-black">
                 <thead>
                   <tr>
@@ -254,17 +258,17 @@ const ProductUploadForm: React.FC = () => {
           />
         </div>
         <div className="flex flex-col">
-          <label>Product Discount (%):</label>
+          <label>Product Selling Price:</label>
           <input
             type="number"
-            value={productDiscount}
-            onChange={(e) => setProductDiscount(Number(e.target.value))}
+            value={productSP}
+            onChange={(e) => setProductSP(Number(e.target.value))}
             required
             className="border-2 border-white rounded-md bg-transparent pl-1 outline-none"
           />
         </div>
         <div className="flex flex-col relative">
-        <div
+          <div
             className="flex justify-between items-center"
             onMouseOver={() => setIsSuggestionVisible(true)}
             onMouseOut={() => setIsSuggestionVisible(false)}
@@ -274,15 +278,22 @@ const ProductUploadForm: React.FC = () => {
           </div>
           {isSuggestionVisible && (
             <div className="absolute z-[2] top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter">
-              <h1 className="text-center text-indigo-500 font-bold">Cheatlist for Uploading Image</h1>
+              <h1 className="text-center text-indigo-500 font-bold">
+                Cheatlist for Uploading Image
+              </h1>
               <p className="text-center text-black">
-                Remember to <b>Rename</b> the image you want to set as <b>First image</b>.
+                Remember to <b>Rename</b> the image you want to set as{" "}
+                <b>First image</b>.
               </p>
               <p className="text-center text-black">
-                Rename it and add <span className="text-indigo-500 font-bold">_first</span> at the end of the image name.
+                Rename it and add{" "}
+                <span className="text-indigo-500 font-bold">_first</span> at the
+                end of the image name.
               </p>
               <p className="text-center text-black">
-                If you have only one image, also in that case, <b>Rename</b> and add <span className="text-indigo-500 font-bold">_first</span> to that image name.
+                If you have only one image, also in that case, <b>Rename</b> and
+                add <span className="text-indigo-500 font-bold">_first</span> to
+                that image name.
               </p>
             </div>
           )}

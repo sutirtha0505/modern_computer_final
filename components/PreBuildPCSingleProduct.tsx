@@ -274,9 +274,15 @@ const PreBuildPCSingleProduct: React.FC = () => {
             </div>
             <div
               onClick={() => {
-                router.push(`/product/${product.graphics_card}`);
+                if (product.show_product) {
+                  router.push(`/product/${product.graphics_card}`);
+                }
               }}
-              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+              className={`flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg ${
+                product.show_product
+                  ? "cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
             >
               <img
                 src={getProductImageByID(product.graphics_card)}
@@ -349,9 +355,15 @@ const PreBuildPCSingleProduct: React.FC = () => {
             </div>
             <div
               onClick={() => {
-                router.push(`/product/${product.cooling_system}`);
+                if (product.show_product) {
+                  router.push(`/product/${product.cooling_system}`);
+                }
               }}
-              className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
+              className={`flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg ${
+                product.show_product
+                  ? "cursor-pointer"
+                  : "opacity-50 cursor-not-allowed"
+              }`}
             >
               <img
                 src={getProductImageByID(product.cooling_system)}

@@ -59,7 +59,6 @@ const CPCIntelDisplay = () => {
   const [resetDropdown, setResetDropdown] = useState(false);
   const [customBuildId, setCustomBuildId] = useState<string | null>(null);
 
-
   const [processorSP, setProcessorSP] = useState("");
   const [motherboardSP, setMotherboardSP] = useState("");
   const [ramSP, setRamSP] = useState("");
@@ -82,7 +81,7 @@ const CPCIntelDisplay = () => {
   const handleBuyNow = () => {
     // Create a query string with serialized data, excluding `product_id`
     const queryString = new URLSearchParams({
-      customBuildId: customBuildId ?? '',
+      customBuildId: customBuildId ?? "",
       totalPrice: totalPrice.toString(),
       processor: JSON.stringify(excludeProductId(selectedProcessorOptions)),
       motherboard: JSON.stringify(excludeProductId(selectedMotherboardOptions)),
@@ -158,7 +157,7 @@ const CPCIntelDisplay = () => {
 
       const formattedOptions = data.map((product) => ({
         id: product.product_id,
-        name: product.product_name.split(" ").slice(0, 5).join(" "),
+        name: product.product_name.split(" ").slice(0, 10).join(" "),
         price: product.product_SP,
         image: product.product_image?.find((img: any) =>
           img.url.includes("_first")
@@ -327,19 +326,20 @@ const CPCIntelDisplay = () => {
         >
           <ToastContainer />
 
-          <div className="md:w-[80%] w-auto flex rounded-md justify-center flex-col items-center gap-5 p-4 custom-backdrop-filter">
+          <div className="md:w-[80%] w-full flex rounded-md justify-center flex-col items-center gap-5 p-4 custom-backdrop-filter">
             <h1 className="text-2xl font-extrabold bg-gradient-to-br from-purple-600 to-blue-500 text-transparent bg-clip-text">
               Choose your Components
             </h1>
-            <div className="w-full flex flex-col">
-              <div className="w-full flex gap-2 justify-between items-center">
-                <div className="flex justify-center items-center gap-2">
-                  <img
-                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
-                    className="w-8 h-8"
-                  />
-                  <h1 className="text-xl font-bold">Processor: </h1>
-                </div>
+
+            <div className="w-full flex gap-2 justify-between flex-col items-start">
+              <div className="flex justify-start items-center gap-2">
+                <img
+                  src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
+                  className="w-8 h-8"
+                />
+                <h1 className="text-xl font-bold">Processor: </h1>
+              </div>
+              <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={processorOptions}
                   onSelect={(options) => handleSelectProcessor(options[0])}
@@ -351,7 +351,7 @@ const CPCIntelDisplay = () => {
                 </h2>
               </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
@@ -359,23 +359,25 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Motherboard: </h1>
               </div>
-              <Dropdown
-                options={motherboardOptions}
-                onSelect={(options) =>
-                  handleSelect(
-                    options,
-                    setSelectedMotherboardOptions,
-                    setMotherboardSP
-                  )
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{motherboardSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between gap-5 items-center">
+                <Dropdown
+                  options={motherboardOptions}
+                  onSelect={(options) =>
+                    handleSelect(
+                      options,
+                      setSelectedMotherboardOptions,
+                      setMotherboardSP
+                    )
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{motherboardSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex-wrap flex gap-2 justify-between items-center">
+            <div className="w-full flex-wrap flex-col flex gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
@@ -383,35 +385,37 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">RAM: </h1>
               </div>
-              <Dropdown
-                options={ramOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedRAMOptions, setRamSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-bold">Quantity:</label>
-                <select
-                  className="p-2 bg-transparent border rounded-md"
-                  value={ramQuantity}
-                  onChange={(e) =>
-                    handleSelectRamQuantity(Number(e.target.value))
+              <div className="w-full flex justify-between gap- items-center">
+                <Dropdown
+                  options={ramOptions}
+                  onSelect={(options) =>
+                    handleSelect(options, setSelectedRAMOptions, setRamSP)
                   }
-                >
-                  {[1, 2, 4, 8, 16, 32].map((quantity) => (
-                    <option key={quantity} value={quantity}>
-                      {quantity}
-                    </option>
-                  ))}
-                </select>
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-bold">Quantity:</label>
+                  <select
+                    className="p-2 bg-transparent border rounded-md"
+                    value={ramQuantity}
+                    onChange={(e) =>
+                      handleSelectRamQuantity(Number(e.target.value))
+                    }
+                  >
+                    {[1, 2, 4, 8, 16, 32].map((quantity) => (
+                      <option key={quantity} value={quantity}>
+                        {quantity}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <h2 className="text-xs text-emerald-300">
+                  ₹{(Number(ramSP) * ramQuantity).toLocaleString()}
+                </h2>
               </div>
-              <h2 className="text-xs text-emerald-300">
-                ₹{(Number(ramSP) * ramQuantity).toLocaleString()}
-              </h2>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
@@ -419,19 +423,21 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">SSD: </h1>
               </div>
-              <Dropdown
-                options={ssdOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedSSDOptions, setSsdSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{ssdSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={ssdOptions}
+                  onSelect={(options) =>
+                    handleSelect(options, setSelectedSSDOptions, setSsdSP)
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{ssdSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
@@ -439,23 +445,25 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Graphics Card: </h1>
               </div>
-              <Dropdown
-                options={graphicsCardOptions}
-                onSelect={(options) =>
-                  handleSelect(
-                    options,
-                    setSelectedGraphicsCardOptions,
-                    setGraphicsCardSP
-                  )
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{graphicsCardSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={graphicsCardOptions}
+                  onSelect={(options) =>
+                    handleSelect(
+                      options,
+                      setSelectedGraphicsCardOptions,
+                      setGraphicsCardSP
+                    )
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{graphicsCardSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
@@ -463,19 +471,26 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Cabinet: </h1>
               </div>
-              <Dropdown
-                options={cabinetOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedCabinetOptions, setCabinetSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{cabinetSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={cabinetOptions}
+                  onSelect={(options) =>
+                    handleSelect(
+                      options,
+                      setSelectedCabinetOptions,
+                      setCabinetSP
+                    )
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{cabinetSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
@@ -483,19 +498,21 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Power Supply: </h1>
               </div>
-              <Dropdown
-                options={psuOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedPSUOptions, setPsuSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{psuSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={psuOptions}
+                  onSelect={(options) =>
+                    handleSelect(options, setSelectedPSUOptions, setPsuSP)
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{psuSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
@@ -503,19 +520,21 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Hard Disk: </h1>
               </div>
-              <Dropdown
-                options={hddOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedHDDOptions, setHddSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{hddSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={hddOptions}
+                  onSelect={(options) =>
+                    handleSelect(options, setSelectedHDDOptions, setHddSP)
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{hddSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
-            <div className="w-full flex gap-2 justify-between items-center">
+            <div className="w-full flex gap-2 justify-between items-start flex-col">
               <div className="flex justify-center items-center gap-2">
                 <img
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cooler/cooler.png"
@@ -523,19 +542,22 @@ const CPCIntelDisplay = () => {
                 />
                 <h1 className="text-xl font-bold">Cooling System: </h1>
               </div>
-              <Dropdown
-                options={coolerOptions}
-                onSelect={(options) =>
-                  handleSelect(options, setSelectedCoolerOptions, setCoolerSP)
-                }
-                reset={resetDropdown}
-                multiple={false}
-              />
-              <h2 className="text-xs text-emerald-300">
-                ₹{coolerSP.toLocaleString()}
-              </h2>
+              <div className="flex w-full justify-between items-center gap-5">
+                <Dropdown
+                  options={coolerOptions}
+                  onSelect={(options) =>
+                    handleSelect(options, setSelectedCoolerOptions, setCoolerSP)
+                  }
+                  reset={resetDropdown}
+                  multiple={false}
+                />
+                <h2 className="text-xs text-emerald-300">
+                  ₹{coolerSP.toLocaleString()}
+                </h2>
+              </div>
             </div>
           </div>
+
           <div className="text-xl font-bold">
             Total Price: ₹{totalPrice.toLocaleString()}
           </div>
