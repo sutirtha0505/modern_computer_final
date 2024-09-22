@@ -35,7 +35,6 @@ const CartSingleProductFinalCheckOut = () => {
         if (error) {
           console.error("Error fetching product:", error);
         } else {
-          // Process product_image to find the URL containing '_first'
           const productImage = data.product_image.find((img: { url: string }) =>
             img.url.includes("_first")
           );
@@ -56,6 +55,36 @@ const CartSingleProductFinalCheckOut = () => {
       toast.success("Coupon code redeemed successfully!");
     } else {
       toast.error("Wrong coupon code");
+    }
+  };
+
+  const handlePayment = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: discountedTotal,
+          currency: "INR", // Adjust the currency as needed
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        toast.error("Payment failed!");
+      } else {
+        toast.success("Order created successfully!");
+        // Redirect to Razorpay Checkout (or handle success accordingly)
+      }
+    } catch (error) {
+      console.error("Error during payment:", error);
+      toast.error("Payment failed!");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,7 +164,7 @@ const CartSingleProductFinalCheckOut = () => {
                 couponApplied ? "bg-gray-600 cursor-not-allowed" : ""
               }`}
               placeholder="Coupon code..."
-              disabled={couponApplied} // Disable input after coupon applied
+              disabled={couponApplied}
             />
             <button
               onClick={handleApplyCoupon}
@@ -144,7 +173,7 @@ const CartSingleProductFinalCheckOut = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-indigo-500 text-white"
               } `}
-              disabled={couponApplied} // Disable button after coupon applied
+              disabled={couponApplied}
             >
               {couponApplied ? "Applied" : "Apply"}
             </button>
@@ -168,8 +197,12 @@ const CartSingleProductFinalCheckOut = () => {
             </p>
           </div>
           <div className="flex justify-center">
-            <button className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200">
-              Pay Here
+            <button
+              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              onClick={handlePayment}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Pay Here"}
             </button>
           </div>
         </div>
