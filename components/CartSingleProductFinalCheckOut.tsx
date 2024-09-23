@@ -1,15 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Razorpay from "razorpay";
 
-const CartSingleProductFinalCheckOut = () => {
+interface CartSingleProductFinalCheckOutProps {
+  userId: string; // Explicitly typing the userId as a string
+}
+
+const CartSingleProductFinalCheckOut: React.FC<
+  CartSingleProductFinalCheckOutProps
+> = ({ userId }) => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [productId, setProductId] = useState<string | null>(null);
   const [productData, setProductData] = useState<any>(null);
+  const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [couponCode, setCouponCode] = useState<string>("");
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
@@ -47,12 +55,17 @@ const CartSingleProductFinalCheckOut = () => {
 
     fetchProductDetails();
   }, [productId]);
-
   // Load the Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded"); // Log when the script is loaded
+    };
+    script.onerror = () => {
+      console.error("Error loading Razorpay script"); // Log error if the script fails to load
+    };
     document.body.appendChild(script);
 
     return () => {
@@ -60,9 +73,51 @@ const CartSingleProductFinalCheckOut = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchCustomerDetails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profile")
+          .select(
+            "customer_name, customer_house_no, customer_house_street, customer_house_city, customer_house_pincode, customer_house_landmark, profile_photo, email, phone_no"
+          )
+          .eq("id", userId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching customer details:", error);
+          return;
+        }
+
+        if (
+          !data.customer_name ||
+          !data.customer_house_no ||
+          !data.customer_house_street ||
+          !data.customer_house_city ||
+          !data.customer_house_pincode ||
+          !data.customer_house_landmark ||
+          !data.email ||
+          !data.phone_no ||
+          !data.profile_photo
+        ) {
+          router.push(`/profile/${userId}`);
+        } else {
+          setCustomerDetails(data);
+        }
+      } catch (error) {
+        console.error("Error fetching customer details:", error);
+      }
+    };
+
+    if (userId) {
+      fetchCustomerDetails();
+    }
+  }, [userId, router]);
+
   const handleApplyCoupon = () => {
     if (couponCode === productData.coupon_code) {
-      const discount = productData.product_SP * (productData.code_equiv_percent / 100);
+      const discount =
+        productData.product_SP * (productData.code_equiv_percent / 100);
       setDiscountedTotal(productData.product_SP - discount);
       setCouponApplied(true);
       toast.success("Coupon code redeemed successfully!");
@@ -81,15 +136,16 @@ const CartSingleProductFinalCheckOut = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          amount: discountedTotal*100,
+          amount: discountedTotal,
           currency: "INR",
         }),
       });
 
       const data = await response.json();
 
-      if (data.error) {
-        toast.error("Payment failed!");
+      if (!window.Razorpay) {
+        console.error("Razorpay is not loaded"); // Log if Razorpay is not defined
+        toast.error("Payment gateway is not available. Please try again.");
         return;
       }
 
@@ -105,29 +161,29 @@ const CartSingleProductFinalCheckOut = () => {
           console.log("Payment Response:", response);
         },
         prefill: {
-          name: "Customer Name",
-          email: "customer@example.com",
-          contact: "1234567890",
+          name: customerDetails.customer_name,
+          email: customerDetails.email,
+          contact: customerDetails.phone_no,
         },
         notes: {
-          address: "Customer Address",
+          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         },
         theme: {
           color: "#F37254",
         },
       };
 
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
+      const razorpay = new window.Razorpay(options); // Create Razorpay instance
+      razorpay.open(); // Open Razorpay payment window
     } catch (error) {
-      console.error("Error during payment:", error);
+      console.error("Error during payment:", error); // Log any errors during payment process
       toast.error("Payment failed!");
     } finally {
       setLoading(false);
     }
   };
 
-  if (!productData) {
+  if (!productData || !customerDetails) {
     return <div>Loading...</div>;
   }
 
@@ -225,7 +281,8 @@ const CartSingleProductFinalCheckOut = () => {
               className="w-6 h-6"
             />
             <p className="font-bold text-sm">
-              Total Amount Payable <br />(Including all Taxes):
+              Total Amount Payable <br />
+              (Including all Taxes):
             </p>
             <p className="text-sm font-bold text-indigo-600">
               {loading ? (
