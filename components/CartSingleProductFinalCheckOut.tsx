@@ -153,8 +153,9 @@ const CartSingleProductFinalCheckOut: React.FC<
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
-        name: productData.product_name,
-        description: "Purchase Description",
+        app_name: "Modern Computer",
+        description: productData.product_name,
+        image: "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
         handler: (response: any) => {
           toast.success("Payment successful!");
@@ -165,12 +166,18 @@ const CartSingleProductFinalCheckOut: React.FC<
           email: customerDetails.email,
           contact: customerDetails.phone_no,
         },
+        
         notes: {
           address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         },
         theme: {
-          color: "#F37254",
+          color: "#6366F1", // Blue color
+        },        
+        notify: {
+          sms: true,
+          email: true,
         },
+        reminder_enable: true, // Enabling payment reminders
       };
 
       const razorpay = new window.Razorpay(options); // Create Razorpay instance
