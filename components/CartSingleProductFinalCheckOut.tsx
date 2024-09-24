@@ -5,14 +5,13 @@ import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Razorpay from "razorpay";
+import dayjs from "dayjs"; // For date manipulation
 
 interface CartSingleProductFinalCheckOutProps {
   userId: string; // Explicitly typing the userId as a string
 }
 
-const CartSingleProductFinalCheckOut: React.FC<
-  CartSingleProductFinalCheckOutProps
-> = ({ userId }) => {
+const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutProps> = ({ userId }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [productId, setProductId] = useState<string | null>(null);
@@ -55,16 +54,17 @@ const CartSingleProductFinalCheckOut: React.FC<
 
     fetchProductDetails();
   }, [productId]);
+
   // Load the Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
     script.onload = () => {
-      console.log("Razorpay script loaded"); // Log when the script is loaded
+      console.log("Razorpay script loaded");
     };
     script.onerror = () => {
-      console.error("Error loading Razorpay script"); // Log error if the script fails to load
+      console.error("Error loading Razorpay script");
     };
     document.body.appendChild(script);
 
@@ -116,8 +116,7 @@ const CartSingleProductFinalCheckOut: React.FC<
 
   const handleApplyCoupon = () => {
     if (couponCode === productData.coupon_code) {
-      const discount =
-        productData.product_SP * (productData.code_equiv_percent / 100);
+      const discount = productData.product_SP * (productData.code_equiv_percent / 100);
       setDiscountedTotal(productData.product_SP - discount);
       setCouponApplied(true);
       toast.success("Coupon code redeemed successfully!");
@@ -144,7 +143,7 @@ const CartSingleProductFinalCheckOut: React.FC<
       const data = await response.json();
 
       if (!window.Razorpay) {
-        console.error("Razorpay is not loaded"); // Log if Razorpay is not defined
+        console.error("Razorpay is not loaded");
         toast.error("Payment gateway is not available. Please try again.");
         return;
       }
@@ -157,43 +156,63 @@ const CartSingleProductFinalCheckOut: React.FC<
         description: productData.product_name,
         image: "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
-        handler: (response: any) => {
+        handler: async (response: any) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
+
+          // Save order in database
+          await saveOrder(response.razorpay_order_id, response.razorpay_payment_id);
         },
         prefill: {
           name: customerDetails.customer_name,
           email: customerDetails.email,
           contact: customerDetails.phone_no,
         },
-        
         notes: {
           address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         },
         theme: {
-          color: "#6366F1", // Blue color
-        },        
-        notify: {
-          sms: true,
-          email: true,
+          color: "#6366F1",
         },
-        reminder_enable: true, // Enabling payment reminders
       };
 
-      const razorpay = new window.Razorpay(options); // Create Razorpay instance
-      razorpay.open(); // Open Razorpay payment window
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      console.error("Error during payment:", error); // Log any errors during payment process
+      console.error("Error during payment:", error);
       toast.error("Payment failed!");
     } finally {
       setLoading(false);
     }
   };
 
+  const saveOrder = async (order_id: string, payment_id: string) => {
+    const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD"); // Calculate expected delivery date
+
+    const { error } = await supabase.from("order_table").insert([
+      {
+        order_id: order_id,
+        payment_id: payment_id,
+        customer_id: userId,
+        payment_amount: discountedTotal,
+        ordered_products: [productId], // Save product_id in array
+        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        expected_delivery_date: expectedDeliveryDate,
+        created_at: new Date(), // Set current timestamp
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving order:", error);
+      toast.error("Failed to save the order. Please try again.");
+    } else {
+      toast.success("Order saved successfully!");
+    }
+  };
+
   if (!productData || !customerDetails) {
     return <div>Loading...</div>;
   }
-
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
