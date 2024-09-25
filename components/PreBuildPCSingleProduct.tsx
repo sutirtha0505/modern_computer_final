@@ -1,7 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "@/lib/hooks/redux";
-import { addToCart } from "@/redux/cartSlice";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import { Carousel } from "react-responsive-carousel";
@@ -11,14 +9,13 @@ import "react-toastify/dist/ReactToastify.css";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { setProductDetails } from "@/redux/actions"; // Adjust the path accordingly
 
 const PreBuildPCSingleProduct: React.FC = () => {
   const { id } = useParams();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
-  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPreBuilds = async () => {
@@ -61,6 +58,7 @@ const PreBuildPCSingleProduct: React.FC = () => {
       ? truncateProductName(product.product_name)
       : "No product is added";
   };
+
   const getProductImageByID = (productId: string) => {
     const product = products.find(
       (product) => product.product_id === productId
@@ -85,19 +83,11 @@ const PreBuildPCSingleProduct: React.FC = () => {
   const handleHeartClick = () => {
     setIsHeartFilled(!isHeartFilled);
   };
-
-  // const handleAddToCart = () => {
-  //   if (product) {
-  //     dispatch(addToCart(product));
-  //   }
-  // };
-
   if (!product) {
     return <div>Loading...</div>;
   }
 
   const productImages = product.image_urls || [];
-  const router = useRouter();
 
   return (
     <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center mb-14">
@@ -426,11 +416,8 @@ const PreBuildPCSingleProduct: React.FC = () => {
           <button
             className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
             onClick={() => {
-              if (product) {
-                // Dispatch the product details to Redux store
-                dispatch(setProductDetails(product.id, product.selling_price));
-                // Navigate to the next page
-                router.push("/checkout-pre-build");
+              if (product){
+                router.push(`/checkout-pre-build?id=${product.id}&selling_price=${product.selling_price}`);
               }
             }}
           >
