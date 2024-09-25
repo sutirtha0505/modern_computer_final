@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAppSelector } from '@/lib/hooks/redux';
 
 const PreBuildSingleProductFinalCheckOut: React.FC = () => {
   const searchParams = useSearchParams();
@@ -13,10 +14,15 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [sellingPrice, setSellingPrice] = useState<number>(0); // State for selling price
 
   // Extract query parameters
   const id = searchParams.get("id");
-  const sellingPrice = parseFloat(searchParams.get("selling_price") || "0");
+
+  useEffect(() => {
+    const fetchedSellingPrice = parseFloat(searchParams.get("selling_price") || "0");
+    setSellingPrice(fetchedSellingPrice); // Set the selling price in state
+  }, [searchParams]); // Only run on search params change
 
   useEffect(() => {
     const fetchProductDetails = async () => {

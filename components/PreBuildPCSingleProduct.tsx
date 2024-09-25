@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { setProductDetails } from "@/redux/actions"; // Adjust the path accordingly
 
 const PreBuildPCSingleProduct: React.FC = () => {
   const { id } = useParams();
@@ -426,9 +427,10 @@ const PreBuildPCSingleProduct: React.FC = () => {
             className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
             onClick={() => {
               if (product) {
-                router.push(
-                  `/checkout-pre-build?id=${product.id}&selling_price=${product.selling_price}`
-                );
+                // Dispatch the product details to Redux store
+                dispatch(setProductDetails(product.id, product.selling_price));
+                // Navigate to the next page
+                router.push("/checkout-pre-build");
               }
             }}
           >
