@@ -10,12 +10,36 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 
+interface Product {
+  id: string;
+  build_name: string;
+  selling_price: number;
+  processor: string;
+  motherboard?: string;
+  ram?: string;
+  ram_quantity?: number;
+  ssd?: string;
+  hdd?: string;
+  graphics_card?: string;
+  psu?: string;
+  cabinet?: string;
+  cooling_system?: string;
+  additional_products?: string[];
+  show_product?: boolean;
+  image_urls?: { url: string }[];
+}
+
 const PreBuildPCSingleProduct: React.FC = () => {
   const { id } = useParams();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<any[]>([]);
   const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false); // New state for mounted check
+
+  useEffect(() => {
+    setIsMounted(true); // Set mounted flag to true once the component is loaded
+  }, []);
 
   useEffect(() => {
     const fetchPreBuilds = async () => {
@@ -83,12 +107,29 @@ const PreBuildPCSingleProduct: React.FC = () => {
   const handleHeartClick = () => {
     setIsHeartFilled(!isHeartFilled);
   };
+
+    const handleBuyNow = async () => {
+      if (product && isMounted) {
+        try {
+          // Store data in localStorage
+          localStorage.setItem("checkoutProduct", JSON.stringify({
+            id: product.id,
+            selling_price: product.selling_price,
+          }));
+
+          // Navigate to checkout page
+          router.push(`/checkout-pre-build`);
+        } catch (error) {
+          console.error("Error processing buy now:", error);
+        }
+      }
+    };
+
   if (!product) {
     return <div>Loading...</div>;
   }
 
   const productImages = product.image_urls || [];
-
   return (
     <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center mb-14">
       <div className="w-full md:w-1/2 flex p-6 flex-col justify-center items-center relative">
@@ -408,18 +449,14 @@ const PreBuildPCSingleProduct: React.FC = () => {
         </div>
         <div className="w-full flex gap-10">
           {/* <button
-            className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
-            onClick={handleAddToCart}
-          >
-            Add to Cart
-          </button> */}
+                className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+                onClick={handleAddToCart}
+              >
+                Add to Cart
+              </button> */}
           <button
             className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
-            onClick={() => {
-              if (product){
-                router.push(`/checkout-pre-build?id=${product.id}&selling_price=${product.selling_price}`);
-              }
-            }}
+            onClick={handleBuyNow}
           >
             Buy Now
           </button>

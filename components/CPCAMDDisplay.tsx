@@ -79,25 +79,30 @@ const CPCAMDDisplay = () => {
   };
 
   const handleBuyNow = () => {
-    // Create a query string with serialized data, excluding `product_id`
-    const queryString = new URLSearchParams({
+    // Prepare the data to be stored in localStorage, excluding `product_id`
+    const checkoutData = {
       customBuildId: customBuildId ?? "",
       totalPrice: totalPrice.toString(),
-      processor: JSON.stringify(excludeProductId(selectedProcessorOptions)),
-      motherboard: JSON.stringify(excludeProductId(selectedMotherboardOptions)),
-      ram: JSON.stringify(excludeProductId(selectedRAMOptions)),
+      processor: excludeProductId(selectedProcessorOptions),
+      motherboard: excludeProductId(selectedMotherboardOptions),
+      ram: excludeProductId(selectedRAMOptions),
       ramQuantity: ramQuantity.toString(),
-      ssd: JSON.stringify(excludeProductId(selectedSSDOptions)),
-      graphicsCard: JSON.stringify(
-        excludeProductId(selectedGraphicsCardOptions)
-      ),
-      cabinet: JSON.stringify(excludeProductId(selectedCabinetOptions)),
-      psu: JSON.stringify(excludeProductId(selectedPSUOptions)),
-      hdd: JSON.stringify(excludeProductId(selectedHDDOptions)),
-      cooler: JSON.stringify(excludeProductId(selectedCoolerOptions)),
-    }).toString();
-    // Redirect to the checkout page with the query string
-    router.push(`/checkout-custom-build?${queryString}`);
+      ssd: excludeProductId(selectedSSDOptions),
+      graphicsCard: excludeProductId(selectedGraphicsCardOptions),
+      cabinet: excludeProductId(selectedCabinetOptions),
+      psu: excludeProductId(selectedPSUOptions),
+      hdd: excludeProductId(selectedHDDOptions),
+      cooler: excludeProductId(selectedCoolerOptions),
+    };
+
+    // Store the data in localStorage
+    localStorage.setItem(
+      "checkoutCustomBuildData",
+      JSON.stringify(checkoutData)
+    );
+
+    // Redirect to the checkout page without any query parameters
+    router.push(`/checkout-custom-build`);
   };
 
   useEffect(() => {

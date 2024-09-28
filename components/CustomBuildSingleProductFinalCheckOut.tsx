@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "@/lib/supabaseClient";
@@ -11,32 +10,44 @@ interface Product {
 }
 
 const CustomBuildSingleProductFinalCheckOut = () => {
-  const searchParams = useSearchParams();
-
-  // Extract parameters
-  const totalPrice = Number(searchParams.get("totalPrice")) || 0; // Convert totalPrice to number safely
-  const processor = JSON.parse(
-    searchParams.get("processor") || "[]"
-  ) as Product[];
-  const motherboard = JSON.parse(
-    searchParams.get("motherboard") || "[]"
-  ) as Product[];
-  const ram = JSON.parse(searchParams.get("ram") || "[]") as Product[];
-  const ramQuantity = Number(searchParams.get("ramQuantity")) || 1;
-  const ssd = JSON.parse(searchParams.get("ssd") || "[]") as Product[];
-  const graphicsCard = JSON.parse(
-    searchParams.get("graphicsCard") || "[]"
-  ) as Product[];
-  const cabinet = JSON.parse(searchParams.get("cabinet") || "[]") as Product[];
-  const psu = JSON.parse(searchParams.get("psu") || "[]") as Product[];
-  const hdd = JSON.parse(searchParams.get("hdd") || "[]") as Product[];
-  const cooler = JSON.parse(searchParams.get("cooler") || "[]") as Product[];
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [processor, setProcessor] = useState<Product[]>([]);
+  const [motherboard, setMotherboard] = useState<Product[]>([]);
+  const [ram, setRam] = useState<Product[]>([]);
+  const [ramQuantity, setRamQuantity] = useState<number>(1);
+  const [ssd, setSsd] = useState<Product[]>([]);
+  const [graphicsCard, setGraphicsCard] = useState<Product[]>([]);
+  const [cabinet, setCabinet] = useState<Product[]>([]);
+  const [psu, setPsu] = useState<Product[]>([]);
+  const [hdd, setHdd] = useState<Product[]>([]);
+  const [cooler, setCooler] = useState<Product[]>([]);
+  const [customBuildId, setCustomBuildId] = useState<string>("");
   const [couponCode, setCouponCode] = useState<string>("");
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
-  const customBuildId = searchParams.get("customBuildId") || '';
+
+  useEffect(() => {
+    // Fetch the stored data from localStorage
+    const storedData = localStorage.getItem("checkoutCustomBuildData");
+    
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      setTotalPrice(Number(parsedData.totalPrice) || 0);
+      setProcessor(parsedData.processor || []);
+      setMotherboard(parsedData.motherboard || []);
+      setRam(parsedData.ram || []);
+      setRamQuantity(Number(parsedData.ramQuantity) || 1);
+      setSsd(parsedData.ssd || []);
+      setGraphicsCard(parsedData.graphicsCard || []);
+      setCabinet(parsedData.cabinet || []);
+      setPsu(parsedData.psu || []);
+      setHdd(parsedData.hdd || []);
+      setCooler(parsedData.cooler || []);
+      setCustomBuildId(parsedData.customBuildId || "");
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -46,9 +57,7 @@ const CustomBuildSingleProductFinalCheckOut = () => {
       try {
         const { data, error } = await supabase
           .from("custom_build")
-          .select(
-            "processor, build_type, coupon_code, code_equiv_percent"
-          )
+          .select("processor, build_type, coupon_code, code_equiv_percent")
           .eq("id", customBuildId)
           .single();
 

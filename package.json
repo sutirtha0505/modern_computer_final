@@ -25,6 +25,7 @@
     "@supabase/ssr": "^0.4.0",
     "@supabase/supabase-js": "^2.44.1",
     "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "embla-carousel-react": "^8.1.8",
     "framer-motion": "^11.2.10",
@@ -51,6 +52,7 @@
     "vanilla-tilt": "^1.8.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

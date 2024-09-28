@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
-import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAppSelector } from '@/lib/hooks/redux';
+import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient"; // Ensure to import your Supabase client
 
 const PreBuildSingleProductFinalCheckOut: React.FC = () => {
-  const searchParams = useSearchParams();
   const [product, setProduct] = useState<any>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [couponCode, setCouponCode] = useState<string>("");
@@ -16,50 +13,45 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [sellingPrice, setSellingPrice] = useState<number>(0); // State for selling price
 
-  // Extract query parameters
-  const id = searchParams.get("id");
-
   useEffect(() => {
-    const fetchedSellingPrice = parseFloat(searchParams.get("selling_price") || "0");
-    setSellingPrice(fetchedSellingPrice); // Set the selling price in state
-  }, [searchParams]); // Only run on search params change
+    const storedProduct = localStorage.getItem("checkoutProduct");
+    if (storedProduct) {
+      const { id, selling_price } = JSON.parse(storedProduct);
+      fetchProductDetails(id, selling_price);
+    }
+  }, []);
 
-  useEffect(() => {
-    const fetchProductDetails = async () => {
-      if (!id) return;
+  const fetchProductDetails = async (id: string, selling_price: string) => {
+    setLoading(true); // Set loading state to true
+    try {
+      const { data, error } = await supabase
+        .from("pre_build")
+        .select(
+          "build_name, image_urls, build_type, coupon_code, code_equiv_percent"
+        )
+        .eq("id", id)
+        .single();
 
-      setLoading(true); // Set loading state to true
-      try {
-        const { data, error } = await supabase
-          .from("pre_build")
-          .select(
-            "build_name, image_urls, build_type, coupon_code, code_equiv_percent"
-          )
-          .eq("id", id)
-          .single();
+      if (error) throw error;
 
-        if (error) throw error;
+      setProduct(data);
+      setSellingPrice(Number(selling_price)); // Use the passed selling_price directly
 
-        setProduct(data);
+      // Extract the image URL with "_first"
+      const firstImageUrl = data.image_urls?.find((img: { url: string }) =>
+        img.url.includes("_first")
+      )?.url;
 
-        // Extract the image URL with "_first"
-        const firstImageUrl = data.image_urls?.find((img: { url: string }) =>
-          img.url.includes("_first")
-        )?.url;
-
-        setImageUrl(firstImageUrl || "");
-      } catch (error) {
-        console.error(
-          "Error fetching product details:",
-          (error as Error).message
-        );
-      } finally {
-        setLoading(false); // Set loading state to false
-      }
-    };
-
-    fetchProductDetails();
-  }, [id]);
+      setImageUrl(firstImageUrl || "");
+    } catch (error) {
+      console.error(
+        "Error fetching product details:",
+        (error as Error).message
+      );
+    } finally {
+      setLoading(false); // Set loading state to false
+    }
+  };
 
   const handleApplyCoupon = () => {
     if (couponCode === product?.coupon_code) {
