@@ -257,7 +257,7 @@ const Header = () => {
                         ) : (
                           <CircleUser className="w-7 h-7" />
                         )}
-                        <h1 className="text-sm font-medium hover:text-indigo-600 cursor-pointer block w-fit text-center overflow-hidden break-all text-wrap">
+                        <h1 className="text-sm font-medium hover:text-indigo-600 cursor-pointer block w-fit text-center overflow-hidden text-wrap break-before-auto">
                           {customerName
                             ? customerName // Render customer_name if it exists
                             : user?.user_metadata?.name
@@ -266,18 +266,37 @@ const Header = () => {
                         </h1>
                       </div>
                       {role === "admin" && (
-                        <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">
-                          <p
-                            onClick={() => {
-                              toggleProfileMenu();
-                              router.push("/admin");
-                            }}
-                            className="text-white cursor-pointer hover:text-indigo-600"
-                          >
-                            Admin Panel
-                          </p>
+                        <div
+                          className="flex justify-center gap-8 px-4 py-2 hover:bg-white/30 hover:rounded-md text-white cursor-pointer hover:text-indigo-600"
+                          onClick={() => {
+                            toggleProfileMenu();
+                            router.push("/admin");
+                          }}
+                        >
+                          <img
+                            src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/web-administrator.png"
+                            alt=""
+                            className="w-6 h-6"
+                          />
+                          <p>Admin Panel</p>
                         </div>
                       )}
+                      <div
+                        className="flex justify-center gap-8 px-4 py-2 hover:bg-white/30 hover:rounded-md text-white cursor-pointer hover:text-indigo-600"
+                        onClick={() => {
+                          toggleProfileMenu();
+                          router.push("/orders");
+                        }}
+                      >
+                        <img
+                          src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-box.png"
+                          alt=""
+                          className="w-6 h-6"
+                        />
+                        <p>
+                          Your Orders
+                        </p>
+                      </div>
                       <div className="flex justify-center gap-3 px-4 py-2">
                         <button
                           onClick={async () => {
