@@ -46,7 +46,7 @@ const CheckOutCart = () => {
           Checkout for <span className='text-indigo-500'>Cart Items</span>
         </h1>
         {user && <CustomerDetails userId={user.id} />} {/* Pass user.id to CustomerDetails */}
-        <CartFinalCheckOut />
+        {user && <CartFinalCheckOut userId = {user.id} />}
       </div>
     </div>
   )
