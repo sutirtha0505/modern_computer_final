@@ -44,17 +44,13 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         return;
       }
 
-      // Concatenate all product names into a single string
-      const productNames = cart
-        .map((product) => product.product_name)
-        .join(", ");
 
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: data.currency,
         app_name: "Modern Computer",
-        description: productNames, // Pass concatenated product names here
+        description: "Your Cart Items ", // Pass concatenated product names here
         image:
           "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
@@ -63,7 +59,10 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
           console.log("Payment Response:", response);
 
           // Save order in database
-          await saveOrder(response.razorpay_order_id, response.razorpay_payment_id);
+          await saveOrder(
+            response.razorpay_order_id,
+            response.razorpay_payment_id
+          );
         },
         prefill: {
           name: customerDetails.customer_name,
@@ -178,6 +177,23 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       fetchCustomerDetails();
     }
   }, [userId, router]);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded");
+    };
+    script.onerror = () => {
+      console.error("Error loading Razorpay script");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   const handleApplyCoupon = async () => {
     if (!couponCode) {
@@ -346,13 +362,13 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
               </p>
             </div>
             <div className="flex justify-center">
-            <button
-              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
-              onClick={handlePayment}
-              disabled={loading}
-            >
-              {loading ? "Processing..." : "Pay Here"}
-            </button>
+              <button
+                className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+                onClick={handlePayment}
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Pay Here"}
+              </button>
             </div>
           </div>
         </div>
