@@ -48,7 +48,7 @@ const CheckOutCustomBuildSingleProduct = () => {
           Checkout for <span className='text-indigo-500'>Your Selected Custom-Build PC</span>
         </h1>
         {user && <CustomerDetails userId={user.id} />} {/* Pass user.id to CustomerDetails */}
-        <CustomBuildSingleProductFinalCheckOut />
+        {user &&<CustomBuildSingleProductFinalCheckOut userId={user.id} />}
       </div>
     </div>
   )

@@ -29,31 +29,31 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    const fetchProductDetails = async () => {
-      if (productId) {
-        const { data, error } = await supabase
-          .from("products")
-          .select(
-            "product_image, product_name, product_SP, coupon_code, code_equiv_percent"
-          )
-          .eq("product_id", productId)
-          .single();
+    useEffect(() => {
+      const fetchProductDetails = async () => {
+        if (productId) {
+          const { data, error } = await supabase
+            .from("products")
+            .select(
+              "product_image, product_name, product_SP, coupon_code, code_equiv_percent"
+            )
+            .eq("product_id", productId)
+            .single();
 
-        if (error) {
-          console.error("Error fetching product:", error);
-        } else {
-          const productImage = data.product_image.find((img: { url: string }) =>
-            img.url.includes("_first")
-          );
-          setProductData({ ...data, product_image: productImage?.url || "" });
-          setDiscountedTotal(data.product_SP);
+          if (error) {
+            console.error("Error fetching product:", error);
+          } else {
+            const productImage = data.product_image.find((img: { url: string }) =>
+              img.url.includes("_first")
+            );
+            setProductData({ ...data, product_image: productImage?.url || "" });
+            setDiscountedTotal(data.product_SP);
+          }
         }
-      }
-    };
+      };
 
-    fetchProductDetails();
-  }, [productId]);
+      fetchProductDetails();
+    }, [productId]);
 
   // Load the Razorpay script
   useEffect(() => {

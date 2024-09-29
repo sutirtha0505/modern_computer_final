@@ -2,14 +2,21 @@ import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 
 interface Product {
   name: string;
   price: number;
   image: string;
 }
-
-const CustomBuildSingleProductFinalCheckOut = () => {
+interface CustomBuildSingleProductFinalCheckOutProps {
+  userId: string;
+}
+const CustomBuildSingleProductFinalCheckOut: React.FC<
+  CustomBuildSingleProductFinalCheckOutProps
+> = ({ userId }) => {
+  const router = useRouter();
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [processor, setProcessor] = useState<Product[]>([]);
   const [motherboard, setMotherboard] = useState<Product[]>([]);
@@ -27,11 +34,12 @@ const CustomBuildSingleProductFinalCheckOut = () => {
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
+  const [customerDetails, setCustomerDetails] = useState<any>(null);
 
   useEffect(() => {
     // Fetch the stored data from localStorage
     const storedData = localStorage.getItem("checkoutCustomBuildData");
-    
+
     if (storedData) {
       const parsedData = JSON.parse(storedData);
       setTotalPrice(Number(parsedData.totalPrice) || 0);
@@ -77,6 +85,169 @@ const CustomBuildSingleProductFinalCheckOut = () => {
     fetchProductDetails();
   }, [customBuildId]);
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded");
+    };
+    script.onerror = () => {
+      console.error("Error loading Razorpay script");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchCustomerDetails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profile")
+          .select(
+            "customer_name, customer_house_no, customer_house_street, customer_house_city, customer_house_pincode, customer_house_landmark, profile_photo, email, phone_no"
+          )
+          .eq("id", userId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching customer details:", error);
+          return;
+        }
+
+        if (
+          !data.customer_name ||
+          !data.customer_house_no ||
+          !data.customer_house_street ||
+          !data.customer_house_city ||
+          !data.customer_house_pincode ||
+          !data.customer_house_landmark ||
+          !data.email ||
+          !data.phone_no ||
+          !data.profile_photo
+        ) {
+          router.push(`/profile/${userId}`);
+        } else {
+          setCustomerDetails(data);
+        }
+      } catch (error) {
+        console.error("Error fetching customer details:", error);
+      }
+    };
+
+    if (userId) {
+      fetchCustomerDetails();
+    }
+  }, [userId, router]);
+
+  const handlePayment = async () => {
+    setLoading(true);
+
+    try {
+      const payableAmount = Math.round(couponApplied ? discountedTotal : totalPrice); // Use totalPrice if coupon is not applied
+
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: payableAmount, // Pass the correct amount
+          currency: "INR",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!window.Razorpay) {
+        console.error("Razorpay is not loaded");
+        toast.error("Payment gateway is not available. Please try again.");
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        app_name: "Modern Computer",
+        description: product.product_name,
+        image:
+          "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
+        order_id: data.id,
+        handler: async (response: any) => {
+          toast.success("Payment successful!");
+          console.log("Payment Response:", response);
+
+          // Save order in database, using the correct amount
+          await saveOrder(
+            response.razorpay_order_id,
+            response.razorpay_payment_id,
+            payableAmount // Pass the actual amount charged
+          );
+        },
+        prefill: {
+          name: customerDetails.customer_name,
+          email: customerDetails.email,
+          contact: customerDetails.phone_no,
+        },
+        notes: {
+          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        },
+        theme: {
+          color: "#6265F1",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error("Error during payment:", error);
+      toast.error("Payment failed!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveOrder = async (
+    order_id: string,
+    payment_id: string,
+    amount: number
+  ) => {
+    const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD");
+
+    const { error } = await supabase.from("order_table_custom_build").insert([
+      {
+        order_id: order_id,
+        payment_id: payment_id,
+        customer_id: userId,
+        payment_amount: amount, // Use the amount passed from the payment handler
+        ordered_products: [
+          { processor_name: processor[0]?.name || "", quantity: 1 },
+          { motherboard_name: motherboard[0]?.name || "", quantity: 1 },
+          { ram_name: ram[0]?.name || "", quantity: ramQuantity }, // Using ramQuantity here
+          { ssd_name: ssd[0]?.name || "", quantity: 1 },
+          { hdd_name: hdd[0]?.name || "", quantity: 1 },
+          { cabinet_name: cabinet[0]?.name || "", quantity: 1 },
+          { psu_name: psu[0]?.name || "", quantity: 1 },
+          { cooler_name: cooler[0]?.name || "", quantity: 1 },
+        ],
+        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        expected_delivery_date: expectedDeliveryDate,
+        created_at: new Date(),
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving order:", error);
+      toast.error("Failed to save the order. Please try again.");
+    } else {
+      toast.success("Order saved successfully!");
+    }
+  };
+
   const handleApplyCoupon = () => {
     if (couponCode === product?.coupon_code) {
       if (!isNaN(totalPrice)) {
@@ -95,13 +266,14 @@ const CustomBuildSingleProductFinalCheckOut = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-  
 
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
         <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-slate-800">
-          <h1 className="text-xl font-bold">Your <span className="text-indigo-500">Configuration</span></h1>
+          <h1 className="text-xl font-bold">
+            Your <span className="text-indigo-500">Configuration</span>
+          </h1>
           <div className="flex justify-start gap-4 items-center w-full">
             <img
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
@@ -302,8 +474,8 @@ const CustomBuildSingleProductFinalCheckOut = () => {
         </div>
       </div>
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-4">
-            <div className="w-96 bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
-            <h1 className="text-2xl font-bold">
+        <div className="w-96 bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
+          <h1 className="text-2xl font-bold">
             Order <span className="text-indigo-500">Summary</span>
           </h1>
           <div className="w-full flex gap-2 justify-center items-center">
@@ -316,7 +488,7 @@ const CustomBuildSingleProductFinalCheckOut = () => {
               Product Amount:
             </label>
             <p className="text-sm font-bold text-indigo-600">
-              &#x20B9;{totalPrice}
+              &#x20B9;{totalPrice.toFixed(2)}
             </p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
@@ -366,22 +538,29 @@ const CustomBuildSingleProductFinalCheckOut = () => {
               className="w-6 h-6"
             />
             <p className="font-bold text-sm">
-              Total Amount Payable <br />(Including all Taxes):
+              Total Amount Payable <br />
+              (Including all Taxes):
             </p>
             <p className="text-sm font-bold text-indigo-600">
               {loading ? (
                 <span>Loading...</span>
               ) : (
-                <span>&#x20B9;{discountedTotal || totalPrice}</span>
+                <span>
+                  &#x20B9;{(discountedTotal || totalPrice).toFixed(2)}
+                </span>
               )}
             </p>
           </div>
           <div className="flex justify-center">
-            <button className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200">
-              Pay Here
+            <button
+              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              onClick={handlePayment}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Pay Here"}
             </button>
           </div>
-            </div>
+        </div>
       </div>
       <ToastContainer />
     </div>

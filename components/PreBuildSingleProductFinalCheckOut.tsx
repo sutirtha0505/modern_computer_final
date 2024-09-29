@@ -3,13 +3,23 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
 import { supabase } from "@/lib/supabaseClient"; // Ensure to import your Supabase client
+import dayjs from "dayjs";
+import { useRouter } from "next/navigation";
 
-const PreBuildSingleProductFinalCheckOut: React.FC = () => {
+interface PreBuildPCSingleProductFinalCheckOutProps {
+  userId: string; // Explicitly typing the userId as a string
+}
+const PreBuildSingleProductFinalCheckOut: React.FC<
+  PreBuildPCSingleProductFinalCheckOutProps
+> = ({ userId }) => {
+  const router = useRouter();
   const [product, setProduct] = useState<any>(null);
+  const [productId, setProductId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [couponCode, setCouponCode] = useState<string>("");
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
+  const [customerDetails, setCustomerDetails] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [sellingPrice, setSellingPrice] = useState<number>(0); // State for selling price
 
@@ -18,6 +28,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
     if (storedProduct) {
       const { id, selling_price } = JSON.parse(storedProduct);
       fetchProductDetails(id, selling_price);
+      setProductId(id);
     }
   }, []);
 
@@ -53,6 +64,64 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("Razorpay script loaded");
+    };
+    script.onerror = () => {
+      console.error("Error loading Razorpay script");
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchCustomerDetails = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("profile")
+          .select(
+            "customer_name, customer_house_no, customer_house_street, customer_house_city, customer_house_pincode, customer_house_landmark, profile_photo, email, phone_no"
+          )
+          .eq("id", userId)
+          .single();
+
+        if (error) {
+          console.error("Error fetching customer details:", error);
+          return;
+        }
+
+        if (
+          !data.customer_name ||
+          !data.customer_house_no ||
+          !data.customer_house_street ||
+          !data.customer_house_city ||
+          !data.customer_house_pincode ||
+          !data.customer_house_landmark ||
+          !data.email ||
+          !data.phone_no ||
+          !data.profile_photo
+        ) {
+          router.push(`/profile/${userId}`);
+        } else {
+          setCustomerDetails(data);
+        }
+      } catch (error) {
+        console.error("Error fetching customer details:", error);
+      }
+    };
+
+    if (userId) {
+      fetchCustomerDetails();
+    }
+  }, [userId, router]);
+
   const handleApplyCoupon = () => {
     if (couponCode === product?.coupon_code) {
       if (!isNaN(sellingPrice)) {
@@ -68,11 +137,107 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
     }
   };
 
+  const handlePayment = async () => {
+    setLoading(true);
+
+    try {
+      const payableAmount = couponApplied ? discountedTotal : sellingPrice; // Use sellingPrice if coupon is not applied
+
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: payableAmount, // Pass the correct amount
+          currency: "INR",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!window.Razorpay) {
+        console.error("Razorpay is not loaded");
+        toast.error("Payment gateway is not available. Please try again.");
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        app_name: "Modern Computer",
+        description: product.product_name,
+        image:
+          "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
+        order_id: data.id,
+        handler: async (response: any) => {
+          toast.success("Payment successful!");
+          console.log("Payment Response:", response);
+
+          // Save order in database, using the correct amount
+          await saveOrder(
+            response.razorpay_order_id,
+            response.razorpay_payment_id,
+            payableAmount // Pass the actual amount charged
+          );
+        },
+        prefill: {
+          name: customerDetails.customer_name,
+          email: customerDetails.email,
+          contact: customerDetails.phone_no,
+        },
+        notes: {
+          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        },
+        theme: {
+          color: "#6265F1",
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error("Error during payment:", error);
+      toast.error("Payment failed!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveOrder = async (
+    order_id: string,
+    payment_id: string,
+    amount: number
+  ) => {
+    const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD");
+
+    const { error } = await supabase.from("order_table_pre_build").insert([
+      {
+        order_id: order_id,
+        payment_id: payment_id,
+        customer_id: userId,
+        payment_amount: amount, // Use the amount passed from the payment handler
+        ordered_products: [productId],
+        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        expected_delivery_date: expectedDeliveryDate,
+        created_at: new Date(),
+      },
+    ]);
+
+    if (error) {
+      console.error("Error saving order:", error);
+      toast.error("Failed to save the order. Please try again.");
+    } else {
+      toast.success("Order saved successfully!");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>; // Show loading indicator while fetching data
   }
 
-  if (!product) {
+  if (!product || !customerDetails) {
     return <div>No product found.</div>; // Handle the case where no product data is available
   }
 
@@ -171,7 +336,8 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
               className="w-6 h-6"
             />
             <p className="font-bold text-sm">
-              Total Amount Payable <br />(Including all Taxes):
+              Total Amount Payable <br />
+              (Including all Taxes):
             </p>
             <p className="text-sm font-bold text-indigo-600">
               {loading ? (
@@ -182,8 +348,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC = () => {
             </p>
           </div>
           <div className="flex justify-center">
-            <button className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200">
-              Pay Here
+            <button
+              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              onClick={handlePayment}
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Pay Here"}
             </button>
           </div>
         </div>
