@@ -4,8 +4,6 @@ import HeaderCart from './HeaderCart'
 import CustomerDetails from './CustomerDetails'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import CartSingleProductFinalCheckOut from './CartSingleProductFinalCheckOut'
-import PreBuildSingleProductFinalCheckOut from './PreBuildSingleProductFinalCheckOut'
 import CustomBuildSingleProductFinalCheckOut from './CustomBuildSingleProductFinalCheckOut'
 
 const CheckOutCustomBuildSingleProduct = () => {

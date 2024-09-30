@@ -18,59 +18,69 @@ const UserProfile = () => {
   const [city, setCity] = useState<string | null>(null);
   const [pinCode, setPinCode] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null); // New state for profile photo
-  const [photoUrl, setPhotoUrl] = useState<string | null>(null); // New state for uploaded photo URL
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (id) {
-        try {
-          const { data: profileData, error: profileError } = await supabase
-            .from("profile")
-            .select(
-              "email, phone_no, customer_house_no, customer_house_street, customer_house_landmark, customer_house_city, customer_house_pincode, profile_photo"
-            )
-            .eq("id", id)
-            .single();
+      try {
+        // Get the current logged-in user's ID
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
 
-            console.log(profileData); // Add this line to check if email is being fetched
-
-
-
-          if (profileError) {
-            console.error("Error fetching profile data:", profileError);
-          } else {
-            setEmail(profileData?.email || null);
-            setPhoneNo(profileData?.phone_no || null);
-            setHouseNo(profileData?.customer_house_no || null);
-            setStreetName(profileData?.customer_house_street || null);
-            setLandmark(profileData?.customer_house_landmark || null);
-            setCity(profileData?.customer_house_city || null);
-            setPinCode(profileData?.customer_house_pincode || null);
-            setPhotoUrl(profileData?.profile_photo || null);
-          }
-
-          const {
-            data: { user },
-            error: userError,
-          } = await supabase.auth.getUser();
-
-          if (userError) {
-            console.error("Error fetching user data:", userError);
-          } else if (user) {
-            setName(user.user_metadata.name);
-          }
-        } catch (error) {
-          console.error("Unexpected error fetching user data:", error);
-        } finally {
-          setLoading(false);
+if (!user || user && user.id !== id) {
+          // If the user ID does not match the profile ID, redirect to /SignIn
+          router.push("/SignIn");
+          return;
         }
+
+        // If the IDs match, fetch the profile data
+        if (id) {   
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from("profile")
+              .select(
+                "email, phone_no, customer_house_no, customer_house_street, customer_house_landmark, customer_house_city, customer_house_pincode, profile_photo"
+              )
+              .eq("id", id)
+              .single();
+
+            console.log(profileData); // Check if email is being fetched
+
+            if (profileError) {
+              console.error("Error fetching profile data:", profileError);
+            } else {
+              setEmail(profileData?.email || null);
+              setPhoneNo(profileData?.phone_no || null);
+              setHouseNo(profileData?.customer_house_no || null);
+              setStreetName(profileData?.customer_house_street || null);
+              setLandmark(profileData?.customer_house_landmark || null);
+              setCity(profileData?.customer_house_city || null);
+              setPinCode(profileData?.customer_house_pincode || null);
+              setPhotoUrl(profileData?.profile_photo || null);
+            }
+
+            // Fetch user name from supabase.auth
+            if (user) {
+              setName(user.user_metadata.name);
+            }
+          } catch (error) {
+            console.error("Unexpected error fetching user data:", error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, [id]);
+  }, [id, router]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setProfilePhoto(acceptedFiles[0]);
@@ -78,12 +88,9 @@ const UserProfile = () => {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: {
-      'image/*': []
-    },
+    accept: { "image/*": [] },
     maxFiles: 1,
   });
-  
 
   const handleSave = async () => {
     if (id && name) {
@@ -161,7 +168,11 @@ const UserProfile = () => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <img src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/profile_display.png" alt="" className="w-10 h-10" />
+          <img
+            src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/profile_display.png"
+            alt=""
+            className="w-10 h-10"
+          />
         )}
       </div>
 
@@ -206,7 +217,8 @@ const UserProfile = () => {
             type="text"
             value={name || ""}
             onChange={(e) => setName(e.target.value)}
-            className="border-b bg-transparent text-white p-2 w-full outline-none" required
+            className="border-b bg-transparent text-white p-2 w-full outline-none"
+            required
           />
         </div>
         <div className="w-full">
@@ -224,7 +236,8 @@ const UserProfile = () => {
             id="phoneNo"
             type="number"
             value={phoneNo || ""}
-            onChange={(e) => setPhoneNo(e.target.value)} required
+            onChange={(e) => setPhoneNo(e.target.value)}
+            required
             className="border-b bg-transparent text-white p-2 w-full outline-none"
           />
         </div>
@@ -245,7 +258,8 @@ const UserProfile = () => {
               type="text"
               value={houseNo || ""}
               onChange={(e) => setHouseNo(e.target.value)}
-              className="border-b bg-transparent text-white p-2 w-full outline-none" required
+              className="border-b bg-transparent text-white p-2 w-full outline-none"
+              required
             />
           </div>
           <div className="w-2/3">
@@ -263,7 +277,8 @@ const UserProfile = () => {
               id="streetName"
               type="text"
               value={streetName || ""}
-              onChange={(e) => setStreetName(e.target.value)} required
+              onChange={(e) => setStreetName(e.target.value)}
+              required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>
@@ -285,7 +300,8 @@ const UserProfile = () => {
               type="text"
               value={landmark || ""}
               onChange={(e) => setLandmark(e.target.value)}
-              className="border-b bg-transparent text-white p-2 w-full outline-none" required
+              className="border-b bg-transparent text-white p-2 w-full outline-none"
+              required
             />
           </div>
           <div className="w-1/3">
@@ -303,7 +319,8 @@ const UserProfile = () => {
               id="city"
               type="text"
               value={city || ""}
-              onChange={(e) => setCity(e.target.value)} required
+              onChange={(e) => setCity(e.target.value)}
+              required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>
@@ -322,7 +339,8 @@ const UserProfile = () => {
               id="pinCode"
               type="number"
               value={pinCode || ""}
-              onChange={(e) => setPinCode(e.target.value)} required
+              onChange={(e) => setPinCode(e.target.value)}
+              required
               className="border-b bg-transparent text-white p-2 w-full outline-none"
             />
           </div>

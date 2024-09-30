@@ -195,7 +195,7 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
         payment_id: payment_id,
         customer_id: userId,
         payment_amount: discountedTotal,
-        ordered_products: [productId], // Save product_id in array
+        ordered_products: [{product_id: productId, quantity: 1}], // Save product_id in array
         order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(), // Set current timestamp
