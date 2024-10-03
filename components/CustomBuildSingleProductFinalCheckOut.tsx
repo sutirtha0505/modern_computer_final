@@ -225,14 +225,14 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
         customer_id: userId,
         payment_amount: amount, // Use the amount passed from the payment handler
         ordered_products: [
-          { processor_name: processor[0]?.name || "", quantity: 1 },
-          { motherboard_name: motherboard[0]?.name || "", quantity: 1 },
-          { ram_name: ram[0]?.name || "", quantity: ramQuantity }, // Using ramQuantity here
-          { ssd_name: ssd[0]?.name || "", quantity: 1 },
-          { hdd_name: hdd[0]?.name || "", quantity: 1 },
-          { cabinet_name: cabinet[0]?.name || "", quantity: 1 },
-          { psu_name: psu[0]?.name || "", quantity: 1 },
-          { cooler_name: cooler[0]?.name || "", quantity: 1 },
+          { processor_name: processor[0]?.name || "", quantity: 1, image_url:processor[0]?.image },
+          { motherboard_name: motherboard[0]?.name || "", quantity: 1, image_url:motherboard[0]?.image },
+          { ram_name: ram[0]?.name || "", quantity: ramQuantity, image_url:ram[0]?.image }, // Using ramQuantity here
+          { ssd_name: ssd[0]?.name || "", quantity: 1, image_url:ssd[0]?.image }, //
+          { hdd_name: hdd[0]?.name || "", quantity: 1, image_url:hdd[0]?.image }, // Using hdd here
+          { cabinet_name: cabinet[0]?.name || "", quantity: 1, image_url:cabinet[0]?.image }, //
+          { psu_name: psu[0]?.name || "", quantity: 1, image_url:psu[0]?.image },
+          { cooler_name: cooler[0]?.name || "", quantity: 1, image_url:cooler[0]?.image },
         ],
         order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,

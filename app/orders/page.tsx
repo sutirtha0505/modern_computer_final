@@ -40,7 +40,7 @@ const OrdersPage = () => {
   return (
     <div className='w-full h-full flex flex-col justify-center items-center gap-6'>
       <div className='w-full pt-20'>
-        <h1 className='text-2xl font-bold text-center'>
+        <h1 className='text-3xl font-bold text-center'>
           Check Your <span className='text-indigo-500'>Ordered Products</span>
         </h1>
         {user && <OrdersForU userId={user.id} />} {/* Pass user.id to CustomerDetails */}

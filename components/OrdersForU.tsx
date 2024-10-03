@@ -19,9 +19,6 @@ const OrdersForU: React.FC<OrdersForUProps> = ({ userId }) => {
         <OrderedPreBuildPC userId={userId} />
       </div>
       <div className="flex flex-col justify-center items-center gap-4">
-        <h1 className="text-lg font-bold">
-          Your <span className="text-indigo-600">Ordered Custom-Build PC</span>
-        </h1>
         {/* Pass userId as prop */}
         <OrderedCustomBuildPC userId={userId} />
       </div>

@@ -15,7 +15,7 @@ interface OrderedProduct {
 }
 
 interface Order {
-  order_id: number; // Add order_id to the interface
+  order_id: number;
   ordered_products: OrderedProduct[];
   expected_delivery_date: string;
   order_status: string;
@@ -41,8 +41,10 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
       try {
         const { data: ordersData, error: ordersError } = await supabase
           .from("order_table")
-          .select("order_id, ordered_products, expected_delivery_date, order_status")
-          .eq("customer_id", userId); // Fetch order_id from the order_table
+          .select(
+            "order_id, ordered_products, expected_delivery_date, order_status"
+          )
+          .eq("customer_id", userId);
 
         if (ordersError) {
           console.error("Error fetching orders:", ordersError);
@@ -94,17 +96,18 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
       const { error } = await supabase
         .from("order_table")
         .update({ order_status: "Cancelled" })
-        .eq("order_id", orderId); // Use order_id for the cancellation
+        .eq("order_id", orderId);
 
       if (error) {
         throw new Error("Error canceling order");
       }
 
       toast.success("Your order is cancelled. You'll be refunded soon.");
-      
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order.order_id === orderId ? { ...order, order_status: "Cancelled" } : order
+          order.order_id === orderId
+            ? { ...order, order_status: "Cancelled" }
+            : order
         )
       );
     } catch (error) {
@@ -134,22 +137,22 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <ToastContainer /> {/* Include ToastContainer here */}
+      <ToastContainer />
       <h1 className="text-xl font-bold">
         Your <span className="text-indigo-600">Ordered PC Components</span>
       </h1>
       <div className="flex flex-col justify-center items-center w-full p-16 gap-5">
         {orders.map((order) => (
           <div
-            key={order.order_id} // Use order_id as the key
+            key={order.order_id}
             className="flex flex-col border p-4 rounded-md bg-slate-800 custom-backdrop-filter gap-4"
           >
             <h2 className="font-extrabold text-center">
               Order : <span className="text-indigo-600">{order.order_id}</span>
             </h2>
 
-            <div className="flex items-center justify-center gap-10">
-              <ol className="list-decimal">
+            <div className="w-full flex items-center justify-center gap-10">
+              <ol className="w-[50%] list-decimal">
                 {order.ordered_products.map((product: OrderedProduct, idx) => {
                   const productDetails = productsMap.get(product.product_id);
                   const firstImageUrl =
@@ -180,7 +183,7 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                   );
                 })}
               </ol>
-              <div className="flex flex-col justify-center items-center gap-2">
+              <div className="w-[15%] flex flex-col justify-center items-center gap-2">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
@@ -201,16 +204,28 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                   {order.order_status}
                 </p>
               </div>
+              <div className="w-[10%]">
+                <button
+                  onClick={() =>
+                    handleCancelOrder(order.order_id, order.order_status)
+                  }
+                  className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
+                    order.order_status === "Shipped" ||
+                    order.order_status === "Cancelled"
+                      ? "border-gray-400 bg-gray-400 cursor-not-allowed"
+                      : "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                  }`}
+                  disabled={
+                    order.order_status === "Shipped" ||
+                    order.order_status === "Cancelled"
+                  } // Disable if shipped or cancelled
+                >
+                  <CircleX />
+                  Cancel Order
+                </button>
+              </div>
 
-              <button
-                onClick={() => handleCancelOrder(order.order_id, order.order_status)} // Use order_id here
-                className="p-4 flex justify-center items-center gap-2 border-2 border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600 text-xs rounded-md"
-              >
-                <CircleX />
-                Cancel Order
-              </button>
-
-              <div className="flex flex-col justify-center items-center gap-4">
+              <div className="w-[25%] flex flex-col justify-center items-center gap-4">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
