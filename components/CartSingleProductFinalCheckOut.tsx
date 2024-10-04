@@ -11,7 +11,9 @@ interface CartSingleProductFinalCheckOutProps {
   userId: string; // Explicitly typing the userId as a string
 }
 
-const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutProps> = ({ userId }) => {
+const CartSingleProductFinalCheckOut: React.FC<
+  CartSingleProductFinalCheckOutProps
+> = ({ userId }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [productId, setProductId] = useState<string | null>(null);
@@ -29,31 +31,31 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
     }
   }, [searchParams]);
 
-    useEffect(() => {
-      const fetchProductDetails = async () => {
-        if (productId) {
-          const { data, error } = await supabase
-            .from("products")
-            .select(
-              "product_image, product_name, product_SP, coupon_code, code_equiv_percent"
-            )
-            .eq("product_id", productId)
-            .single();
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (productId) {
+        const { data, error } = await supabase
+          .from("products")
+          .select(
+            "product_image, product_name, product_SP, coupon_code, code_equiv_percent, product_amount"
+          )
+          .eq("product_id", productId)
+          .single();
 
-          if (error) {
-            console.error("Error fetching product:", error);
-          } else {
-            const productImage = data.product_image.find((img: { url: string }) =>
-              img.url.includes("_first")
-            );
-            setProductData({ ...data, product_image: productImage?.url || "" });
-            setDiscountedTotal(data.product_SP);
-          }
+        if (error) {
+          console.error("Error fetching product:", error);
+        } else {
+          const productImage = data.product_image.find((img: { url: string }) =>
+            img.url.includes("_first")
+          );
+          setProductData({ ...data, product_image: productImage?.url || "" });
+          setDiscountedTotal(data.product_SP);
         }
-      };
+      }
+    };
 
-      fetchProductDetails();
-    }, [productId]);
+    fetchProductDetails();
+  }, [productId]);
 
   // Load the Razorpay script
   useEffect(() => {
@@ -116,7 +118,8 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
 
   const handleApplyCoupon = () => {
     if (couponCode === productData.coupon_code) {
-      const discount = productData.product_SP * (productData.code_equiv_percent / 100);
+      const discount =
+        productData.product_SP * (productData.code_equiv_percent / 100);
       setDiscountedTotal(productData.product_SP - discount);
       setCouponApplied(true);
       toast.success("Coupon code redeemed successfully!");
@@ -154,14 +157,18 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
         currency: data.currency,
         app_name: "Modern Computer",
         description: productData.product_name,
-        image: "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
+        image:
+          "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
         handler: async (response: any) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
 
           // Save order in database
-          await saveOrder(response.razorpay_order_id, response.razorpay_payment_id);
+          await saveOrder(
+            response.razorpay_order_id,
+            response.razorpay_payment_id
+          );
         },
         prefill: {
           name: customerDetails.customer_name,
@@ -195,7 +202,7 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
         payment_id: payment_id,
         customer_id: userId,
         payment_amount: discountedTotal,
-        ordered_products: [{product_id: productId, quantity: 1}], // Save product_id in array
+        ordered_products: [{ product_id: productId, quantity: 1 }], // Save product_id in array
         order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(), // Set current timestamp
@@ -205,6 +212,19 @@ const CartSingleProductFinalCheckOut: React.FC<CartSingleProductFinalCheckOutPro
     if (error) {
       console.error("Error saving order:", error);
       toast.error("Failed to save the order. Please try again.");
+      return;
+    }
+
+    // Update product quantity in the 'products' table
+    const updatedQuantity = productData.product_amount - 1;
+    const { error: updateError } = await supabase
+      .from("products")
+      .update({ product_amount: updatedQuantity })
+      .eq("product_id", productId);
+
+    if (updateError) {
+      console.error("Error updating product quantity:", updateError);
+      toast.error("Failed to update product quantity. Please try again.");
     } else {
       toast.success("Order saved successfully!");
     }

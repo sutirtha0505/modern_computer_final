@@ -44,7 +44,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         return;
       }
 
-
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
@@ -58,7 +57,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
 
-          // Save order in database
+          // Save order in the database and update product amount
           await saveOrder(
             response.razorpay_order_id,
             response.razorpay_payment_id
@@ -87,7 +86,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     }
   };
 
-  // Function to save order details in Supabase
+  // Function to save order details in Supabase and update product amount
   const saveOrder = async (order_id: string, payment_id: string) => {
     const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD"); // Calculate expected delivery date
 
@@ -97,6 +96,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       quantity: product.quantity,
     }));
 
+    // Save order in the database
     const { error } = await supabase.from("order_table").insert([
       {
         order_id: order_id,
@@ -113,8 +113,43 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     if (error) {
       console.error("Error saving order:", error);
       toast.error("Failed to save the order. Please try again.");
+      return;
     } else {
       toast.success("Order saved successfully!");
+
+      // Update product quantities after order is saved
+      await updateProductQuantities();
+    }
+  };
+
+  // Function to update product quantities in the products table
+  const updateProductQuantities = async () => {
+    for (const product of cart) {
+      const { data: productData, error: fetchError } = await supabase
+        .from("products")
+        .select("product_amount")
+        .eq("product_id", product.product_id)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching product details:", fetchError);
+        toast.error("Error updating product quantities. Please try again.");
+        return;
+      }
+
+      // Calculate new product amount after subtracting the quantity
+      const newAmount = productData.product_amount - product.quantity;
+
+      // Update the product_amount for the corresponding product_id
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({ product_amount: newAmount })
+        .eq("product_id", product.product_id);
+
+      if (updateError) {
+        console.error("Error updating product amount:", updateError);
+        toast.error("Error updating product quantities. Please try again.");
+      }
     }
   };
 
@@ -207,7 +242,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     // Query Supabase for products that match the product IDs from the cart
     const { data: products, error } = await supabase
       .from("products")
-      .select("product_id, coupon_code, code_equiv_percent")
+      .select("product_id, coupon_code, code_equiv_percent, product_amount")
       .in("product_id", productIds);
 
     if (error) {
@@ -232,23 +267,17 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       return acc;
     }, {} as Record<number, number>);
 
-    // Simulate lazy loading of the discounted total calculation
-    setLoading(true);
-    setTimeout(() => {
-      const newTotal = cart.reduce((sum: number, product: any) => {
-        const discountPercent = discountMap[product.product_id] || 0;
-        const discountedPrice =
-          product.product_SP - (product.product_SP * discountPercent) / 100;
-        const finalPrice =
-          discountPercent > 0 ? discountedPrice : product.product_SP;
-        return sum + finalPrice * product.quantity;
-      }, 0);
+    // Simulate coupon application and calculate the total with discount
+    const newTotal = cart.reduce((sum, product) => {
+      const discountPercent = discountMap[product.product_id] || 0;
+      const discountedPrice =
+        product.product_SP * product.quantity * (1 - discountPercent / 100);
+      return sum + discountedPrice;
+    }, 0);
 
-      setDiscountedTotal(newTotal);
-      setLoading(false);
-      setCouponApplied(true); // Mark coupon as applied
-      toast.success("Coupon code is redeemed successfully!");
-    }, 500); // Adjust the timeout as needed for lazy loading simulation
+    setDiscountedTotal(newTotal);
+    setCouponApplied(true); // Update state to reflect coupon application
+    toast.success("Coupon applied!");
   };
   return (
     <>

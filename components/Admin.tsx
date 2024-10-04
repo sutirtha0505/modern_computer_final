@@ -5,7 +5,7 @@ import { CiViewTable } from "react-icons/ci";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { TbTableOptions } from "react-icons/tb";
 import { useRouter } from "next/navigation";
-import { Sparkles, TableProperties, TicketPercent } from "lucide-react";
+import { Sparkles, TableProperties, TicketPercent, Truck } from "lucide-react";
 import { FaComputer, FaHouseChimney } from "react-icons/fa6";
 import { MdOutlineCategory } from "react-icons/md";
 import { TiInfoLargeOutline } from "react-icons/ti";
@@ -148,6 +148,17 @@ const Admin = () => {
             <TicketPercent size={30} />
             <p className="text-center font-semibold text-xs">
               Offer Management
+            </p>
+          </div>
+          <div
+            onClick={() => {
+              router.push("/admin/order-management");
+            }}
+            className="p-4 rounded-sm flex flex-col justify-center items-center bg-blue-800 border-blue-800 border-2 hover:bg-transparent hover:text-blue-800 cursor-pointer h-24 gap-2"
+          >
+            <Truck size={30} />
+            <p className="text-center font-semibold text-xs">
+              Order Management
             </p>
           </div>
         </div>

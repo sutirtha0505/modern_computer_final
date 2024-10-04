@@ -145,14 +145,14 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
         {orders.map((order) => (
           <div
             key={order.order_id}
-            className="flex flex-col border p-4 rounded-md bg-slate-800 custom-backdrop-filter gap-4"
+            className="flex flex-col border p-4 rounded-md bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
           >
             <h2 className="font-extrabold text-center">
               Order : <span className="text-indigo-600">{order.order_id}</span>
             </h2>
 
-            <div className="w-full flex items-center justify-center gap-10">
-              <ol className="w-[50%] list-decimal">
+            <div className="w-full flex flex-wrap items-center justify-between gap-10">
+              <ol className="w-auto list-decimal">
                 {order.ordered_products.map((product: OrderedProduct, idx) => {
                   const productDetails = productsMap.get(product.product_id);
                   const firstImageUrl =
@@ -183,7 +183,7 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                   );
                 })}
               </ol>
-              <div className="w-[15%] flex flex-col justify-center items-center gap-2">
+              <div className="w-auto flex flex-col justify-center items-center gap-2">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
@@ -204,7 +204,7 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                   {order.order_status}
                 </p>
               </div>
-              <div className="w-[10%]">
+              <div className="w-auto">
                 <button
                   onClick={() =>
                     handleCancelOrder(order.order_id, order.order_status)
@@ -225,7 +225,7 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                 </button>
               </div>
 
-              <div className="w-[25%] flex flex-col justify-center items-center gap-4">
+              <div className="w-auto flex flex-col justify-center items-center gap-4">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"

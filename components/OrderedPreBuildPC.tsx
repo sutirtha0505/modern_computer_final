@@ -153,14 +153,14 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
         {orders.map((order) => (
           <div
             key={order.order_id}
-            className="flex flex-col border p-4 rounded-md bg-slate-800 custom-backdrop-filter gap-4"
+            className="flex flex-col border p-4 rounded-md bg-slate-700 custom-backdrop-filter gap-4"
           >
             <h2 className="font-extrabold text-center">
               Order : <span className="text-indigo-600">{order.order_id}</span>
             </h2>
 
-            <div className="w-full flex items-center justify-center gap-10">
-              <ol className="w-[40%] list-decimal">
+            <div className="w-full flex flex-wrap items-center justify-between gap-10">
+              <ol className="w-auto list-decimal">
                 {order.ordered_products.map((productId, idx) => {
                   const productDetails = productsMap.get(productId);
                   const firstImageUrl =
@@ -188,7 +188,7 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                   );
                 })}
               </ol>
-              <div className="w-[15%] flex flex-col justify-center items-center gap-2">
+              <div className="w-auto flex flex-col justify-center items-center gap-2">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
@@ -209,7 +209,7 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                   {order.order_status}
                 </p>
               </div>
-              <div className="w-[10%]">
+              <div className="w-auto">
                 <button
                   onClick={() =>
                     handleCancelOrder(order.order_id, order.order_status)
@@ -230,7 +230,7 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                 </button>
               </div>
 
-              <div className="w-[35%] flex flex-col justify-center items-center gap-4">
+              <div className="w-auto flex flex-col justify-center items-center gap-4">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"

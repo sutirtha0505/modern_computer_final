@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
+import { CircleX } from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface OrderedProduct {
   quantity: number;
@@ -16,7 +19,7 @@ interface OrderedProduct {
 }
 
 interface Order {
-  order_id: number;
+  order_id: string;
   ordered_products: OrderedProduct[];
   expected_delivery_date: string;
   order_status: string;
@@ -91,13 +94,42 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
               className="w-16 h-16 object-cover"
             />
             <p className="text-sm font-semibold hover:text-indigo-600 text-left">
-              {key}: {name} x {product.quantity}
+              <span className="font-bold text-indigo-500 text-lg">{key}</span>:{" "}
+              {name}... {product.quantity > 1 && `x ${product.quantity}`}
             </p>
           </li>
         );
       }
       return null;
     });
+  };
+  const handleCancelOrder = async (orderId: string, orderStatus: string) => {
+    if (orderStatus === "Shipped") {
+      toast.error("Item is shipped. Order can't be cancelled.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("order_table_pre_build")
+        .update({ order_status: "Cancelled" })
+        .eq("order_id", orderId);
+
+      if (error) {
+        throw new Error("Error canceling order");
+      }
+
+      toast.success("Your order is cancelled. You'll be refunded soon.");
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.order_id === orderId
+            ? { ...order, order_status: "Cancelled" }
+            : order
+        )
+      );
+    } catch (error) {
+      toast.error("Error canceling the order.");
+    }
   };
 
   return (
@@ -109,24 +141,66 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
         {orders.map((order) => (
           <div
             key={order.order_id}
-            className="flex flex-col border p-4 rounded-md bg-slate-800 custom-backdrop-filter gap-4"
+            className="flex flex-col border p-4 rounded-md bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
           >
             <h2 className="font-extrabold text-center">
               Order: <span className="text-indigo-600">{order.order_id}</span>
             </h2>
 
-            <div className="w-full flex items-center justify-center gap-10">
-              <ol className="w-[50%] list-decimal flex flex-col justify-start items-center">
+            <div className="w-full flex flex-wrap md:flex-nowrap items-center justify-between gap-10">
+              <ol className="w-auto list-decimal flex flex-col justify-center gap-2">
                 {order.ordered_products.map((product, idx) => (
                   <li
                     key={idx}
-                    className="flex justify-start items-center hover:text-indigo-600 cursor-pointer"
+                    className="flex hover:text-indigo-600 items-center cursor-pointer"
                   >
                     {renderProduct(product)}
                   </li>
                 ))}
               </ol>
-              <div className="w-[25%] flex flex-col justify-center items-center gap-4">
+              <div className="w-auto flex flex-col justify-center items-center gap-2">
+                <div className="flex gap-2 justify-center items-center">
+                  <img
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
+                    alt=""
+                    className="w-8 h-8"
+                  />
+                  <p className="text-sm font-semibold text-indigo-600">
+                    Order Status:
+                  </p>
+                </div>
+                <p
+                  className={`text-sm font-semibold capitalize ${
+                    order.order_status === "Delivered"
+                      ? "text-green-600"
+                      : "text-yellow-500"
+                  }`}
+                >
+                  {order.order_status}
+                </p>
+              </div>
+              <div className="w-auto">
+                <button
+                  onClick={() =>
+                    handleCancelOrder(order.order_id, order.order_status)
+                  }
+                  className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
+                    order.order_status === "Shipped" ||
+                    order.order_status === "Cancelled"
+                      ? "border-gray-400 bg-gray-400 cursor-not-allowed"
+                      : "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                  }`}
+                  disabled={
+                    order.order_status === "Shipped" ||
+                    order.order_status === "Cancelled"
+                  } // Disable if shipped or cancelled
+                >
+                  <CircleX />
+                  Cancel Order
+                </button>
+              </div>
+
+              <div className="w-auto flex flex-col justify-center items-center gap-4">
                 <div className="flex gap-2 justify-center items-center">
                   <img
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
@@ -147,6 +221,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
           </div>
         ))}
       </div>
+      <ToastContainer />
     </div>
   );
 };
