@@ -466,3 +466,15 @@ select {
     height: auto;
   }
 }
+@media (min-width: 770px) and (max-width: 879px) {
+  .responsive-font {
+    font-size: 0.625em; /* Adjust font size for smaller screens */
+  }
+  .responsive-flex {
+    flex-direction: column;
+  }
+  .responsive-width {
+    width: 100%!important;
+  }
+}
+

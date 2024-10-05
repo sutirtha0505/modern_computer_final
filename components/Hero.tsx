@@ -100,8 +100,8 @@ function  Hero() {
           Welcome, <span className="text-indigo-500">Viewer</span>
         </p>
       )}
-      <div className="w-full flex justify-center items-center flex-wrap" id="hero">
-        <div className="flex justify-center items-center h-[800px] rounded-md w-full md:w-1/2">
+      <div className="w-full flex justify-center items-center flex-wrap responsive-flex" id="hero">
+        <div className="flex justify-center items-center h-[800px] rounded-md responsive-width w-full md:w-1/2">
           <div className="w-[400px] h-[400px] md:w-[600px] flex items-center justify-center backdrop-blur-sm rounded-3xl md:h-[600px]">
             <div ref={tiltRef} className="relative">
               <div className="w-full h-full absolute -z-10">
@@ -120,7 +120,7 @@ function  Hero() {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center px-20 gap-[30px] text-wrap w-full md:w-1/2">
+        <div className="flex flex-col items-center justify-center px-20 gap-[30px] text-wrap responsive-width w-full md:w-1/2">
           <h1 className="text-center uppercase text-5xl tracking-tighter select-none">
             Fulfil Your Dream <br /> with
           </h1>

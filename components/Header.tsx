@@ -175,19 +175,19 @@ const Header = () => {
           </Link>
 
           <div className="hidden md:flex gap-10">
-            <Link href="#productbycategoriesslider" className="relative group">
+            <Link href="#productbycategoriesslider" className="relative group responsive-font">
               Products
               <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
-            <Link href="#pbpc" className="relative group">
+            <Link href="#pbpc" className="relative group responsive-font">
               Pre-Build PC
               <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
-            <Link href="#cbpc" className="relative group">
+            <Link href="#cbpc" className="relative group responsive-font">
               Custom-Build PC
               <span className="block h-0.5 w-0  bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
-            <Link href="#about" className="relative group">
+            <Link href="#about" className="relative group responsive-font">
               About
               <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
