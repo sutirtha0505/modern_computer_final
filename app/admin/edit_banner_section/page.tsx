@@ -1,11 +1,12 @@
 "use client"
-import EditHeroSection from '@/components/EditHeroSection'
+import EditBannerSection from '@/components/EditBannerSection';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
+import RecentProducts from '@/components/RecentProducts';
 import { supabase } from '@/lib/supabaseClient';
 import React, { useState, useEffect } from 'react';
 
 
-const EditHeroSectionPage = () => {
+const EditBannerSectionPage = () => {
     const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -47,8 +48,9 @@ const EditHeroSectionPage = () => {
 
   if (user && role === 'admin') {
     return (
-      <div className='p-20 w-full h-full flex flex-wrap justify-center items-center gap-4'>
-        <EditHeroSection />
+      <div className='p-24 w-full h-full flex flex-wrap justify-center items-center gap-4'>
+        <EditBannerSection />
+        <RecentProducts />
       </div>
     );
   } else {
@@ -59,4 +61,4 @@ const EditHeroSectionPage = () => {
 };
 
 
-export default EditHeroSectionPage
+export default EditBannerSectionPage

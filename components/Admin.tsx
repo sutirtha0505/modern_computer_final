@@ -11,6 +11,7 @@ import { MdOutlineCategory } from "react-icons/md";
 import { TiInfoLargeOutline } from "react-icons/ti";
 import { BiCarousel } from "react-icons/bi";
 import { TbBuildingCarousel } from "react-icons/tb";
+import AdUnitsIcon from '@mui/icons-material/AdUnits';
 
 const Admin = () => {
   const router = useRouter();
@@ -33,6 +34,17 @@ const Admin = () => {
             <FaHouseChimney size={30} />
             <p className="text-center font-semibold text-xs">
               Edit Hero Section
+            </p>
+          </div>
+          <div
+            onClick={() => {
+              router.push("/admin/edit_banner_section");
+            }}
+            className="p-4 rounded-sm flex flex-col justify-center items-center bg-amber-600 border-amber-600 border-2 hover:bg-transparent hover:text-amber-600 cursor-pointer h-24 gap-2"
+          >
+            <AdUnitsIcon />
+            <p className="text-center font-semibold text-xs">
+              Hero Section Banners
             </p>
           </div>
           <div

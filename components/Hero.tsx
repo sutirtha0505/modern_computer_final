@@ -6,6 +6,8 @@ import SVGblob from "./SVGblob";
 import VanillaTilt from "vanilla-tilt";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import BannerSection from "./BannerSection";
+import RecentProductsShow from "./RecentProductsShow";
 
 // TypeScript type for the VanillaTilt options
 interface VanillaTiltOptions {
@@ -15,7 +17,7 @@ interface VanillaTiltOptions {
   "max-glare": number;
 }
 
-function  Hero() {
+function Hero() {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement | null>(null);
   const [user, setUser] = useState<any>(null);
@@ -100,7 +102,14 @@ function  Hero() {
           Welcome, <span className="text-indigo-500">Viewer</span>
         </p>
       )}
-      <div className="w-full flex justify-center items-center flex-wrap responsive-flex" id="hero">
+      <div className="flex flex-col w-full h-full gap-4">
+        <RecentProductsShow />
+        <BannerSection />
+      </div>
+      <div
+        className="w-full flex justify-center items-center flex-wrap responsive-flex"
+        id="hero"
+      >
         <div className="flex justify-center items-center h-[800px] rounded-md responsive-width w-full md:w-1/2">
           <div className="w-[400px] h-[400px] md:w-[600px] flex items-center justify-center backdrop-blur-sm rounded-3xl md:h-[600px]">
             <div ref={tiltRef} className="relative">
