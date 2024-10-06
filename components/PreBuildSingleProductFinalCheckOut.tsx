@@ -23,6 +23,8 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
   const [loading, setLoading] = useState<boolean>(false);
   const [sellingPrice, setSellingPrice] = useState<number>(0); // State for selling price
 
+  const [isPincodeValid, setIsPincodeValid] = useState<boolean>(true);
+
   useEffect(() => {
     const storedProduct = localStorage.getItem("checkoutProduct");
     if (storedProduct) {
@@ -38,7 +40,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
       const { data, error } = await supabase
         .from("pre_build")
         .select(
-          "build_name, image_urls, build_type, coupon_code, code_equiv_percent"
+          "build_name, image_urls, build_type, coupon_code, code_equiv_percent, date_applicable"
         )
         .eq("id", id)
         .single();
@@ -111,6 +113,16 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
           router.push(`/profile/${userId}`);
         } else {
           setCustomerDetails(data);
+          const isValidPincode =
+            data.customer_house_pincode >= 700000 &&
+            data.customer_house_pincode <= 740000;
+          setIsPincodeValid(isValidPincode);
+
+          if (!isValidPincode) {
+            toast.error(
+              "Delivery not available to the entered pincode. We're Shipping within West Bengal, India. Please visit our store and try again later."
+            );
+          }
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);
@@ -124,13 +136,21 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
 
   const handleApplyCoupon = () => {
     if (couponCode === product?.coupon_code) {
-      if (!isNaN(sellingPrice)) {
-        const discount = sellingPrice * (product.code_equiv_percent / 100);
-        setDiscountedTotal(sellingPrice - discount);
-        setCouponApplied(true);
-        toast.success("Coupon code redeemed successfully!");
+      const currentDate = dayjs(); // Get the current date
+      const applicableDate = dayjs(product?.date_applicable); // Get the applicable date for the coupon
+
+      // Check if the coupon is still valid based on the date
+      if (currentDate.isBefore(applicableDate)) {
+        if (!isNaN(sellingPrice)) {
+          const discount = sellingPrice * (product.code_equiv_percent / 100);
+          setDiscountedTotal(sellingPrice - discount);
+          setCouponApplied(true);
+          toast.success("Coupon code redeemed successfully!");
+        } else {
+          toast.error("Invalid selling price");
+        }
       } else {
-        toast.error("Invalid selling price");
+        toast.error("Coupon code has expired");
       }
     } else {
       toast.error("Wrong coupon code");
@@ -349,9 +369,13 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
           </div>
           <div className="flex justify-center">
             <button
-              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              className={`bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200 ${
+                !isPincodeValid || loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : ""
+              }`}
               onClick={handlePayment}
-              disabled={loading}
+              disabled={loading || !isPincodeValid} // Disable button if pincode is not valid
             >
               {loading ? "Processing..." : "Pay Here"}
             </button>

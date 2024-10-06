@@ -3,7 +3,9 @@ import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { XCircle } from "lucide-react";
 
+// Interfaces for types
 interface OrderedProduct {
   product_id: string;
 }
@@ -23,13 +25,15 @@ interface Customer {
 
 const OrderedPCComponentManagement = () => {
   const [orders, setOrders] = useState<any[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<any[]>([]); // State to hold filtered orders
   const [productsMap, setProductsMap] = useState<Map<string, Product>>(
     new Map()
   );
   const [customersMap, setCustomersMap] = useState<Map<string, Customer>>(
     new Map()
-  ); // State to store customer details
+  );
   const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
     const image = images.find((img) => img.url.includes("_first"));
@@ -52,6 +56,7 @@ const OrderedPCComponentManagement = () => {
         }
 
         setOrders(ordersData || []);
+        setFilteredOrders(ordersData || []); // Set filtered orders initially
 
         // Fetch unique product IDs
         const uniqueProductIds = new Set<string>();
@@ -111,14 +116,65 @@ const OrderedPCComponentManagement = () => {
     fetchOrders();
   }, []);
 
+  // Function to handle filtering
+  const handleFilter = () => {
+    const query = searchQuery.toLowerCase();
+
+    const filtered = orders.filter((order) => {
+      const customer = customersMap.get(order.customer_id);
+      return (
+        order.order_id.toLowerCase().includes(query) ||
+        order.payment_id.toLowerCase().includes(query) ||
+        customer?.customer_name?.toLowerCase().includes(query) ||
+        customer?.email?.toLowerCase().includes(query) ||
+        order.order_status.toLowerCase().includes(query) // Ensures 'Shipped' or any other status is filtered
+      );
+    });
+
+    setFilteredOrders(filtered);
+  };
+
+  // Function to clear the filter
+  const clearFilter = () => {
+    setSearchQuery(""); // Reset search query
+    setFilteredOrders(orders); // Reset filtered orders to original orders
+  };
+
   return (
-    <div className="w-full h-full justify-center items-center flex flex-col pt-8">
+    <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12    ">
       <h1 className="text-xl font-bold text-center">
         <span className="text-indigo-500">Ordered PC Component</span> Orders
       </h1>
 
+      {/* Filter Section */}
+      <div className="flex justify-center items-center w-full gap-6 py-4 px-8">
+        <input
+          type="text"
+          placeholder="Search by order ID, payment ID, customer details, or order status"
+          value={searchQuery} // Bind the input value to state
+          onChange={(e) => setSearchQuery(e.target.value)} // Update the search query state
+          className="w-full px-4 py-2 border rounded-md bg-transparent"
+        />
+        {/* Clear Filter Icon */}
+        {searchQuery && ( // Show the clear button only if there's a search query
+          <button
+            className="text-red-500 hover:text-red-700"
+            onClick={clearFilter}
+            aria-label="Clear filter"
+          >
+            <XCircle size={24} />
+          </button>
+        )}
+        <button
+          className="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md"
+          onClick={handleFilter} // Call handleFilter on click
+        >
+          Filter
+        </button>
+      </div>
+
       {/* Table Section */}
-      <div className="w-full flex justify-center overflow-x-auto p-8 scrollbar-hide">
+      <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
         <table className="min-w-full text-left table-auto border-collapse">
           <thead>
             <tr className="bg-gray-800 w-full">
@@ -155,19 +211,26 @@ const OrderedPCComponentManagement = () => {
                 </td>
               </tr>
             ) : (
-              orders.map((order) => {
+              filteredOrders.map((order) => {
                 const customer = customersMap.get(order.customer_id);
 
                 return (
                   <tr key={order.order_id}>
-                    <td className="px-4 py-2 border w-[5%] break-all text-xs">
+                    <td className="px-4 py-2 border w-[5%] break-all text-xs select-text ">
                       {order.order_id}
                     </td>
-                    <td className="px-4 py-2 border w-[5%] text-xs">
+                    <td
+                      className="px-4 py-2 break-all border w-[5%] text-xs select-text cursor-pointer hover:text-indigo-500"
+                      onClick={() => {
+                        window.open(
+                          `https://dashboard.razorpay.com/app/payments/${order.payment_id}?init_page=Payments`
+                        );
+                      }}
+                    >
                       {order.payment_id}
                     </td>
                     <td className="px-4 py-2 border w-[25%] text-xs">
-                      <div className="flex flex-wrap items-center gap-2 justify-center">
+                      <div className="flex flex-wrap items-center gap-2 justify-center mb-3">
                         {customer?.profile_photo && (
                           <img
                             src={customer.profile_photo}
@@ -175,7 +238,9 @@ const OrderedPCComponentManagement = () => {
                             className="w-8 h-8 rounded-full object-cover"
                           />
                         )}
-                        <p>{customer?.customer_name || "Unknown Name"}</p>
+                        <p className="text-center">
+                          {customer?.customer_name || "Unknown Name"}
+                        </p>
                       </div>
                       <div className="flex flex-col gap-2 justify-center items-center">
                         <div
@@ -192,7 +257,9 @@ const OrderedPCComponentManagement = () => {
                             alt=""
                             className="w-4 h-4"
                           />
-                          <p>{customer?.email || "Unknown Email"}</p>
+                          <p className="break-all">
+                            {customer?.email || "Unknown Email"}
+                          </p>
                         </div>
                         <div
                           className="flex gap-2 justify-center items-center cursor-pointer hover:text-indigo-500"
@@ -209,9 +276,19 @@ const OrderedPCComponentManagement = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-2 border w-[5%] text-xs">
+                    <td
+                      className="px-4 py-2 border w-[5%] text-xs cursor-pointer hover:text-indigo-500"
+                      onClick={() => {
+                        const address = encodeURIComponent(order.order_address);
+                        window.open(
+                          `https://www.google.com/maps/search/?api=1&query=${address}`,
+                          "_blank"
+                        );
+                      }}
+                    >
                       {order.order_address}
                     </td>
+
                     <td className="px-4 py-2 border w-[35%]">
                       {order.ordered_products.map((product: OrderedProduct) => {
                         const productDetails = productsMap.get(
@@ -224,7 +301,7 @@ const OrderedPCComponentManagement = () => {
                         return (
                           <div
                             key={product.product_id}
-                            className="flex items-center gap-2 cursor-pointer"
+                            className="flex flex-wrap justify-center items-center gap-2 cursor-pointer"
                             onClick={() => {
                               window.open(`/product/${product.product_id}`);
                             }}
@@ -321,15 +398,61 @@ const OrderedPCComponentManagement = () => {
                       </div>
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
-                      <button className="bg-blue-500 text-white px-2 py-1 w-full rounded" onClick={()=>{
-                        //Message in whatsapp using customer.phone_no
-                        window.open(`https://wa.me/${customer?.phone_no}?text=Hello, You've ordered something from Modern Computer. Here is your Order ID: ${order.order_id}. We've something to talk about the order.`);
-                      }}>
+                      <button
+                        className="bg-blue-500 border-1 hover:bg-transparent hover:text-blue-500 border-blue-500 text-white px-2 py-1 w-full rounded"
+                        onClick={() => {
+                          const message = `Hello, You've ordered something from Modern Computer. Here is your Order ID: ${order.order_id}. We've something to talk about the order.`;
+                          const encodedMessage = encodeURIComponent(message);
+
+                          window.open(
+                            `https://web.whatsapp.com/send?phone=${customer?.phone_no}&text=${encodedMessage}`
+                          );
+                        }}
+                      >
                         Contact
                       </button>
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
-                      <button className="bg-red-500 text-white px-2 py-1 w-full rounded">
+                      <button
+                        className={`${
+                          order.order_status === "Cancelled"
+                            ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
+                            : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
+                        } border-1 px-2 py-1 w-full rounded`}
+                        onClick={async () => {
+                          const orderId = order.order_id; // Get order ID
+                          const paymentId = order.payment_id; // Get payment ID
+                          const amount = order.payment_amount * 100; // Get payment amount (ensure this is part of your order data)
+
+                          try {
+                            const response = await fetch("/api/refund", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify({
+                                order_id: orderId,
+                                payment_id: paymentId,
+                                amount,
+                              }),
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                              toast.success("Refund processed successfully!");
+                              // Optionally, refresh the orders list or update the state
+                            } else {
+                              toast.error(`Refund failed: ${data.error}`);
+                            }
+                          } catch (error) {
+                            console.error("Error during refund:", error);
+                            toast.error(
+                              "An error occurred while processing the refund."
+                            );
+                          }
+                        }}
+                      >
                         Refund
                       </button>
                     </td>

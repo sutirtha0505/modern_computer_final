@@ -23,6 +23,7 @@ const CartSingleProductFinalCheckOut: React.FC<
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isPincodeValid, setIsPincodeValid] = useState<boolean>(true); // New state to track pincode validity
 
   useEffect(() => {
     const product_id = searchParams.get("product_id");
@@ -37,7 +38,7 @@ const CartSingleProductFinalCheckOut: React.FC<
         const { data, error } = await supabase
           .from("products")
           .select(
-            "product_image, product_name, product_SP, coupon_code, code_equiv_percent, product_amount"
+            "product_image, product_name, product_SP, coupon_code, code_equiv_percent, product_amount, date_applicable"
           )
           .eq("product_id", productId)
           .single();
@@ -78,7 +79,7 @@ const CartSingleProductFinalCheckOut: React.FC<
   useEffect(() => {
     const fetchCustomerDetails = async () => {
       try {
-        const { data, error } = await supabase
+        const { data: customerInfo, error } = await supabase
           .from("profile")
           .select(
             "customer_name, customer_house_no, customer_house_street, customer_house_city, customer_house_pincode, customer_house_landmark, profile_photo, email, phone_no"
@@ -91,20 +92,32 @@ const CartSingleProductFinalCheckOut: React.FC<
           return;
         }
 
+        // Check if required fields exist
         if (
-          !data.customer_name ||
-          !data.customer_house_no ||
-          !data.customer_house_street ||
-          !data.customer_house_city ||
-          !data.customer_house_pincode ||
-          !data.customer_house_landmark ||
-          !data.email ||
-          !data.phone_no ||
-          !data.profile_photo
+          !customerInfo.customer_name ||
+          !customerInfo.customer_house_no ||
+          !customerInfo.customer_house_street ||
+          !customerInfo.customer_house_city ||
+          !customerInfo.customer_house_pincode ||
+          !customerInfo.customer_house_landmark ||
+          !customerInfo.email ||
+          !customerInfo.phone_no ||
+          !customerInfo.profile_photo
         ) {
           router.push(`/profile/${userId}`);
         } else {
-          setCustomerDetails(data);
+          setCustomerDetails(customerInfo);
+          // Check if pincode is valid
+          const isValidPincode =
+            customerInfo.customer_house_pincode >= 700000 &&
+            customerInfo.customer_house_pincode <= 740000;
+          setIsPincodeValid(isValidPincode);
+
+          if (!isValidPincode) {
+            toast.error(
+              "Delivery not available to the entered pincode. We're Shipping within West Bengal, India. Please visit our store and try again later."
+            );
+          }
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);
@@ -117,6 +130,17 @@ const CartSingleProductFinalCheckOut: React.FC<
   }, [userId, router]);
 
   const handleApplyCoupon = () => {
+    const currentDate = dayjs(); // Get the current date
+    const applicableDate = dayjs(productData.date_applicable); // Convert date_applicable to dayjs object
+
+    // Check if the coupon code is correct and the current date hasn't passed the applicable date
+    if (currentDate.isAfter(applicableDate)) {
+      toast.error(
+        "Coupon code can't be applied because you've crossed the applicable date."
+      );
+      return; // Stop further execution if the coupon has expired
+    }
+
     if (couponCode === productData.coupon_code) {
       const discount =
         productData.product_SP * (productData.code_equiv_percent / 100);
@@ -340,9 +364,13 @@ const CartSingleProductFinalCheckOut: React.FC<
           </div>
           <div className="flex justify-center">
             <button
-              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              className={`bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200 ${
+                !isPincodeValid || loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : ""
+              }`}
               onClick={handlePayment}
-              disabled={loading}
+              disabled={loading || !isPincodeValid} // Disable if loading or pincode is invalid
             >
               {loading ? "Processing..." : "Pay Here"}
             </button>

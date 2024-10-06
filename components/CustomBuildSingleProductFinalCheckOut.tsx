@@ -13,6 +13,7 @@ interface Product {
 interface CustomBuildSingleProductFinalCheckOutProps {
   userId: string;
 }
+
 const CustomBuildSingleProductFinalCheckOut: React.FC<
   CustomBuildSingleProductFinalCheckOutProps
 > = ({ userId }) => {
@@ -35,7 +36,7 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
   const [loading, setLoading] = useState<boolean>(false);
   const [product, setProduct] = useState<any>(null);
   const [customerDetails, setCustomerDetails] = useState<any>(null);
-
+  const [isPincodeValid, setIsPincodeValid] = useState<boolean>(true);
   useEffect(() => {
     // Fetch the stored data from localStorage
     const storedData = localStorage.getItem("checkoutCustomBuildData");
@@ -65,7 +66,9 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
       try {
         const { data, error } = await supabase
           .from("custom_build")
-          .select("processor, build_type, coupon_code, code_equiv_percent")
+          .select(
+            "processor, build_type, coupon_code, code_equiv_percent, date_applicable"
+          )
           .eq("id", customBuildId)
           .single();
 
@@ -132,6 +135,16 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
           router.push(`/profile/${userId}`);
         } else {
           setCustomerDetails(data);
+          const isValidPincode =
+            data.customer_house_pincode >= 700000 &&
+            data.customer_house_pincode <= 740000;
+          setIsPincodeValid(isValidPincode);
+
+          if (!isValidPincode) {
+            toast.error(
+              "Delivery not available to the entered pincode. We're Shipping within West Bengal, India. Please visit our store and try again later."
+            );
+          }
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);
@@ -147,7 +160,9 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
     setLoading(true);
 
     try {
-      const payableAmount = Math.round(couponApplied ? discountedTotal : totalPrice); // Use totalPrice if coupon is not applied
+      const payableAmount = Math.round(
+        couponApplied ? discountedTotal : totalPrice
+      ); // Use totalPrice if coupon is not applied
 
       const response = await fetch("/api/payment", {
         method: "POST",
@@ -225,14 +240,51 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
         customer_id: userId,
         payment_amount: amount, // Use the amount passed from the payment handler
         ordered_products: [
-          { processor_name: processor[0]?.name || "", quantity: 1, image_url:processor[0]?.image },
-          { motherboard_name: motherboard[0]?.name || "", quantity: 1, image_url:motherboard[0]?.image },
-          { ram_name: ram[0]?.name || "", quantity: ramQuantity, image_url:ram[0]?.image }, // Using ramQuantity here
-          { ssd_name: ssd[0]?.name || "", quantity: 1, image_url:ssd[0]?.image }, //
-          { hdd_name: hdd[0]?.name || "", quantity: 1, image_url:hdd[0]?.image }, // Using hdd here
-          { cabinet_name: cabinet[0]?.name || "", quantity: 1, image_url:cabinet[0]?.image }, //
-          { psu_name: psu[0]?.name || "", quantity: 1, image_url:psu[0]?.image },
-          { cooler_name: cooler[0]?.name || "", quantity: 1, image_url:cooler[0]?.image },
+          {
+            processor_name: processor[0]?.name || "",
+            quantity: 1,
+            image_url: processor[0]?.image,
+          },
+          {
+            motherboard_name: motherboard[0]?.name || "",
+            quantity: 1,
+            image_url: motherboard[0]?.image,
+          },
+          {
+            ram_name: ram[0]?.name || "",
+            quantity: ramQuantity,
+            image_url: ram[0]?.image,
+          }, // Using ramQuantity here
+          {
+            ssd_name: ssd[0]?.name || "",
+            quantity: 1,
+            image_url: ssd[0]?.image,
+          }, //
+          {
+            hdd_name: hdd[0]?.name || "",
+            quantity: 1,
+            image_url: hdd[0]?.image,
+          }, // Using hdd here
+          {
+            cabinet_name: cabinet[0]?.name || "",
+            quantity: 1,
+            image_url: cabinet[0]?.image,
+          }, //
+          {
+            psu_name: psu[0]?.name || "",
+            quantity: 1,
+            image_url: psu[0]?.image,
+          },
+          {
+            cooler_name: cooler[0]?.name || "",
+            quantity: 1,
+            image_url: cooler[0]?.image,
+          },
+          {
+            graphics_card_name: graphicsCard[0]?.name || "",
+            quantity: 1,
+            image_url: graphicsCard[0]?.image,
+          },
         ],
         order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
@@ -250,13 +302,21 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
 
   const handleApplyCoupon = () => {
     if (couponCode === product?.coupon_code) {
-      if (!isNaN(totalPrice)) {
-        const discount = totalPrice * (product.code_equiv_percent / 100);
-        setDiscountedTotal(totalPrice - discount);
-        setCouponApplied(true);
-        toast.success("Coupon code redeemed successfully!");
+      const currentDate = dayjs(); // Get the current date
+      const applicableDate = dayjs(product?.date_applicable); // Get the applicable date for the coupon
+
+      // Check if the coupon is still valid based on the date
+      if (currentDate.isBefore(applicableDate)) {
+        if (!isNaN(totalPrice)) {
+          const discount = totalPrice * (product.code_equiv_percent / 100);
+          setDiscountedTotal(totalPrice - discount);
+          setCouponApplied(true);
+          toast.success("Coupon code redeemed successfully!");
+        } else {
+          toast.error("Invalid selling price");
+        }
       } else {
-        toast.error("Invalid selling price");
+        toast.error("Coupon code has expired");
       }
     } else {
       toast.error("Wrong coupon code");
@@ -553,9 +613,13 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
           </div>
           <div className="flex justify-center">
             <button
-              className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+              className={`bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200 ${
+                !isPincodeValid || loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : ""
+              }`}
               onClick={handlePayment}
-              disabled={loading}
+              disabled={loading || !isPincodeValid}
             >
               {loading ? "Processing..." : "Pay Here"}
             </button>

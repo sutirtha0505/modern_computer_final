@@ -210,14 +210,15 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
                     handleCancelOrder(order.order_id, order.order_status)
                   }
                   className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
-                    order.order_status === "Shipped" ||
-                    order.order_status === "Cancelled"
-                      ? "border-gray-400 bg-gray-400 cursor-not-allowed"
-                      : "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                    order.order_status === "ordered"
+                      ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                      : "border-gray-400 bg-gray-400 cursor-not-allowed"
                   }`}
                   disabled={
                     order.order_status === "Shipped" ||
-                    order.order_status === "Cancelled"
+                    order.order_status === "Cancelled" ||
+                    order.order_status === "Delivered" ||
+                    order.order_status === "Refunded"
                   } // Disable if shipped or cancelled
                 >
                   <CircleX />

@@ -19,9 +19,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false); // Track loading state
   const [couponApplied, setCouponApplied] = useState<boolean>(false); // Track if coupon has been applied
+  const [isPincodeValid, setIsPincodeValid] = useState<boolean>(true); // To check pincode validation
 
   // Function to handle payment logic
   const handlePayment = async () => {
+    if (!isPincodeValid) return; // Disable if pincode is not valid
+
     setLoading(true);
 
     try {
@@ -85,7 +88,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       setLoading(false);
     }
   };
-
   // Function to save order details in Supabase and update product amount
   const saveOrder = async (order_id: string, payment_id: string) => {
     const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD"); // Calculate expected delivery date
@@ -127,7 +129,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     for (const product of cart) {
       const { data: productData, error: fetchError } = await supabase
         .from("products")
-        .select("product_amount")
+        .select("product_amount, date_applicable")
         .eq("product_id", product.product_id)
         .single();
 
@@ -188,6 +190,19 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
           return;
         }
 
+        setCustomerDetails(data);
+
+        // Validate pincode range and update state
+        const isValid =
+          data.customer_house_pincode >= 700000 &&
+          data.customer_house_pincode <= 740000;
+        setIsPincodeValid(isValid);
+
+        if (!isValid) {
+          toast.error("Delivery not available to the entered pincode. We're Shipping within West Bengal, India. Please visit our store and try again later.");
+        }
+
+        // If necessary details are missing, redirect to the profile page
         if (
           !data.customer_name ||
           !data.customer_house_no ||
@@ -200,8 +215,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
           !data.profile_photo
         ) {
           router.push(`/profile/${userId}`);
-        } else {
-          setCustomerDetails(data);
         }
       } catch (error) {
         console.error("Error fetching customer details:", error);
@@ -242,7 +255,9 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     // Query Supabase for products that match the product IDs from the cart
     const { data: products, error } = await supabase
       .from("products")
-      .select("product_id, coupon_code, code_equiv_percent, product_amount")
+      .select(
+        "product_id, coupon_code, code_equiv_percent, product_SP, product_amount, date_applicable"
+      )
       .in("product_id", productIds);
 
     if (error) {
@@ -250,13 +265,22 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       return;
     }
 
-    // Find products with the entered coupon code
-    const matchedProducts = products.filter(
-      (product) => product.coupon_code === couponCode
-    );
+    // Get the current date for comparison
+    const currentDate = dayjs(); // Using dayjs for date manipulation
+
+    // Find products with the entered coupon code and check date applicability
+    const matchedProducts = products.filter((product) => {
+      const productDate = dayjs(product.date_applicable);
+      return (
+        product.coupon_code === couponCode && currentDate.isBefore(productDate)
+      );
+    });
 
     if (matchedProducts.length === 0) {
-      toast.error("Wrong code, try again.");
+      // If no products match the coupon or the date has passed
+      toast.error(
+        "Coupon code can't be applied because you've crossed the date or it's invalid."
+      );
       setCouponCode(""); // Reset input field
       return;
     }
@@ -279,6 +303,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     setCouponApplied(true); // Update state to reflect coupon application
     toast.success("Coupon applied!");
   };
+
   return (
     <>
       <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
@@ -392,9 +417,13 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
             </div>
             <div className="flex justify-center">
               <button
-                className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200"
+                className={`bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-36 rounded-md text-l hover:text-l hover:font-bold duration-200 ${
+                  !isPincodeValid || loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : ""
+                }`}
                 onClick={handlePayment}
-                disabled={loading}
+                disabled={!isPincodeValid || loading} // Disable button if pincode is invalid or loading
               >
                 {loading ? "Processing..." : "Pay Here"}
               </button>

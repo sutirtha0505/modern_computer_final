@@ -175,7 +175,7 @@ const About: React.FC = () => {
                   key={index}
                   src={image.url}
                   alt={image.name}
-                  className="w-96 h-96 rounded-md cursor-pointer"
+                  className="w-96 h-96 rounded-md cursor-pointer object-contain"
                   onClick={() => setSelectedImage(image.url)}
                 />
               ))}
@@ -232,7 +232,7 @@ const About: React.FC = () => {
             />
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute top-2 right-2 text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-red-600"
+              className="absolute top-2 right-2 text-white bg-black bg-opacity-70 rounded-full p-2 hover:bg-red-600 object-scale-down"
             >
               <X />
             </button>

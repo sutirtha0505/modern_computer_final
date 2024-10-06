@@ -5,7 +5,6 @@ import { CircleX } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 interface Order {
   order_id: string;
   ordered_products: string[]; // Array of product IDs
@@ -161,32 +160,33 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
 
             <div className="w-full flex flex-wrap items-center justify-between gap-10">
               <ol className="w-auto list-decimal">
-                {order.ordered_products.map((productId, idx) => {
-                  const productDetails = productsMap.get(productId);
-                  const firstImageUrl =
-                    productDetails &&
-                    getFirstImageUrl(productDetails.image_urls);
+                  {order.ordered_products.map((productId, idx) => {
+                    const productDetails = productsMap.get(productId);
+                    const firstImageUrl =
+                      productDetails &&
+                      getFirstImageUrl(productDetails.image_urls);
 
-                  return (
-                    <li key={idx} className="flex gap-4 items-center">
-                      <div className="flex items-center justify-between gap-6 cursor-pointer">
-                        {firstImageUrl && (
-                          <img
-                            src={firstImageUrl}
-                            alt="Product Image"
-                            className="w-16 h-16 object-cover"
-                          />
-                        )}
-                        <p className="text-sm font-semibold hover:text-indigo-600">
-                          {truncateString(
-                            productDetails?.build_name || "Unknown Product",
-                            30
-                          )} - {productDetails?.build_type}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
+                    return (
+                      <li key={idx} className="flex gap-4 items-center">
+                        <div className="flex items-center justify-between gap-6 cursor-pointer">
+                          {firstImageUrl && (
+                            <img
+                              src={firstImageUrl}
+                              alt="Product Image"
+                              className="w-16 h-16 object-cover"
+                            />
+                          )}
+                          <p className="text-sm font-semibold hover:text-indigo-600">
+                            {truncateString(
+                              productDetails?.build_name || "Unknown Product",
+                              30
+                            )}{" "}
+                            - {productDetails?.build_type}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
               </ol>
               <div className="w-auto flex flex-col justify-center items-center gap-2">
                 <div className="flex gap-2 justify-center items-center">
@@ -215,14 +215,15 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                     handleCancelOrder(order.order_id, order.order_status)
                   }
                   className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
-                    order.order_status === "Shipped" ||
-                    order.order_status === "Cancelled"
-                      ? "border-gray-400 bg-gray-400 cursor-not-allowed"
-                      : "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                    order.order_status === "ordered"
+                      ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                      : "border-gray-400 bg-gray-400 cursor-not-allowed"
                   }`}
                   disabled={
                     order.order_status === "Shipped" ||
-                    order.order_status === "Cancelled"
+                    order.order_status === "Cancelled" ||
+                    order.order_status === "Delivered" ||
+                    order.order_status === "Refunded"
                   } // Disable if shipped or cancelled
                 >
                   <CircleX />

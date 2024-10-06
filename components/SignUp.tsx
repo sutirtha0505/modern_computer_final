@@ -15,7 +15,7 @@ export const SignUp = () => {
     supabaseClient={supabase}
     appearance={{ theme: ThemeSupa }}
     theme="dark"
-    providers={['google', 'github']}
+    providers={['google']}
     localization={{
         variables: {
           sign_in: {
