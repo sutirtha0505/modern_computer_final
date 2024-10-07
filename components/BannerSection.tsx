@@ -6,8 +6,8 @@ import Autoplay from 'embla-carousel-autoplay';
 const BannerSection: React.FC = () => {
   const [galleryImages, setGalleryImages] = useState<{ name: string; url: string }[]>([]);
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, dragFree: true }, // Ensure smooth scrolling
-    [Autoplay({ delay: 2000, stopOnInteraction: false })] // Autoplay
+    { loop: true, dragFree: true }, // Enable looping and drag-free scrolling
+    [Autoplay({ delay: 4000, stopOnInteraction: false })] // Enable autoplay
   );
 
   const fetchGalleryImages = async () => {
@@ -35,15 +35,17 @@ const BannerSection: React.FC = () => {
   const onScroll = useCallback(() => {
     if (!emblaApi) return;
 
-    const slides = emblaApi.slideNodes();
-    const scrollProgress = emblaApi.scrollProgress();
+    const slides = emblaApi.slideNodes(); // Get all slide elements
+    const scrollProgress = emblaApi.scrollProgress(); // Get current scroll progress
 
     slides.forEach((slide, index) => {
       const slideProgress = emblaApi.scrollSnapList()[index] - scrollProgress;
-      const parallax = -50 * slideProgress; // Adjust this value for stronger/weaker effect
-      const image = slide.querySelector("img");
-      if (image) {
-        image.style.transform = `translateX(${parallax}px)`; // Apply parallax effect
+      const opacity = 1 - Math.abs(slideProgress); // Calculate opacity based on position
+
+      // Set opacity for each slide
+      const innerImageWrapper = slide.querySelector(".embla__slide__inner") as HTMLElement;
+      if (innerImageWrapper) {
+        innerImageWrapper.style.opacity = opacity.toString(); // Apply opacity effect
       }
     });
   }, [emblaApi]);
@@ -51,15 +53,15 @@ const BannerSection: React.FC = () => {
   useEffect(() => {
     fetchGalleryImages();
     if (emblaApi) {
-      emblaApi.on("scroll", onScroll); // Apply parallax effect during scrolling
-      emblaApi.on("select", onScroll); // Ensure effect when snapping to a slide
+      emblaApi.on("scroll", onScroll); // Apply opacity effect on scroll
+      emblaApi.on("select", onScroll); // Ensure effect when snapping to slide
     }
   }, [emblaApi, onScroll]);
 
   return (
     <div className="flex flex-col items-center w-full py-16 px-4">
       <h1 className="font-bold text-2xl md:mb-6 mb-0 text-center">
-        Our <span className="text-indigo-500">Recently Launched</span> Products
+        Our <span className="text-indigo-500">Recent Offers</span> on Products
       </h1>
 
       {/* Embla Carousel */}
@@ -67,17 +69,30 @@ const BannerSection: React.FC = () => {
         <div className="embla__container flex">
           {galleryImages.map((image, index) => (
             <div
-              className="relative flex-shrink-0 w-[50%] px-2 transition-transform duration-300" // Embla slide
+              className="embla__slide relative flex-shrink-0 w-full md:w-[33.333%] px-2" // Adjusted width for responsive design
               key={index}
             >
-              <img
-                src={image.url}
-                alt={image.name}
-                className="transform transition-transform will-change-transform w-full h-64 object-scale-down rounded-lg shadow-lg" // Set a fixed height with object-cover
-              />
+              <div className="embla__slide__inner transition-opacity duration-300"> {/* Apply transition for smooth effect */}
+                <img
+                  src={image.url}
+                  alt={image.name}
+                  className="w-full h-64 object-scale-down rounded-lg shadow-lg" // Use object-cover for better image fit
+                />
+              </div>
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-4">
+        {galleryImages.map((_, index) => (
+          <button
+            key={index}
+            className="w-3 h-3 rounded-full mx-1 bg-gray-300 hover:bg-gray-500 transition duration-200"
+            onClick={() => emblaApi?.scrollTo(index)}
+          />
+        ))}
       </div>
     </div>
   );

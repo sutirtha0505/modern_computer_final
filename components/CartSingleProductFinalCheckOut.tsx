@@ -260,7 +260,7 @@ const CartSingleProductFinalCheckOut: React.FC<
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-        <div className="flex items-center gap-4 p-4 border rounded-lg bg-slate-800">
+        <div className="flex flex-wrap items-center gap-4 p-4 border rounded-lg bg-slate-800">
           {productData.product_image && (
             <Image
               src={productData.product_image}

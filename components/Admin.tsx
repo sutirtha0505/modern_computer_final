@@ -20,7 +20,7 @@ const Admin = () => {
       <h1 className="text-center text-5xl font-extrabold">
         Welcome to <span className="text-indigo-500">Admin page</span>
       </h1>
-      <div className="p-4 flex flex-col justify-center items-center gap-4">
+      <div className="mb-0 md:mb-12 p-4 flex flex-col justify-center items-center gap-4">
         <h1 className="font-bold text-emerald-300 text-xl">
           Products Management
         </h1>

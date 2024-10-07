@@ -1,14 +1,26 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+import { supabase } from "@/lib/supabaseClient";
+import { EmblaCarouselType } from "embla-carousel";
+import './carousel.css';
+
+const TWEEN_FACTOR_BASE = 0.52;
+
+const numberWithinRange = (number: number, min: number, max: number): number =>
+  Math.min(Math.max(number, min), max);
 
 const RecentProductsShow: React.FC = () => {
-  const [galleryImages, setGalleryImages] = useState<{ name: string; url: string }[]>([]);
+  const [galleryImages, setGalleryImages] = useState<
+    { name: string; url: string }[]
+  >([]);
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, dragFree: true }, // Ensure smooth scrolling
-    [Autoplay({ delay: 2000, stopOnInteraction: false })] // Autoplay
+    { loop: true, dragFree: true },
+    [Autoplay({ delay: 2000, stopOnInteraction: false })]
   );
+
+  const tweenFactor = useRef(0);
+  const tweenNodes = useRef<HTMLElement[]>([]);
 
   const fetchGalleryImages = async () => {
     const { data, error } = await supabase.storage
@@ -32,50 +44,99 @@ const RecentProductsShow: React.FC = () => {
     }
   };
 
+  const setTweenNodes = useCallback((emblaApi: EmblaCarouselType) => {
+    tweenNodes.current = emblaApi
+      .slideNodes()
+      .map((slideNode: { querySelector: (arg0: string) => HTMLElement }) => {
+        return slideNode.querySelector(".embla__slide__number") as HTMLElement;
+      });
+  }, []);
+
+  const setTweenFactor = useCallback((emblaApi: EmblaCarouselType) => {
+    tweenFactor.current = TWEEN_FACTOR_BASE * emblaApi.scrollSnapList().length;
+  }, []);
+
+  const tweenScale = useCallback(
+    (emblaApi: EmblaCarouselType, eventName?: string) => {
+      const engine = emblaApi.internalEngine();
+      const scrollProgress = emblaApi.scrollProgress();
+      const slidesInView = emblaApi.slidesInView();
+      const isScrollEvent = eventName === "scroll";
+
+      emblaApi
+        .scrollSnapList()
+        .forEach((scrollSnap: number, snapIndex: number) => {
+          // snapIndex is now always a number
+          let diffToTarget = scrollSnap - scrollProgress;
+          const slidesInSnap = engine.slideRegistry[snapIndex]; // snapIndex as a number
+
+          slidesInSnap.forEach((slideIndex: number) => {
+            if (isScrollEvent && !slidesInView.includes(slideIndex)) return;
+
+            if (engine.options.loop) {
+              engine.slideLooper.loopPoints.forEach(
+                (loopItem: { target: () => any; index: number }) => {
+                  const target = loopItem.target();
+
+                  if (slideIndex === loopItem.index && target !== 0) {
+                    const sign = Math.sign(target);
+
+                    if (sign === -1) {
+                      diffToTarget = scrollSnap - (1 + scrollProgress);
+                    }
+                    if (sign === 1) {
+                      diffToTarget = scrollSnap + (1 - scrollProgress);
+                    }
+                  }
+                }
+              );
+            }
+
+            const tweenValue = 1 - Math.abs(diffToTarget * tweenFactor.current);
+            const scale = numberWithinRange(tweenValue, 0, 1).toString();
+            const tweenNode = tweenNodes.current[slideIndex];
+            tweenNode.style.transform = `scale(${scale})`;
+          });
+        });
+    },
+    []
+  );
+
   useEffect(() => {
     fetchGalleryImages();
-    if (emblaApi) {
-      emblaApi.on("select", onSlideChange); // Custom scale effect on select
-    }
-  }, [emblaApi]);
 
-  const onSlideChange = useCallback(() => {
     if (!emblaApi) return;
 
-    const slides = emblaApi.slideNodes();
-    const scaleFactor = 0.3; // Scaling factor for non-center slides
-    const selectedIndex = emblaApi.selectedScrollSnap();
+    setTweenNodes(emblaApi);
+    setTweenFactor(emblaApi);
+    tweenScale(emblaApi);
 
-    slides.forEach((slide, index) => {
-      if (index === selectedIndex) {
-        slide.style.transform = 'scale(1)'; // Center slide stays at full size
-      } else {
-        slide.style.transform = `scale(${scaleFactor})`; // Smaller scale for others
-      }
-    });
-  }, [emblaApi]);
+    emblaApi
+      .on("reInit", setTweenNodes)
+      .on("reInit", setTweenFactor)
+      .on("reInit", tweenScale)
+      .on("scroll", tweenScale)
+      .on("slideFocus", tweenScale);
+  }, [emblaApi, tweenScale]);
 
   return (
-    <div className="flex flex-col items-center w-full py-16 px-4">
+    <div className="pt-8 flex flex-col justify-center items-center gap-4">
       <h1 className="font-bold text-2xl md:mb-6 mb-0 text-center">
         Our <span className="text-indigo-500">Recently Launched</span> Products
       </h1>
-
-      {/* Embla Carousel */}
-      <div className="embla w-full max-w-4xl overflow-hidden" ref={emblaRef}>
-        <div className="embla__container flex">
-          {galleryImages.map((image, index) => (
-            <div
-              className="embla__slide flex-shrink-0 w-[50%] relative px-2 transition-transform duration-300"
-              key={index}
-            >
-              <img
-                src={image.url}
-                alt={image.name}
-                className="w-full h-72 object-scale-down rounded-lg shadow-lg"
-              />
-            </div>
-          ))}
+      <div className="embla">
+        <div className="embla__viewport" ref={emblaRef}>
+          <div className="embla__container">
+            {galleryImages.map((image, index) => (
+              <div className="embla__slide" key={index}>
+                <img
+                  src={image.url}
+                  alt={image.name}
+                  className="embla__slide__number"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

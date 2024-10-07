@@ -102,9 +102,9 @@ function Hero() {
           Welcome, <span className="text-indigo-500">Viewer</span>
         </p>
       )}
-      <div className="flex flex-col w-full h-full gap-4">
-        <RecentProductsShow />
+      <div className="flex flex-wrap justify-center items-center w-full h-full gap-4">
         <BannerSection />
+        <RecentProductsShow />
       </div>
       <div
         className="w-full flex justify-center items-center flex-wrap responsive-flex"

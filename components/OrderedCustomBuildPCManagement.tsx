@@ -173,7 +173,7 @@ const OrderedCustomBuildPCManagement = () => {
         return (
           <li
             key={index}
-            className="flex gap-4 items-center justify-start cursor-pointer"
+            className="flex flex-wrap gap-4 items-center justify-start cursor-pointer"
             onClick={() => handleProductClick(name)} // Fetch product ID on click
           >
             <img

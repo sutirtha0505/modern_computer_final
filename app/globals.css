@@ -373,7 +373,7 @@ nav .nav-content {
   background: transparent;
   border: 2px solid magenta;
 }
-.insta{
+.insta {
   transform: rotate(-78deg);
 }
 .third-planet {
@@ -395,7 +395,7 @@ nav .nav-content {
   background: transparent;
   border: 2px solid yellow;
 }
-.gmail{
+.gmail {
   transform: rotate(134deg);
 }
 .nav-content .toggle-btn {
@@ -474,7 +474,6 @@ select {
     flex-direction: column;
   }
   .responsive-width {
-    width: 100%!important;
+    width: 100% !important;
   }
 }
-
