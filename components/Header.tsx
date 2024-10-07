@@ -9,19 +9,22 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
-
-interface Product {
-  product_id: string;
-  product_name: string;
-  product_image: { string: string }[];
-  show_product: boolean;
-}
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector } from "@/lib/hooks/redux";
 import { getCart } from "@/redux/cartSlice";
 import { supabase } from "@/lib/supabaseClient";
 import "@/app/globals.css";
+
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_image: { string: string }[];
+  product_main_category: string;
+  show_product: boolean;
+  category_product_image: string;
+}
+
 const Header = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [suggestions, setSuggestions] = useState<Product[]>([]);
@@ -68,18 +71,39 @@ const Header = () => {
   // Fetch product data
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data: products, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("show_product", true); // Filter for products where show_product is true
+      try {
+        const { data: products, error } = await supabase
+          .from("products")
+          .select(
+            "product_id, product_name, product_image, product_main_category, show_product, category_product_image"
+          )
+          .eq("show_product", true); // Filter for products where show_product is true
 
-      if (error) {
-        console.error("Error fetching products:", error);
-        setProducts([]); // Set an empty array in case of error
-      } else if (products) {
-        setProducts(products); // Set the products if fetched successfully
-      } else {
-        setProducts([]); // Fallback to an empty array if the data is null
+        if (error) {
+          console.error("Error fetching products:", error);
+          setProducts([]); // Set an empty array in case of error
+        } else if (products) {
+          // Ensure unique categories
+          const uniqueCategories = Array.from(
+            new Set(products.map((product) => product.product_main_category))
+          );
+          const uniqueProducts = uniqueCategories.map((category) =>
+            products.find(
+              (product) => product.product_main_category === category
+            )
+          );
+
+          // Filter out undefined values
+          const filteredProducts = uniqueProducts.filter(
+            (product): product is Product => product !== undefined
+          );
+
+          setProducts(filteredProducts);
+        } else {
+          setProducts([]); // Fallback to an empty array if the data is null
+        }
+      } catch (err) {
+        console.error("Error:", err);
       }
     };
     fetchProducts();
@@ -152,14 +176,10 @@ const Header = () => {
           setProfilePhoto(profile.profile_photo);
           setCustomerName(profile.customer_name);
         }
-        // else if (error) {
-        //   console.error("Error fetching profile:", error);
-        // }
       }
     };
     getUserData();
   }, []);
-
   return (
     <>
       <div className="relative" id="mouse-region">
@@ -175,19 +195,119 @@ const Header = () => {
           </Link>
 
           <div className="hidden md:flex gap-10">
-            <Link href="#productbycategoriesslider" className="relative group responsive-font">
-              Products
-              <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
-            </Link>
-            <Link href="#pbpc" className="relative group responsive-font">
-              Pre-Build PC
-              <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
-            </Link>
-            <Link href="#cbpc" className="relative group responsive-font">
-              Custom-Build PC
-              <span className="block h-0.5 w-0  bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
-            </Link>
-            <Link href="#about" className="relative group responsive-font">
+            <div className="relative group">
+              <Link href="#" className="responsive-font font-bold">
+                Products
+                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+              </Link>
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+                <ul className="py-2 text-gray-800">
+                  {products.map((category, index) => (
+                    <div className="flex items-center justify-start">
+                      <img
+                        src={category.category_product_image}
+                        alt=""
+                        className="w-8 h-8"
+                      />
+                      <li
+                        key={index}
+                        onClick={() =>
+                          router.push(
+                            `/product-by-categories/${encodeURIComponent(
+                              category?.product_main_category ?? ""
+                            )}`
+                          )
+                        }
+                        className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                      >
+                        {category?.product_main_category}
+                      </li>
+                    </div>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="relative group">
+              <Link href="#pbpc" className="responsive-font font-bold">
+                Pre-Build PC
+                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+              </Link>
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+                <ul className="py-2 text-gray-800">
+                  <div className="flex items-center justify-start">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_intel/INTEL_Prebuild.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <li
+                      onClick={() => {
+                        router.push("/pbpc/pbpc-intel");
+                      }}
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                    >
+                      <p>Pre-Build Intel PC</p>
+                    </li>
+                  </div>
+                  <div className="flex items-center justify-start">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_amd/AMD_Prebuild.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <li
+                      onClick={() => {
+                        router.push("/pbpc/pbpc-amd");
+                      }}
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                    >
+                      <p>Pre-Build AMD PC</p>
+                    </li>
+                  </div>
+                </ul>
+              </div>
+            </div>
+            <div className="relative group">
+              <Link href="#cbpc" className="responsive-font font-bold">
+                Custom-Build PC
+                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+              </Link>
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+                <ul className="py-2 text-gray-800">
+                  <div className="flex items-center justify-start">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_intel/INTEL_Custom.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <li
+                      onClick={() => {
+                        router.push("/cbpc/cbpc-intel");
+                      }}
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                    >
+                      <p>Custom-Build Intel PC</p>
+                    </li>
+                  </div>
+                  <div className="flex items-center justify-start">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_amd/AMD_Custom.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <li
+                      onClick={() => {
+                        router.push("/cbpc/cbpc-amd");
+                      }}
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                    >
+                      <p>Custom-Build AMD PC</p>
+                    </li>
+                  </div>
+                </ul>
+              </div>
+            </div>
+            <Link href="#about" className="relative group responsive-font font-bold">
               About
               <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
@@ -293,9 +413,7 @@ const Header = () => {
                           alt=""
                           className="w-6 h-6"
                         />
-                        <p>
-                          Your Orders
-                        </p>
+                        <p>Your Orders</p>
                       </div>
                       <div className="flex justify-center gap-3 px-4 py-2">
                         <button
