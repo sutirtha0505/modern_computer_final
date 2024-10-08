@@ -151,6 +151,7 @@ const Header = () => {
     setSuggestions([]);
     searchHandler(); // Trigger search after clicking on a suggestion
   };
+  
 
   useEffect(() => {
     if (pathname.startsWith("/search")) {
@@ -166,6 +167,10 @@ const Header = () => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       searchHandler();
+    }
+    else if (event.key === "Escape") {
+      // Clear the suggestions when Escape is pressed
+      setSuggestions([]);
     }
   };
 
@@ -363,7 +368,7 @@ const Header = () => {
 
                     <li
                       key={product.product_id}
-                      className="cursor-pointer p-2 text-xs"
+                      className="cursor-pointer p-2 text-xs break-all"
                     >
                       {product.product_name}
                     </li>

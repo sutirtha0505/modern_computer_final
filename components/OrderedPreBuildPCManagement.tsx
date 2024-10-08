@@ -331,7 +331,7 @@ const OrderedPreBuildPCManagement = () => {
 
                           // Update the order status in Supabase
                           const { error } = await supabase
-                            .from("order_table")
+                            .from("order_table_pre_build")
                             .update({ order_status: newStatus }) // Update the order status
                             .eq("order_id", order.order_id); // Where the order_id matches
 
