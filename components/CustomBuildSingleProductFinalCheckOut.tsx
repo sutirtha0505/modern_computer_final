@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
+import { InfoIcon } from "lucide-react";
 
 interface Product {
   name: string;
@@ -531,6 +532,15 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
               </div>
             ))}
           </div>
+            <div className="flex justify-center items-center gap-3">
+              <InfoIcon className="text-indigo-500" />
+              <p className="text-sm font-extrabold">
+                If you cancel your{" "}
+                <span className="text-indigo-500"> Custom Build PC</span> order{" "}
+                <span className="text-green-400">30%</span> of the price will be
+                deducted as penalty
+              </p>
+            </div>
         </div>
       </div>
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-4">

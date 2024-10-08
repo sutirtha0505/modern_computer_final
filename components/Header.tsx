@@ -151,7 +151,6 @@ const Header = () => {
     setSuggestions([]);
     searchHandler(); // Trigger search after clicking on a suggestion
   };
-  
 
   useEffect(() => {
     if (pathname.startsWith("/search")) {
@@ -167,8 +166,7 @@ const Header = () => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       searchHandler();
-    }
-    else if (event.key === "Escape") {
+    } else if (event.key === "Escape") {
       // Clear the suggestions when Escape is pressed
       setSuggestions([]);
     }
@@ -253,12 +251,12 @@ const Header = () => {
                 Pre-Build PC
                 <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
                     <img
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_intel/INTEL_Prebuild.png"
-                      alt=""
+                      alt="Intel Pre-Build"
                       className="w-8 h-8"
                     />
                     <li
@@ -273,7 +271,7 @@ const Header = () => {
                   <div className="flex items-center justify-start">
                     <img
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_amd/AMD_Prebuild.png"
-                      alt=""
+                      alt="AMD Pre-Build"
                       className="w-8 h-8"
                     />
                     <li
@@ -288,6 +286,7 @@ const Header = () => {
                 </ul>
               </div>
             </div>
+
             <div className="relative group">
               <Link href="#cbpc" className="responsive-font font-bold">
                 Custom-Build PC
