@@ -19,7 +19,7 @@ import "@/app/globals.css";
 interface Product {
   product_id: string;
   product_name: string;
-  product_image: { string: string }[];
+  product_image: { url: string }[];
   product_main_category: string;
   show_product: boolean;
   category_product_image: string;
@@ -115,19 +115,35 @@ const Header = () => {
     }
   };
 
-  const handleSearchTermChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchTermChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const value = e.target.value;
     setQuery(value);
 
     if (value) {
       const lowercasedValue = value.toLowerCase();
-      const suggestionData = products.filter((product) =>
-        product.product_name.toLowerCase().startsWith(lowercasedValue)
-      );
+      const suggestionData = await fetchProducts(lowercasedValue); // Fetching products using ILIKE
+
       setSuggestions(suggestionData);
     } else {
       setSuggestions([]);
     }
+  };
+
+  // Fetch function using ILIKE
+  const fetchProducts = async (query: any) => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .ilike("product_name", `%${query}%`); // Using ILIKE for broader search
+
+    if (error) {
+      console.error("Error fetching products:", error);
+      return [];
+    }
+
+    return data;
   };
 
   const handleSuggestionClick = (product: Product) => {
@@ -307,7 +323,10 @@ const Header = () => {
                 </ul>
               </div>
             </div>
-            <Link href="#about" className="relative group responsive-font font-bold">
+            <Link
+              href="#about"
+              className="relative group responsive-font font-bold"
+            >
               About
               <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
@@ -324,17 +343,31 @@ const Header = () => {
             />
             {suggestions.length > 0 && (
               <ul
-                className="absolute bg-slate-900 border border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide
+                className="absolute bg-slate-900 border border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide p-6
               "
               >
                 {suggestions.map((product) => (
-                  <li
-                    key={product.product_id}
+                  <div
+                    className="w-full justify-center  hover:bg-gray-700 items-center flex flex-wrap gap-2"
                     onClick={() => handleSuggestionClick(product)}
-                    className="cursor-pointer p-2 hover:bg-gray-700 text-xs"
                   >
-                    {product.product_name}
-                  </li>
+                    <img
+                      src={
+                        product.product_image?.find((img: any) =>
+                          img.url.includes("_first")
+                        )?.url
+                      }
+                      alt=""
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+
+                    <li
+                      key={product.product_id}
+                      className="cursor-pointer p-2 text-xs"
+                    >
+                      {product.product_name}
+                    </li>
+                  </div>
                 ))}
               </ul>
             )}
