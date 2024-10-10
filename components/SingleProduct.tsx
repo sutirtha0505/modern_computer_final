@@ -2,18 +2,62 @@ import { useAppDispatch } from "@/lib/hooks/redux";
 import { addToCart } from "@/redux/cartSlice";
 import { Heart } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
 import { ToastContainer, toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for react-toastify
 import { useRouter } from "next/navigation";
 import SingleProductReview from "./SingleProductReview";
+import RatingForProduct from "./RatingForProduct";
+
+import CharacterCounterInputForproduct from "./CharacterCounterInputForProduct";
+import { supabase } from "@/lib/supabaseClient";
 
 const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
   const router = useRouter();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const dispatch = useAppDispatch();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [rating, setRating] = useState<number>(0);
+  const [resetRating, setResetRating] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        setUser(user);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getUserData();
+  }, []);
+
+  const handleResetRating = () => {
+    setRating(0);
+    setResetRating(true);
+  };
+
+  const handleRatingChange = (newRating: number) => {
+    setRating(newRating);
+  };
+
+  useEffect(() => {
+    if (resetRating) {
+      setResetRating(false);
+    }
+  }, [resetRating]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!singleProduct) {
     return <div>Loading...</div>;
@@ -37,8 +81,8 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
   };
 
   return (
-    <>
-      <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center pb-20 pt-16">
+    <div className="pb-20">
+      <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center pt-16">
         <div className="md:w-1/2 w-full flex p-6 flex-col justify-center items-center relative">
           <div
             className="absolute top-2 right-2 z-10 rounded-full bg-white/50 p-2 custom-backdrop-filter cursor-pointer"
@@ -110,13 +154,26 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           </div>
         </div>
       </div>
-      <hr className="bg-white h-0.5 border-none" />
       <ToastContainer position="bottom-center" />{" "}
       {/* Set position prop directly */}
-      <div className="flex justify-center items-center gap-2">
-
+      <div className="flex justify-center items-center gap-2 pb-12">
+        <h1 className="font-bold text-xl text-center">
+          Want to say something about{" "}
+          <span className="text-indigo-500">this product?</span>
+          {/* Rating Component */}
+          <RatingForProduct
+            onRatingChange={handleRatingChange}
+            resetRating={resetRating}
+          />
+          {/* CharacterCounterInput Component */}
+          <CharacterCounterInputForproduct
+            user={user}
+            rating={rating}
+            onResetRating={handleResetRating}
+          />
+        </h1>
       </div>
-    </>
+    </div>
   );
 };
 

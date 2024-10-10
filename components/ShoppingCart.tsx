@@ -87,11 +87,11 @@ const ShoppingCart = () => {
 
               <div className="md:w-[50%] flex flex-col gap-4 p-4">
                 <p className="text-sm font-extrabold">{product.product_name}</p>
-                <div className="flex gap-6 items-center">
+                <div className="flex gap-6 items-center flex-wrap justify-center">
                   <p className="text-md font-extrabold">
                     &#x20B9;{product.product_SP}
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ">
                     <p className="text-sm font-bold text-green-300">
                       ({product.product_discount}% off)
                     </p>

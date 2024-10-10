@@ -344,16 +344,16 @@ const Header = () => {
               onChange={handleSearchTermChange}
               onKeyDown={handleKeyDown}
               placeholder="Search..."
-              className="pl-11 py-2 rounded-full border border-gray-300 w-[220px] focus:outline-none text-black"
+              className="pl-11 py-2 rounded-full border border-black dark:border-gray-300 w-[220px] focus:outline-none text-black"
             />
             {suggestions.length > 0 && (
               <ul
-                className="absolute bg-slate-900 border border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide p-6
+                className="absolute bg-slate-300 dark:bg-slate-900 border border-black dark:border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide p-6
               "
               >
                 {suggestions.map((product) => (
                   <div
-                    className="w-full justify-center  hover:bg-gray-700 items-center flex flex-wrap gap-2"
+                    className="w-full justify-center hover:bg-gray-200  dark:hover:bg-gray-700 items-center flex flex-wrap gap-2"
                     onClick={() => handleSuggestionClick(product)}
                   >
                     <img
@@ -395,7 +395,7 @@ const Header = () => {
                   {user ? (
                     <>
                       <div
-                        className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md backdrop-blur-3xl"
+                        className="flex justify-center items-center gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md backdrop-blur-3xl"
                         onClick={() => {
                           if (user && user.id) {
                             // Navigate to a user profile page or perform an action with the user ID
@@ -425,7 +425,7 @@ const Header = () => {
                       </div>
                       {role === "admin" && (
                         <div
-                          className="flex justify-center gap-8 px-4 py-2 hover:bg-white/30 hover:rounded-md text-white cursor-pointer hover:text-indigo-600"
+                          className="flex justify-center gap-8 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md dark:text-white cursor-pointer hover:text-indigo-600"
                           onClick={() => {
                             toggleProfileMenu();
                             router.push("/admin");
@@ -440,7 +440,7 @@ const Header = () => {
                         </div>
                       )}
                       <div
-                        className="flex justify-center gap-8 px-4 py-2 hover:bg-white/30 hover:rounded-md text-white cursor-pointer hover:text-indigo-600"
+                        className="flex justify-center gap-8 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md dark:text-white cursor-pointer hover:text-indigo-600"
                         onClick={() => {
                           toggleProfileMenu();
                           router.push("/orders");
@@ -468,7 +468,7 @@ const Header = () => {
                     </>
                   ) : (
                     <>
-                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">
+                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md">
                         <LucideLogIn className="text-indigo-500" />
                         <Link
                           href="/SignIn"
@@ -477,7 +477,7 @@ const Header = () => {
                           LogIn
                         </Link>
                       </div>
-                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-white/30 hover:rounded-md">
+                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md">
                         <UserPlus className=" text-emerald-400" />
                         <Link
                           href="/SignUp"
