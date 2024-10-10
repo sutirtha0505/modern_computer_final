@@ -143,7 +143,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
         {orders.map((order) => (
           <div
             key={order.order_id}
-            className="flex flex-col border p-4 rounded-md bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
+            className="flex flex-col border p-4 rounded-md bg-slate-300 dark:bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
           >
             <h2 className="font-extrabold text-center">
               Order: <span className="text-indigo-600">{order.order_id}</span>
