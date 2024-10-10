@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-black">
+    <html lang="en" className="bg-[#DFE4E4] dark:bg-black">
       <body className={inter.className}>
         <ReduxProvider>
           <Header />

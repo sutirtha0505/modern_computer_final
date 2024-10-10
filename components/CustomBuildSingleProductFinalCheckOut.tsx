@@ -331,7 +331,7 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-        <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-slate-800">
+        <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-slate-300 dark:bg-slate-800">
           <h1 className="text-xl font-bold">
             Your <span className="text-indigo-500">Configuration</span>
           </h1>
@@ -544,7 +544,7 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
         </div>
       </div>
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-4">
-        <div className="w-96 bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
+        <div className="w-96 bg-slate-300 dark:bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
           <h1 className="text-2xl font-bold">
             Order <span className="text-indigo-500">Summary</span>
           </h1>

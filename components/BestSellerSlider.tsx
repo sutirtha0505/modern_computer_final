@@ -112,7 +112,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[0].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[0].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[0].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[0].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[0].product_id)}
@@ -134,7 +134,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[1].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[1].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[1].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[1].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[1].product_id)}
@@ -156,7 +156,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[2].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[2].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[2].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[2].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[2].product_id)}
@@ -178,7 +178,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[3].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[3].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[3].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[3].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[3].product_id)}
@@ -200,7 +200,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[4].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[4].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[4].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[4].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[4].product_id)}
@@ -222,7 +222,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[5].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[5].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[5].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[5].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[5].product_id)}
@@ -244,7 +244,7 @@ const BestSellerSlider = () => {
                     <h1 className="text-center text-sm">{products[6].product_name}</h1>
                     <div className="price">
                       <p className=" text-medium font-extrabold">&#x20B9; {products[6].product_SP}</p>
-                      <p className="font-bold text-white/30 line-through">&#x20B9; {products[6].product_MRP}</p>
+                      <p className="font-bold opacity-50 dark:text-white/30 line-through">&#x20B9; {products[6].product_MRP}</p>
                     </div>
                     <button 
                       onClick={() => handleCheckOut(products[6].product_id)}

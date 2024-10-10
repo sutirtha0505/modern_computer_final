@@ -40,8 +40,8 @@ const CustomBuildPCINHomePage = () => {
 
   return (
     <div className="w-full flex gap-28 justify-center items-center flex-col" id="cbpc">
-      <h1 className="text-4xl font-bold text-wrap text-indigo-500">
-        Custom-Build <span className="text-white">PC</span>
+      <h1 className="text-4xl font-bold text-wrap ">
+         <span className="text-indigo-500">Custom-Build</span> PC
       </h1>
       <div className="flex justify-center flex-wrap items-center gap-20">
         <div onClick={() =>{

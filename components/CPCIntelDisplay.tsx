@@ -568,7 +568,27 @@ const CPCIntelDisplay = () => {
           </div>
           <button
             onClick={handleBuyNow}
-            className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
+            disabled={
+              !selectedProcessorOptions.length ||
+              !selectedMotherboardOptions.length ||
+              !selectedRAMOptions.length ||
+              !selectedSSDOptions.length ||
+              !selectedGraphicsCardOptions.length ||
+              !selectedPSUOptions.length ||
+              !selectedCoolerOptions.length
+            }
+            className={`bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200 cursor-pointer
+  ${
+    !selectedProcessorOptions.length ||
+    !selectedMotherboardOptions.length ||
+    !selectedRAMOptions.length ||
+    !selectedSSDOptions.length ||
+    !selectedGraphicsCardOptions.length ||
+    !selectedPSUOptions.length ||
+    !selectedCoolerOptions.length
+      ? "opacity-50 cursor-not-allowed"
+      : ""
+  }`}
           >
             Buy Now
           </button>

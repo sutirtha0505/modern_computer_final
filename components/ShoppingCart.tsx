@@ -138,7 +138,7 @@ const ShoppingCart = () => {
       )}
       {cart.length > 0 && (
         <div className="flex justify-center p-4 mt-4 border-t border-gray-300">
-          <div className="bg-white/50 custom-backdrop-filter min-w-fit w-[30%] rounded-md p-2 flex flex-col gap-4">
+          <div className="dark:bg-slate-700 bg-slate-300 custom-backdrop-filter min-w-fit w-[30%] rounded-md p-4 flex flex-col gap-4">
             <div className="flex justify-between">
               <p className="font-extrabold text-xs">Item(s) Total : </p>
               <p className="text-xs font-extrabold">&#x20B9;{totalSum}</p>
@@ -157,8 +157,8 @@ const ShoppingCart = () => {
               <p className="text-md font-extrabold">&#x20B9;{totalSum}</p>
             </div>
             <div className="flex items-center gap-2 justify-center">
-              <BadgeCheck className="text-green-400" />
-              <p className="text-md text-green-400">
+              <BadgeCheck className="text-green-800 dark:text-green-400" />
+              <p className="text-md text-green-700 dark:text-green-400">
                 You've saved &#x20B9;{totalSavings} successfully
               </p>
             </div>

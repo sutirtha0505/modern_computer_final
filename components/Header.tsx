@@ -217,9 +217,10 @@ const Header = () => {
             <div className="relative group">
               <Link href="#" className="responsive-font font-bold">
                 Products
-                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+                <span className="block h-0.5 w-0 
+                bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
                 <ul className="py-2 text-gray-800">
                   {products.map((category, index) => (
                     <div className="flex items-center justify-start">
@@ -237,7 +238,7 @@ const Header = () => {
                             )}`
                           )
                         }
-                        className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                        className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 dark:text-white font-bold"
                       >
                         {category?.product_main_category}
                       </li>
@@ -249,9 +250,9 @@ const Header = () => {
             <div className="relative group">
               <Link href="#pbpc" className="responsive-font font-bold">
                 Pre-Build PC
-                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+                <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
                     <img
@@ -263,7 +264,7 @@ const Header = () => {
                       onClick={() => {
                         router.push("/pbpc/pbpc-intel");
                       }}
-                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 dark:text-white font-bold"
                     >
                       <p>Pre-Build Intel PC</p>
                     </li>
@@ -278,7 +279,7 @@ const Header = () => {
                       onClick={() => {
                         router.push("/pbpc/pbpc-amd");
                       }}
-                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 dark:text-white font-bold"
                     >
                       <p>Pre-Build AMD PC</p>
                     </li>
@@ -290,9 +291,9 @@ const Header = () => {
             <div className="relative group">
               <Link href="#cbpc" className="responsive-font font-bold">
                 Custom-Build PC
-                <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+                <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
                     <img
@@ -304,7 +305,7 @@ const Header = () => {
                       onClick={() => {
                         router.push("/cbpc/cbpc-intel");
                       }}
-                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 dark:text-white font-bold"
                     >
                       <p>Custom-Build Intel PC</p>
                     </li>
@@ -319,7 +320,7 @@ const Header = () => {
                       onClick={() => {
                         router.push("/cbpc/cbpc-amd");
                       }}
-                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 text-white font-bold"
+                      className="block text-xs px-4 py-2 cursor-pointer hover:text-indigo-500 dark:text-white font-bold"
                     >
                       <p>Custom-Build AMD PC</p>
                     </li>
@@ -332,7 +333,7 @@ const Header = () => {
               className="relative group responsive-font font-bold"
             >
               About
-              <span className="block h-0.5 w-0 bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+              <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
             </Link>
           </div>
 

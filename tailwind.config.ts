@@ -8,6 +8,9 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./node_modules/@nextui-org/theme/dist/components/(dropdown|menu|divider|popover|button|ripple|spinner).js"
   ],
+  // Add the darkMode option here
+  darkMode: 'media', // Enables dark mode based on user's system preferences
+  
   theme: {
     extend: {
       backgroundImage: {

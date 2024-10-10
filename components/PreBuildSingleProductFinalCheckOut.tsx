@@ -264,7 +264,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-        <div className="flex items-center gap-4 p-4 border rounded-lg bg-slate-800">
+        <div className="flex items-center gap-4 p-4 border rounded-lg bg-slate-300 dark:bg-slate-800">
           <Image
             src={imageUrl}
             alt={product.build_name}
@@ -292,7 +292,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
       </div>
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-4">
         {/* Additional content goes here */}
-        <div className="w-96 bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
+        <div className="w-96 bg-slate-300 dark:bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
           <h1 className="text-2xl font-bold">
             Order <span className="text-indigo-500">Summary</span>
           </h1>
@@ -330,7 +330,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
               type="text"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
-              className={`rounded-md bg-transparent border w-44 outline-none p-2 text-xs ${
+              className={`rounded-md bg-transparent border-1 border-indigo-500 w-44 outline-none p-2 text-xs ${
                 couponApplied ? "bg-gray-600 cursor-not-allowed" : ""
               }`}
               placeholder="Coupon code..."

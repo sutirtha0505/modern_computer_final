@@ -249,7 +249,7 @@ const About: React.FC = () => {
           {profilePhotos.map((profile, index) => (
             <div
               key={index}
-              className="w-96 h-96 p-6 bg-slate-900 rounded-md shadow-lg flex flex-col justify-center gap-6 items-center relative"
+              className="w-96 h-96 p-6 bg-white/90 dark:bg-slate-900 rounded-md shadow-lg flex flex-col justify-center gap-6 items-center relative"
             >
               <img
                 src={profile.profile_photo}

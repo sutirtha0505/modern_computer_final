@@ -260,7 +260,7 @@ const CartSingleProductFinalCheckOut: React.FC<
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-        <div className="flex flex-wrap items-center gap-4 p-4 border rounded-lg bg-slate-800">
+        <div className="flex flex-wrap justify-center items-center gap-4 p-4 border rounded-lg bg-gray-300 dark:bg-slate-800">
           {productData.product_image && (
             <Image
               src={productData.product_image}
@@ -273,21 +273,19 @@ const CartSingleProductFinalCheckOut: React.FC<
           <div className="flex flex-col gap-2">
             <p className="font-bold text-sm">{productData.product_name}</p>
             <div className="flex gap-3 px-8 justify-between items-center">
-              <p className="text-indigo-500 font-extrabold">
-                Total:{" "}
-                <span className="text-white">
-                  &#x20B9;{productData.product_SP}
-                </span>
+              <p className=" font-extrabold">
+                <span className="text-indigo-500">Total: </span>
+                &#x20B9;{productData.product_SP}
               </p>
-              <p className="font-extrabold text-sm text-indigo-500">
-                Quantity: <span className="text-white">1</span>
+              <p className="font-extrabold text-sm ">
+                <span className="text-indigo-500">Quantity:</span>1
               </p>
             </div>
           </div>
         </div>
       </div>
       <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-4">
-        <div className="w-96 bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
+        <div className="w-96 bg-slate-300 dark:bg-slate-800 gap-5 p-4 flex flex-col justify-between items-center rounded-md">
           <h1 className="text-2xl font-bold">
             Order <span className="text-indigo-500">Summary</span>
           </h1>
@@ -325,7 +323,7 @@ const CartSingleProductFinalCheckOut: React.FC<
               type="text"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
-              className={`rounded-md bg-transparent border w-44 outline-none p-2 text-xs ${
+              className={`rounded-md bg-transparent border-indigo-500 border-1 w-44 outline-none p-2 text-xs ${
                 couponApplied ? "bg-gray-600 cursor-not-allowed" : ""
               }`}
               placeholder="Coupon code..."
