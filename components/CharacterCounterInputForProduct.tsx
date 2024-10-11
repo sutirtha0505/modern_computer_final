@@ -92,8 +92,8 @@ import { SendHorizonal } from "lucide-react";
                 <textarea
                   value={inputValue}
                   onChange={handleChange}
-                  rows={2}
-                  className="w-96 placeholder:bg-center h-full p-2 bg-transparent border-b-1 border-indigo-600 resize-none outline-none focus:shadow-lg focus:shadow-indigo-600"
+                  rows={3}
+                  className="w-96 placeholder:bg-center h-full p-2 bg-transparent border-b-1 border-indigo-600 resize-none outline-none focus:shadow-lg focus:shadow-indigo-600 text-sm"
                   placeholder="Type here ..."
                   required
                 />
@@ -103,7 +103,7 @@ import { SendHorizonal } from "lucide-react";
               </div>
               <button
                 type="submit"
-                className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 px-4 py-1 rounded-md text-l hover:text-l hover:font-bold duration-200"
+                className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 p-4 rounded-md text-l hover:text-l hover:font-bold duration-200"
               >
                 <SendHorizonal />
               </button>
