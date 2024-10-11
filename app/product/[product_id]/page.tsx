@@ -4,7 +4,7 @@ import { UseSupabase } from '@/lib/hooks/UseSupabase'
 import { useParams } from 'next/navigation'
 import React, { useEffect } from 'react'
 
-const page = () => {
+const ProductPage = () => {
     const {product_id} = useParams();
     const {singleProduct, getSingleProduct} = UseSupabase();
     useEffect(() => {
@@ -18,4 +18,4 @@ const page = () => {
   )
 }
 
-export default page
+export default ProductPage

@@ -124,7 +124,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           <p className="text-xs">{singleProduct.product_description}</p>
           <div className="flex gap-5">
             <p className="font-extrabold text-xl">
-              &#x20B9;{singleProduct.product_SP}
+              &#x20B9;{singleProduct.product_SP} 
             </p>
             <div className="flex gap-1">
               <p className="line-through text-[#b8b4b4] text-sm">
@@ -156,10 +156,12 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
       </div>
       <ToastContainer position="bottom-center" />{" "}
       {/* Set position prop directly */}
-      <div className="flex justify-center items-center gap-2 pb-12">
+      <div className="flex flex-col justify-center items-center gap-4 pb-12">
         <h1 className="font-bold text-xl text-center">
           Want to say something about{" "}
           <span className="text-indigo-500">this product?</span>
+
+        </h1>
           {/* Rating Component */}
           <RatingForProduct
             onRatingChange={handleRatingChange}
@@ -170,8 +172,8 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
             user={user}
             rating={rating}
             onResetRating={handleResetRating}
+            productId={singleProduct.product_id}
           />
-        </h1>
       </div>
     </div>
   );
