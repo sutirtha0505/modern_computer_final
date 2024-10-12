@@ -318,7 +318,7 @@ body {
 }
 @media (prefers-color-scheme: dark) {
   .rotator::after {
-    background-color: #222;
+    background-color: #000000;
   }
 }
 .hide-scrollbar {
