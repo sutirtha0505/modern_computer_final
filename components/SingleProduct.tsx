@@ -8,11 +8,10 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carous
 import { ToastContainer, toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for react-toastify
 import { useRouter } from "next/navigation";
-import SingleProductReview from "./SingleProductReview";
 import RatingForProduct from "./RatingForProduct";
-
 import CharacterCounterInputForproduct from "./CharacterCounterInputForProduct";
 import { supabase } from "@/lib/supabaseClient";
+import SingleProductReviews from "./SingleProductReviews";
 
 const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
   const router = useRouter();
@@ -124,7 +123,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           <p className="text-xs">{singleProduct.product_description}</p>
           <div className="flex gap-5">
             <p className="font-extrabold text-xl">
-              &#x20B9;{singleProduct.product_SP} 
+              &#x20B9;{singleProduct.product_SP}
             </p>
             <div className="flex gap-1">
               <p className="line-through text-[#b8b4b4] text-sm">
@@ -156,24 +155,30 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
       </div>
       <ToastContainer position="bottom-center" />{" "}
       {/* Set position prop directly */}
-      <div className="flex flex-col justify-center items-center gap-4 pb-12">
+      <div className="flex flex-col justify-center items-center gap-4 pb-8">
         <h1 className="font-bold text-xl text-center">
           Want to say something about{" "}
           <span className="text-indigo-500">this product?</span>
-
         </h1>
-          {/* Rating Component */}
-          <RatingForProduct
-            onRatingChange={handleRatingChange}
-            resetRating={resetRating}
-          />
-          {/* CharacterCounterInput Component */}
-          <CharacterCounterInputForproduct
-            user={user}
-            rating={rating}
-            onResetRating={handleResetRating}
-            productId={singleProduct.product_id}
-          />
+        {/* Rating Component */}
+        <RatingForProduct
+          onRatingChange={handleRatingChange}
+          resetRating={resetRating}
+        />
+        {/* CharacterCounterInput Component */}
+        <CharacterCounterInputForproduct
+          user={user}
+          rating={rating}
+          onResetRating={handleResetRating}
+          productId={singleProduct.product_id}
+        />
+      </div>
+      <div className="flex flex-col justify-center items-center gap-4 pb-12">
+        <h1 className="font-bold text-xl text-center">
+          What people think about{" "}
+          <span className="text-indigo-500">this product?</span>
+        </h1>
+        <SingleProductReviews productId={singleProduct.product_id}/>
       </div>
     </div>
   );
