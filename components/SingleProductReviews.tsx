@@ -80,7 +80,7 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
 
               return {
                 ...review,
-                customer_name: profileData?.customer_name || "Unknown User",
+                customer_name: profileData?.customer_name || "Non-Verified User",
                 profile_photo: profileData?.profile_photo || null,
               };
             })
@@ -140,7 +140,7 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="flex flex-col items-start justify-start w-full p-24">
+    <div className="flex flex-col items-start justify-start w-full px-4 py-0 md:px-24">
       {reviews.length > 0 ? (
         reviews.map((review, index) => (
           <div
@@ -174,7 +174,17 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
           </div>
         ))
       ) : (
-        <p>No reviews available.</p>
+        <div className="w-full px-20 py-0 justify-center items-center flex gap-2">
+          <img
+            src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/no-comment.png"
+            alt=""
+            className="w-20 h-20 opacity-85"
+          />
+
+          <p className="text-sm text-center">
+            No reviews found for this product.
+          </p>
+        </div>
       )}
     </div>
   );
