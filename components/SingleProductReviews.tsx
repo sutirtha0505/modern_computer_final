@@ -29,8 +29,8 @@ const Star = ({
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    width="24"
-    height="24"
+    width="16"
+    height="16"
     stroke={color}
     fill={fill}
     strokeWidth={strokeWidth}
@@ -40,7 +40,9 @@ const Star = ({
   </svg>
 );
 
-const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({ productId }) => {
+const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
+  productId,
+}) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,27 +115,62 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({ productId }
     );
   };
 
+  // Function to calculate and format the time difference
+  const renderRelativeTime = (reviewTime: string) => {
+    const now = new Date();
+    const reviewDate = new Date(reviewTime);
+    const timeDiff = now.getTime() - reviewDate.getTime(); // Difference in milliseconds
+
+    const minutes = Math.floor(timeDiff / (1000 * 60));
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+    if (minutes < 1) {
+      return "Just now";
+    } else if (minutes < 60) {
+      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    } else if (hours < 24) {
+      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    } else {
+      return `${days} day${days > 1 ? "s" : ""} ago`;
+    }
+  };
+
   if (loading) return <p>Loading reviews...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
-      <h2>Reviews</h2>
+    <div className="flex flex-col items-start justify-start w-full p-24">
       {reviews.length > 0 ? (
         reviews.map((review, index) => (
-          <div key={index} className="review mb-4">
+          <div
+            key={index}
+            className="flex flex-col items-start justify-start mb-4 w-full bg-gray-700 rounded-md p-4"
+          >
             {/* Render the profile photo */}
-            {review.profile_photo && (
-              <img
-                src={review.profile_photo}
-                alt={`${review.customer_name}'s profile photo`}
-                className="w-12 h-12 rounded-full"
-              />
-            )}
-            <p><strong>User:</strong> {review.customer_name}</p>
-            <p><strong>Time:</strong> {new Date(review.time).toLocaleString()}</p>
-            <p><strong>Rating:</strong> {renderStars(review.review)}</p>
-            <p><strong>Comment:</strong> {review.comment}</p>
+            <div className="flex justify-start items-center gap-4">
+              {review.profile_photo && (
+                <img
+                  src={review.profile_photo}
+                  alt={`${review.customer_name}'s profile photo`}
+                  className="w-12 h-12 rounded-full"
+                />
+              )}
+              <p className="text-sm">
+                <span className="text-indigo-500 font-bold">
+                  {review.customer_name}
+                </span>
+              </p>
+            </div>
+            <div className="flex gap-4 justify-start items-center">
+              <div className="mt-2">{renderStars(review.review)}</div>
+              <p className="text-xs">
+                <span className="font-bold text-indigo-500">Commented: </span>{" "}
+                {renderRelativeTime(review.time)}
+              </p>
+            </div>
+
+            <p className="text-sm mt-2">{review.comment}</p>
           </div>
         ))
       ) : (

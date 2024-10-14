@@ -173,7 +173,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           productId={singleProduct.product_id}
         />
       </div>
-      <div className="flex flex-col justify-center items-center gap-4 pb-12">
+      <div className="flex flex-col justify-center items-center gap-8 pb-12">
         <h1 className="font-bold text-xl text-center">
           What people think about{" "}
           <span className="text-indigo-500">this product?</span>
