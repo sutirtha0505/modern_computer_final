@@ -5,25 +5,102 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // Import carousel styles
-import { ToastContainer, toast } from "react-toastify"; // Import toast and ToastContainer from react-toastify
+import { ToastContainer } from "react-toastify"; // Import toast and ToastContainer from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import CSS for react-toastify
 import { useRouter } from "next/navigation";
 import RatingForProduct from "./RatingForProduct";
-import CharacterCounterInputForproduct from "./CharacterCounterInputForProduct";
+import CharacterCounterInputForProduct from "./CharacterCounterInputForProduct";
 import { supabase } from "@/lib/supabaseClient";
 import SingleProductReviews from "./SingleProductReviews";
 
 const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
   const router = useRouter();
-  const [isHeartFilled, setIsHeartFilled] = useState(false);
   const dispatch = useAppDispatch();
+  const [isHeartFilled, setIsHeartFilled] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [rating, setRating] = useState<number>(0);
   const [resetRating, setResetRating] = useState<boolean>(false);
+  const [averageRating, setAverageRating] = useState<number | null>(null); // State for average rating
+  // Star Component
+  const Star = ({
+    color = "#fa9302",
+    fill = "none",
+    strokeWidth = 1,
+    className = "",
+    isFilled = false,
+    isHalfFilled = false,
+  }: {
+    color: string;
+    fill: string;
+    strokeWidth: number;
+    className?: string;
+    isFilled?: boolean;
+    isHalfFilled?: boolean;
+  }) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      stroke={color}
+      fill={isFilled ? color : isHalfFilled ? "url(#gradient)" : fill}
+      strokeWidth={strokeWidth}
+      className={className}
+    >
+      {isHalfFilled && (
+        <defs>
+          <linearGradient id="gradient">
+            <stop offset="50%" stopColor={color} />
+            <stop offset="50%" stopColor="none" />
+          </linearGradient>
+        </defs>
+      )}
+      <polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" />
+    </svg>
+  );
+
+  // Stars Component
+  const Stars = ({ rating }: { rating: number }) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 >= 0.5;
+    const totalStars = 5;
+
+    return (
+      <div className="flex">
+        {Array.from({ length: totalStars }, (_, index) => {
+          if (index < fullStars) {
+            return (
+              <Star
+                key={index}
+                color="#fa9302"
+                fill="#fa9302"
+                strokeWidth={1}
+                isFilled={true}
+              />
+            );
+          }
+          if (index === fullStars && halfStar) {
+            return (
+              <Star
+                key={index}
+                color="#fa9302"
+                fill="none"
+                strokeWidth={1}
+                isHalfFilled={true}
+              />
+            );
+          }
+          return (
+            <Star key={index} color="#fa9302" fill="none" strokeWidth={1} />
+          );
+        })}
+      </div>
+    );
+  };
 
   useEffect(() => {
-    const getUserData = async () => {
+    const fetchUserData = async () => {
       try {
         const {
           data: { user },
@@ -36,8 +113,35 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
       }
     };
 
-    getUserData();
-  }, []);
+    const fetchAverageRating = async () => {
+      if (!singleProduct) return; // Early exit if singleProduct is not defined
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("user_rating")
+          .eq("product_id", singleProduct.product_id)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.user_rating) {
+          const ratings = data.user_rating;
+          const totalReviews = ratings.length;
+          const totalRating = ratings.reduce(
+            (acc: number, curr: { review: number }) => acc + curr.review,
+            0
+          );
+          const average = totalReviews > 0 ? totalRating / totalReviews : 0;
+          setAverageRating(average);
+        }
+      } catch (error) {
+        console.error("Error fetching average rating:", error);
+      }
+    };
+
+    fetchUserData();
+    fetchAverageRating();
+  }, [singleProduct]);
 
   const handleResetRating = () => {
     setRating(0);
@@ -54,16 +158,17 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
     }
   }, [resetRating]);
 
+  // Loading state handling
   if (loading) {
     return <div>Loading...</div>;
   }
 
+  // Handle case where singleProduct is not available
   if (!singleProduct) {
-    return <div>Loading...</div>;
+    return <div>No product found.</div>;
   }
 
-  // Assuming product_image is an array of image URLs
-  const productImages = singleProduct.product_image;
+  const productImages = singleProduct.product_image || []; // Set to an empty array if undefined
 
   const handleHeartClick = () => {
     setIsHeartFilled(!isHeartFilled);
@@ -94,7 +199,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
             />
           </div>
           {/* Carousel to display product images */}
-          {productImages && productImages.length > 0 && (
+          {productImages.length > 0 && (
             <Carousel
               showThumbs={true} // Enable the thumbnails
               autoPlay={true} // Enable auto play
@@ -120,6 +225,14 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           <h1 className="font-extrabold text-2xl">
             {singleProduct.product_name}
           </h1>
+          <div className="flex gap-2 justify-start items-center">
+            {/* Rating Component */}
+            <Stars rating={averageRating ?? 0} />{" "}
+            <p className="text-xs font-bold">
+              {averageRating !== null ? averageRating.toFixed(1) : "No Reviews"}
+            </p>
+            {/* Stars component for average rating */}
+          </div>
           <p className="text-xs">{singleProduct.product_description}</p>
           <div className="flex gap-5">
             <p className="font-extrabold text-xl">
@@ -130,17 +243,14 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
                 &#x20B9;{singleProduct.product_MRP}
               </p>
               <p className="font-bold text-sm text-emerald-300">
-                ({singleProduct.product_discount}%)
+                ({parseFloat(singleProduct.product_discount).toFixed(2)}%)
               </p>
             </div>
           </div>
           <div className="w-full flex gap-10">
             <button
               className="bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 h-10 w-28 rounded-md text-l hover:text-l hover:font-bold duration-200"
-              onClick={() => {
-                handleAddToCart();
-                // No need to toast here, it's handled in cartSlice
-              }}
+              onClick={handleAddToCart}
             >
               Add to Cart
             </button>
@@ -153,8 +263,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           </div>
         </div>
       </div>
-      <ToastContainer position="bottom-center" />{" "}
-      {/* Set position prop directly */}
+      <ToastContainer position="bottom-center" />
       <div className="flex flex-col justify-center items-center gap-4 pb-8">
         <h1 className="font-bold text-xl text-center">
           Want to say something about{" "}
@@ -166,7 +275,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           resetRating={resetRating}
         />
         {/* CharacterCounterInput Component */}
-        <CharacterCounterInputForproduct
+        <CharacterCounterInputForProduct
           user={user}
           rating={rating}
           onResetRating={handleResetRating}
@@ -178,7 +287,8 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
           What people think about{" "}
           <span className="text-indigo-500">this product?</span>
         </h1>
-        <SingleProductReviews productId={singleProduct.product_id}/>
+
+        <SingleProductReviews productId={singleProduct.product_id} />
       </div>
     </div>
   );

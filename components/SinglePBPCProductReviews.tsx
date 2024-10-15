@@ -10,7 +10,7 @@ interface Review {
   customer_name?: string;
 }
 
-interface SingleProductReviewsProps {
+interface SinglePBPCProductReviewsProps {
   productId: string;
 }
 
@@ -39,7 +39,7 @@ const Star = ({
   </svg>
 );
 
-const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
+const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
   productId,
 }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -53,9 +53,9 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
       setLoading(true);
       try {
         const { data: productData, error: productError } = await supabase
-          .from("products")
+          .from("pre_build")
           .select("user_rating")
-          .eq("product_id", productId)
+          .eq("id", productId)
           .single();
 
         if (productError) {
@@ -214,4 +214,4 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
   );
 };
 
-export default SingleProductReviews;
+export default SinglePBPCProductReviews;
