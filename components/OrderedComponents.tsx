@@ -132,7 +132,7 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
   }
 
   if (orders.length === 0) {
-    return <div>No orders found.</div>;
+    return <div></div>;
   }
 
   return (

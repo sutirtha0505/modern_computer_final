@@ -22,7 +22,7 @@ interface OrderedProduct {
 interface Order {
   order_id: string;
   ordered_products: OrderedProduct[];
-  expected_delivery_date: string;
+  expected_delivery_date: string | null;
   order_status: string;
 }
 
@@ -70,7 +70,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
   }
 
   if (orders.length === 0) {
-    return <div>No orders found.</div>;
+    return <div></div>;
   }
 
   const renderProduct = (product: OrderedProduct) => {
@@ -114,7 +114,10 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
     try {
       const { error } = await supabase
         .from("order_table_custom_build")
-        .update({ order_status: "Cancelled" })
+        .update({
+          order_status: "Cancelled",
+          expected_delivery_date: null, // Set expected_delivery_date to null
+        })
         .eq("order_id", orderId);
 
       if (error) {
@@ -125,7 +128,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.order_id === orderId
-            ? { ...order, order_status: "Cancelled" }
+            ? { ...order, order_status: "Cancelled", expected_delivery_date: null }
             : order
         )
       );
