@@ -151,7 +151,7 @@ const OrderedPreBuildPCManagement = () => {
   };
 
   return (
-    <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12    ">
+    <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12">
       <h1 className="text-xl font-bold text-center">
         <span className="text-indigo-500">Pre-Build PC </span> Orders
       </h1>

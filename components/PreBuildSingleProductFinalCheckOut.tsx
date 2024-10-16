@@ -264,7 +264,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
   return (
     <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
       <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-        <div className="flex items-center gap-4 p-4 border rounded-lg bg-slate-300 dark:bg-slate-800">
+        <div className="flex flex-wrap justify-center items-center gap-4 p-4 border rounded-lg bg-slate-300 dark:bg-slate-800">
           <Image
             src={imageUrl}
             alt={product.build_name}

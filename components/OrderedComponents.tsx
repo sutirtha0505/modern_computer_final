@@ -17,7 +17,7 @@ interface OrderedProduct {
 interface Order {
   order_id: number;
   ordered_products: OrderedProduct[];
-  expected_delivery_date: string;
+  expected_delivery_date: string | null;
   order_status: string;
 }
 
@@ -95,7 +95,10 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
     try {
       const { error } = await supabase
         .from("order_table")
-        .update({ order_status: "Cancelled" })
+        .update({
+          order_status: "Cancelled",
+          expected_delivery_date: null, // Set expected_delivery_date to null
+        })
         .eq("order_id", orderId);
 
       if (error) {
@@ -106,7 +109,11 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.order_id === orderId
-            ? { ...order, order_status: "Cancelled" }
+            ? {
+                ...order,
+                order_status: "Cancelled",
+                expected_delivery_date: null,
+              }
             : order
         )
       );
@@ -132,7 +139,19 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
   }
 
   if (orders.length === 0) {
-    return <div></div>;
+    return (
+      <div className="flex gap-4 justify-center items-center h-full pt-12">
+        <img
+          src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/components-Not%20ordered-Photoroom.png"
+          alt=""
+          loading="lazy"
+          className="w-20 h-20"
+        />
+        <p className="text-center font-bold">
+          No <span className="text-indigo-500">PC component</span> orders found.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -142,110 +161,126 @@ const OrderedComponents: React.FC<OrderedComponentsProps> = ({ userId }) => {
         Your <span className="text-indigo-600">Ordered PC Components</span>
       </h1>
       <div className="flex flex-col justify-center items-center w-full p-16 gap-5">
-        {orders.map((order) => (
-          <div
-            key={order.order_id}
-            className="flex flex-col border p-4 rounded-md bg-slate-300 dark:bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
-          >
-            <h2 className="font-extrabold text-center">
-              Order : <span className="text-indigo-600">{order.order_id}</span>
-            </h2>
+        {orders
+          .sort((a, b) => {
+            const dateA = a.expected_delivery_date
+              ? dayjs(a.expected_delivery_date).valueOf()
+              : Infinity; // Set infinity for null dates to push them to the end
+            const dateB = b.expected_delivery_date
+              ? dayjs(b.expected_delivery_date).valueOf()
+              : Infinity;
+            return dateA - dateB;
+          })
+          .map((order) => (
+            <div
+              key={order.order_id}
+              className="flex flex-col border p-4 rounded-md bg-slate-300 dark:bg-slate-700 custom-backdrop-filter gap-4 justify-center items-center"
+            >
+              <h2 className="font-extrabold text-center">
+                Order :{" "}
+                <span className="text-indigo-600">{order.order_id}</span>
+              </h2>
 
-            <div className="w-full flex flex-wrap items-center justify-between gap-10">
-              <ol className="w-auto list-decimal">
-                {order.ordered_products.map((product: OrderedProduct, idx) => {
-                  const productDetails = productsMap.get(product.product_id);
-                  const firstImageUrl =
-                    productDetails &&
-                    getFirstImageUrl(productDetails.product_image);
+              <div className="w-full flex flex-wrap items-center justify-between gap-10">
+                <ol className="w-auto list-decimal">
+                  {order.ordered_products.map(
+                    (product: OrderedProduct, idx) => {
+                      const productDetails = productsMap.get(
+                        product.product_id
+                      );
+                      const firstImageUrl =
+                        productDetails &&
+                        getFirstImageUrl(productDetails.product_image);
 
-                  return (
-                    <li key={idx} className="flex gap-4 items-center">
-                      <div className="flex items-center justify-between gap-6 cursor-pointer">
-                        {firstImageUrl && (
-                          <img
-                            src={firstImageUrl}
-                            alt="Product Image"
-                            className="w-16 h-16 object-cover"
-                          />
-                        )}
-                        <p className="text-sm font-semibold hover:text-indigo-600">
-                          {truncateString(
-                            productDetails?.product_name || "Unknown Product",
-                            30
-                          )}
-                        </p>
-                        <p className="text-sm font-semibold text-indigo-600">
-                          X {product.quantity}
-                        </p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-              <div className="w-auto flex flex-col justify-center items-center gap-2">
-                <div className="flex gap-2 justify-center items-center">
-                  <img
-                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
-                    alt=""
-                    className="w-8 h-8"
-                  />
-                  <p className="text-sm font-semibold text-indigo-600">
-                    Order Status:
-                  </p>
-                </div>
-                <p
-                  className={`text-sm font-semibold capitalize ${
-                    order.order_status === "Delivered"
-                      ? "text-green-600"
-                      : "text-yellow-500"
-                  }`}
-                >
-                  {order.order_status}
-                </p>
-              </div>
-              <div className="w-auto">
-                <button
-                  onClick={() =>
-                    handleCancelOrder(order.order_id, order.order_status)
-                  }
-                  className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
-                    order.order_status === "ordered"
-                      ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
-                      : "border-gray-400 bg-gray-400 cursor-not-allowed"
-                  }`}
-                  disabled={
-                    order.order_status === "Shipped" ||
-                    order.order_status === "Cancelled" ||
-                    order.order_status === "Delivered" ||
-                    order.order_status === "Refunded"
-                  } // Disable if shipped or cancelled
-                >
-                  <CircleX />
-                  Cancel Order
-                </button>
-              </div>
-
-              <div className="w-auto flex flex-col justify-center items-center gap-4">
-                <div className="flex gap-2 justify-center items-center">
-                  <img
-                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
-                    alt=""
-                    className="w-8 h-8"
-                  />
-                  <p className="text-sm font-semibold text-indigo-600">
-                    Expected Delivery Date:
-                  </p>
-                </div>
-                <p className="text-sm font-semibold">
-                  {dayjs(order.expected_delivery_date).format(
-                    "dddd, MMMM D, YYYY"
+                      return (
+                        <li key={idx} className="flex gap-4 items-center">
+                          <div className="flex items-center justify-between gap-6 cursor-pointer">
+                            {firstImageUrl && (
+                              <img
+                                src={firstImageUrl}
+                                alt="Product Image"
+                                className="w-16 h-16 object-cover"
+                              />
+                            )}
+                            <p className="text-sm font-semibold hover:text-indigo-600">
+                              {truncateString(
+                                productDetails?.product_name ||
+                                  "Unknown Product",
+                                30
+                              )}
+                            </p>
+                            <p className="text-sm font-semibold text-indigo-600">
+                              X {product.quantity}
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    }
                   )}
-                </p>
+                </ol>
+                <div className="w-auto flex flex-col justify-center items-center gap-2">
+                  <div className="flex gap-2 justify-center items-center">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <p className="text-sm font-semibold text-indigo-600">
+                      Order Status:
+                    </p>
+                  </div>
+                  <p
+                    className={`text-sm font-semibold capitalize ${
+                      order.order_status === "Delivered"
+                        ? "text-green-600"
+                        : "text-yellow-500"
+                    }`}
+                  >
+                    {order.order_status}
+                  </p>
+                </div>
+                <div className="w-auto">
+                  <button
+                    onClick={() =>
+                      handleCancelOrder(order.order_id, order.order_status)
+                    }
+                    className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
+                      order.order_status === "ordered"
+                        ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                        : "border-gray-400 bg-gray-400 cursor-not-allowed"
+                    }`}
+                    disabled={
+                      order.order_status === "Shipped" ||
+                      order.order_status === "Cancelled" ||
+                      order.order_status === "Delivered" ||
+                      order.order_status === "Refunded"
+                    }
+                  >
+                    <CircleX />
+                    Cancel Order
+                  </button>
+                </div>
+
+                <div className="w-auto flex flex-col justify-center items-center gap-4">
+                  <div className="flex gap-2 justify-center items-center">
+                    <img
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
+                      alt=""
+                      className="w-8 h-8"
+                    />
+                    <p className="text-sm font-semibold text-indigo-600">
+                      Expected Delivery Date:
+                    </p>
+                  </div>
+                  <p className="text-sm font-semibold">
+                    {dayjs(order.expected_delivery_date).format(
+                      "dddd, MMMM D, YYYY"
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

@@ -285,7 +285,7 @@ const PreBuildPCSingleProduct: React.FC = () => {
 
   const productImages = product.image_urls || [];
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full">
       <div className="w-full flex flex-row flex-wrap md:flex-nowrap items-center justify-center mb-14">
         <div className="w-full md:w-1/2 flex p-6 flex-col justify-center items-center relative">
           <div

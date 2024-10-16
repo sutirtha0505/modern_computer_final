@@ -34,6 +34,7 @@ const OrderedPCComponentManagement = () => {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
+  const [sortOrder, setSortOrder] = useState<string>("Newest");
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
     const image = images.find((img) => img.url.includes("_first"));
@@ -115,6 +116,15 @@ const OrderedPCComponentManagement = () => {
 
     fetchOrders();
   }, []);
+  // Sorting logic
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (sortOrder === "Newest") {
+      return dayjs(b.created_at).isAfter(dayjs(a.created_at)) ? 1 : -1;
+    } else if (sortOrder === "Oldest") {
+      return dayjs(a.created_at).isAfter(dayjs(b.created_at)) ? 1 : -1;
+    }
+    return 0;
+  });
 
   // Function to handle filtering
   const handleFilter = () => {
@@ -173,6 +183,22 @@ const OrderedPCComponentManagement = () => {
         </button>
       </div>
 
+      {/* Newest to oldest or vice versa dropdown */}
+      <div className="flex items-center gap-2">
+          <label htmlFor="sort-order" className="text-sm font-semibold">
+            Sort by:
+          </label>
+          <select
+            id="sort-order"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="Newest">Newest</option>
+            <option value="Oldest">Oldest</option>
+          </select>
+        </div>
+
       {/* Table Section */}
       <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
         <table className="min-w-full text-left table-auto border-collapse">
@@ -191,10 +217,10 @@ const OrderedPCComponentManagement = () => {
               <th className="px-4 py-2 border text-center w-[35%]">
                 Ordered Products
               </th>
-              <th className="px-4 py-2 border text-center w-[7%]">
+              <th className="px-4 py-2 border text-center w-[12%]">
                 Order Status
               </th>
-              <th className="px-4 py-2 border text-center w-[18%]">
+              <th className="px-4 py-2 border text-center w-[13%]">
                 Expected Delivery Date
               </th>
               <th className="px-4 py-2 border text-center w-[5%]">
@@ -211,7 +237,7 @@ const OrderedPCComponentManagement = () => {
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => {
+              sortedOrders.map((order) => {
                 const customer = customersMap.get(order.customer_id);
 
                 return (
@@ -330,7 +356,7 @@ const OrderedPCComponentManagement = () => {
                         );
                       })}
                     </td>
-                    <td className="px-4 py-2 border w-[7%]">
+                    <td className="px-4 py-2 border w-[12%]">
                       <select
                         value={order.order_status} // Set the current order status as the default value
                         onChange={async (e) => {
@@ -390,7 +416,7 @@ const OrderedPCComponentManagement = () => {
                       </select>
                     </td>
 
-                    <td className="px-4 py-2 border w-[18%]">
+                    <td className="px-4 py-2 border w-[13%]">
                       <div className="flex justify-center items-center">
                         {dayjs(order.expected_delivery_date).format(
                           "MMM D, YYYY"
