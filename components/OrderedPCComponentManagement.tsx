@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { XCircle } from "lucide-react";
-
+import QRCode from "qrcode";
+import { saveAs } from "file-saver";
 // Interfaces for types
 interface OrderedProduct {
   product_id: string;
@@ -40,6 +41,50 @@ const OrderedPCComponentManagement = () => {
     const image = images.find((img) => img.url.includes("_first"));
     return image ? image.url : null;
   };
+  const generateQRCode = async (order:any) => {
+    const customer = customersMap.get(order.customer_id);
+    const qrData = `Order ID: ${order.order_id}\nCustomer Name: ${
+      customer?.customer_name || "Unknown Name"
+    }\nPhone No: ${customer?.phone_no}\nE-Mail: ${
+      customer?.email || "Unknown Email"
+    }\nAddress: ${order.order_address}\nDelivery Date: ${dayjs(
+      order.expected_delivery_date
+    ).format("MMM D, YYYY")}`;
+
+    try {
+      const canvas = qrCodeCanvasRef.current;
+      if (canvas) {
+        await QRCode.toCanvas(canvas, qrData, { errorCorrectionLevel: "H" });
+      }
+    } catch (err) {
+      console.error("Error generating QR code:", err);
+    }
+  };
+
+  const copyQRCodeToClipboard = () => {
+    const canvas = qrCodeCanvasRef.current;
+    if (canvas) {
+      canvas.toBlob((blob:any) => {
+        if (blob) {
+          saveAs(blob, "qr-code.png"); // Save the QR code image
+          navigator.clipboard
+            .write([
+              new ClipboardItem({
+                "image/png": blob,
+              }),
+            ])
+            .then(() => {
+              toast.success("QR code copied to clipboard!");
+            })
+            .catch((err) => {
+              toast.error("Failed to copy QR code.");
+              console.error("Clipboard error:", err);
+            });
+        }
+      });
+    }
+  };
+
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -149,6 +194,7 @@ const OrderedPCComponentManagement = () => {
     setSearchQuery(""); // Reset search query
     setFilteredOrders(orders); // Reset filtered orders to original orders
   };
+  
 
   return (
     <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12    ">
@@ -214,7 +260,7 @@ const OrderedPCComponentManagement = () => {
               <th className="px-4 py-2 border text-center w-[5%]">
                 Customer Address
               </th>
-              <th className="px-4 py-2 border text-center w-[35%]">
+              <th className="px-4 py-2 border text-center w-[30%]">
                 Ordered Products
               </th>
               <th className="px-4 py-2 border text-center w-[12%]">
@@ -227,6 +273,8 @@ const OrderedPCComponentManagement = () => {
                 Contact Customer
               </th>
               <th className="px-4 py-2 border text-center w-[5%]">Refund</th>
+              <th className="px-4 py-2 border text-center w-[5%]">QR code</th>
+
             </tr>
           </thead>
           <tbody>
@@ -315,7 +363,7 @@ const OrderedPCComponentManagement = () => {
                       {order.order_address}
                     </td>
 
-                    <td className="px-4 py-2 border w-[35%]">
+                    <td className="px-4 py-2 border w-[30%]">
                       {order.ordered_products.map((product: OrderedProduct) => {
                         const productDetails = productsMap.get(
                           product.product_id
@@ -482,6 +530,21 @@ const OrderedPCComponentManagement = () => {
                         Refund
                       </button>
                     </td>
+                    <td className="px-4 py-2 border w-[5%]">
+                    <button
+                      onClick={() => {
+                        generateQRCode(order);
+                        copyQRCodeToClipboard();
+                      }}
+                      className="bg-blue-500 text-white px-2 py-1 w-full rounded hover:bg-blue-700"
+                    >
+                      Generate QR
+                    </button>
+                    <canvas
+                      ref={qrCodeCanvasRef}
+                      style={{ display: "none" }}
+                    ></canvas>
+                  </td>
                   </tr>
                 );
               })
