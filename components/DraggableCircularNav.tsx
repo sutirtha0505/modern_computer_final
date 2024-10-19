@@ -47,7 +47,11 @@ const DraggableCircularNav: React.FC = () => {
       onMouseLeave={removeDragListeners}
     >
       <div className="nav-content">
-        <div className="toggle-btn" onClick={toggleNav}>
+        <div
+          className="toggle-btn"
+          onMouseEnter={toggleNav}
+          onClick={toggleNav}
+        >
           <img
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/customer-service.png"
             alt="customer service"
@@ -60,7 +64,9 @@ const DraggableCircularNav: React.FC = () => {
           <div
             className="planets first-planet"
             onClick={() => {
-              router.push("https://wa.me/917686873088?text=Hi%20Modern%20computer%0AI've%20just%20visited%20the%20website%20and%20want%20to%20talk%20about%20some%20queries.");
+              router.push(
+                "https://wa.me/917686873088?text=Hi%20Modern%20computer%0AI've%20just%20visited%20the%20website%20and%20want%20to%20talk%20about%20some%20queries."
+              );
             }}
           >
             <FaWhatsapp className="text-green-500 icons" />
@@ -107,7 +113,9 @@ const DraggableCircularNav: React.FC = () => {
           <div
             className="planets fifth-planet"
             onClick={() => {
-              router.push("https://www.facebook.com/people/Modern-Computer/100093078390711/?mibextid=ZbWKwL");
+              router.push(
+                "https://www.facebook.com/people/Modern-Computer/100093078390711/?mibextid=ZbWKwL"
+              );
             }}
           >
             <FaFacebook className="text-blue-600 icons" />

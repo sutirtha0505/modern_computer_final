@@ -35,6 +35,7 @@
     "framer-motion": "^11.2.10",
     "lucide-react": "^0.395.0",
     "next": "^14.2.13",
+    "next-qrcode": "^2.5.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.0.1",
     "razorpay": "^2.9.4",

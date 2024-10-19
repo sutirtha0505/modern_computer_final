@@ -4,8 +4,8 @@ import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { XCircle } from "lucide-react";
-import QRCode from "qrcode";
-import { saveAs } from "file-saver";
+import { useQRCode } from "next-qrcode";
+
 // Interfaces for types
 interface OrderedProduct {
   product_id: string;
@@ -36,55 +36,15 @@ const OrderedPCComponentManagement = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
   const [sortOrder, setSortOrder] = useState<string>("Newest");
+  const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
+  const { Image } = useQRCode();
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
     const image = images.find((img) => img.url.includes("_first"));
     return image ? image.url : null;
   };
-  const generateQRCode = async (order:any) => {
-    const customer = customersMap.get(order.customer_id);
-    const qrData = `Order ID: ${order.order_id}\nCustomer Name: ${
-      customer?.customer_name || "Unknown Name"
-    }\nPhone No: ${customer?.phone_no}\nE-Mail: ${
-      customer?.email || "Unknown Email"
-    }\nAddress: ${order.order_address}\nDelivery Date: ${dayjs(
-      order.expected_delivery_date
-    ).format("MMM D, YYYY")}`;
-
-    try {
-      const canvas = qrCodeCanvasRef.current;
-      if (canvas) {
-        await QRCode.toCanvas(canvas, qrData, { errorCorrectionLevel: "H" });
-      }
-    } catch (err) {
-      console.error("Error generating QR code:", err);
-    }
-  };
-
-  const copyQRCodeToClipboard = () => {
-    const canvas = qrCodeCanvasRef.current;
-    if (canvas) {
-      canvas.toBlob((blob:any) => {
-        if (blob) {
-          saveAs(blob, "qr-code.png"); // Save the QR code image
-          navigator.clipboard
-            .write([
-              new ClipboardItem({
-                "image/png": blob,
-              }),
-            ])
-            .then(() => {
-              toast.success("QR code copied to clipboard!");
-            })
-            .catch((err) => {
-              toast.error("Failed to copy QR code.");
-              console.error("Clipboard error:", err);
-            });
-        }
-      });
-    }
-  };
-
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -194,6 +154,69 @@ const OrderedPCComponentManagement = () => {
     setSearchQuery(""); // Reset search query
     setFilteredOrders(orders); // Reset filtered orders to original orders
   };
+
+  // Generate QR codes when orders and customersMap are ready
+  useEffect(() => {
+    if (orders.length > 0 && customersMap.size > 0) {
+      generateQRCodes(orders, customersMap);
+    }
+  }, [orders, customersMap]);
+
+  // Function to generate QR codes automatically on load
+  const generateQRCodes = (
+    ordersData: any[],
+    customerMap: Map<string, Customer>
+  ) => {
+    const newQrCodes = new Map<string, string>();
+
+    ordersData.forEach((order) => {
+      const customer = customerMap.get(order.customer_id);
+      if (customer) {
+        const qrData = `
+          Order ID: ${order.order_id}
+          Customer Name: ${customer?.customer_name || "Unknown Name"}
+          Phone No: ${customer?.phone_no}
+          E-Mail: ${customer?.email || "Unknown Email"}
+          Address: ${order.order_address}
+          Delivery Date: ${dayjs(order.expected_delivery_date).format(
+            "MMM D, YYYY"
+          )}
+        `;
+
+        newQrCodes.set(order.order_id, qrData);
+      }
+    });
+
+    setQrCodes(newQrCodes); // Store the generated QR code data in state
+  };
+  const convertToCSV = () => {
+    const selectedData = sortedOrders.filter(order => selectedOrders.has(order.order_id));
+  
+    // Create CSV content
+    const csvContent = [
+      ['Order ID', 'Payment ID', 'Customer Name', 'Order Status'], // Header
+      ...selectedData.map(order => [
+        order.order_id,
+        order.payment_id,
+        customersMap.get(order.customer_id)?.customer_name || 'Unknown Name',
+        order.order_status,
+      ]),
+    ]
+    .map(e => e.join(",")) // Join rows
+    .join("\n"); // Join with newline
+  
+    // Create a Blob and download it
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "selected_orders.csv");
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+  
   
 
   return (
@@ -231,19 +254,26 @@ const OrderedPCComponentManagement = () => {
 
       {/* Newest to oldest or vice versa dropdown */}
       <div className="flex items-center gap-2">
-          <label htmlFor="sort-order" className="text-sm font-semibold">
-            Sort by:
-          </label>
-          <select
-            id="sort-order"
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="border rounded px-2 py-1"
-          >
-            <option value="Newest">Newest</option>
-            <option value="Oldest">Oldest</option>
-          </select>
-        </div>
+        <label htmlFor="sort-order" className="text-sm font-semibold">
+          Sort by:
+        </label>
+        <select
+          id="sort-order"
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          className="border rounded px-2 py-1"
+        >
+          <option value="Newest">Newest</option>
+          <option value="Oldest">Oldest</option>
+        </select>
+      </div>
+      <button
+      onClick={convertToCSV}
+      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md"
+      disabled={selectedOrders.size === 0} // Disable if no rows are selected
+    >
+      Convert to CSV
+    </button>
 
       {/* Table Section */}
       <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
@@ -273,8 +303,7 @@ const OrderedPCComponentManagement = () => {
                 Contact Customer
               </th>
               <th className="px-4 py-2 border text-center w-[5%]">Refund</th>
-              <th className="px-4 py-2 border text-center w-[5%]">QR code</th>
-
+              <th className="px-4 py-2 border text-center w-[5%]">QR Code</th>
             </tr>
           </thead>
           <tbody>
@@ -287,10 +316,21 @@ const OrderedPCComponentManagement = () => {
             ) : (
               sortedOrders.map((order) => {
                 const customer = customersMap.get(order.customer_id);
+                const isSelected = selectedOrders.has(order.order_id); // Check if the row is selected
 
                 return (
-                  <tr key={order.order_id}>
-                    <td className="px-4 py-2 border w-[5%] break-all text-xs select-text ">
+                  <tr key={order.order_id}
+                  onClick={() => {
+                    const newSelectedOrders = new Set(selectedOrders);
+                    if (newSelectedOrders.has(order.order_id)) {
+                      newSelectedOrders.delete(order.order_id);
+                    } else {
+                      newSelectedOrders.add(order.order_id);
+                    }
+                    setSelectedOrders(newSelectedOrders);
+                  }}
+                  className={isSelected ? "bg-gray-800" : ""} >
+                    <td className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${isSelected ? "bg-gray-800" : ""}`}>
                       {order.order_id}
                     </td>
                     <td
@@ -465,7 +505,7 @@ const OrderedPCComponentManagement = () => {
                     </td>
 
                     <td className="px-4 py-2 border w-[13%]">
-                      <div className="flex justify-center items-center">
+                      <div className="flex justify-center items-center text-xs">
                         {dayjs(order.expected_delivery_date).format(
                           "MMM D, YYYY"
                         )}
@@ -531,20 +571,26 @@ const OrderedPCComponentManagement = () => {
                       </button>
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
-                    <button
-                      onClick={() => {
-                        generateQRCode(order);
-                        copyQRCodeToClipboard();
-                      }}
-                      className="bg-blue-500 text-white px-2 py-1 w-full rounded hover:bg-blue-700"
-                    >
-                      Generate QR
-                    </button>
-                    <canvas
-                      ref={qrCodeCanvasRef}
-                      style={{ display: "none" }}
-                    ></canvas>
-                  </td>
+                      {qrCodes.has(order.order_id) ? (
+                        <Image
+                          text={qrCodes.get(order.order_id) || ""}
+                          options={{
+                            type: "image/jpeg",
+                            quality: 0.9,
+                            errorCorrectionLevel: "M",
+                            margin: 1,
+                            scale: 8,
+                            width: 200,
+                            color: {
+                              dark: "#000000",
+                              light: "#FFFFFF",
+                            },
+                          }}
+                        />
+                      ) : (
+                        "Loading..."
+                      )}
+                    </td>
                   </tr>
                 );
               })

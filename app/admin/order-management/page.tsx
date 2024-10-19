@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 
 
 const OrderManagementPage = () => {
-    const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
