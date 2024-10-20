@@ -3,7 +3,7 @@ import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { XCircle } from "lucide-react";
+import { Download, XCircle } from "lucide-react";
 import { useQRCode } from "next-qrcode";
 
 // Interfaces for types
@@ -39,7 +39,6 @@ const OrderedPCComponentManagement = () => {
   const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
   const { Image } = useQRCode();
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
-
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
     const image = images.find((img) => img.url.includes("_first"));
@@ -190,34 +189,34 @@ const OrderedPCComponentManagement = () => {
     setQrCodes(newQrCodes); // Store the generated QR code data in state
   };
   const convertToCSV = () => {
-    const selectedData = sortedOrders.filter(order => selectedOrders.has(order.order_id));
-  
+    const selectedData = sortedOrders.filter((order) =>
+      selectedOrders.has(order.order_id)
+    );
+
     // Create CSV content
     const csvContent = [
-      ['Order ID', 'Payment ID', 'Customer Name', 'Order Status'], // Header
-      ...selectedData.map(order => [
+      ["Order ID", "Payment ID", "Customer Name", "Order Status"], // Header
+      ...selectedData.map((order) => [
         order.order_id,
         order.payment_id,
-        customersMap.get(order.customer_id)?.customer_name || 'Unknown Name',
+        customersMap.get(order.customer_id)?.customer_name || "Unknown Name",
         order.order_status,
       ]),
     ]
-    .map(e => e.join(",")) // Join rows
-    .join("\n"); // Join with newline
-  
+      .map((e) => e.join(",")) // Join rows
+      .join("\n"); // Join with newline
+
     // Create a Blob and download it
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.setAttribute("href", url);
     link.setAttribute("download", "selected_orders.csv");
-    link.style.visibility = 'hidden';
+    link.style.visibility = "hidden";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
-  
-  
 
   return (
     <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12    ">
@@ -268,12 +267,16 @@ const OrderedPCComponentManagement = () => {
         </select>
       </div>
       <button
-      onClick={convertToCSV}
-      className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md"
-      disabled={selectedOrders.size === 0} // Disable if no rows are selected
-    >
-      Convert to CSV
-    </button>
+        onClick={convertToCSV}
+        className={`${
+          selectedOrders.size === 0
+            ? "bg-gray-400"
+            : "bg-green-500 hover:bg-transparent hover:text-green-500 border-green-500 border-1"
+        } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
+        disabled={selectedOrders.size === 0} // Disable if no rows are selected
+      >
+        <Download /> Convert to CSV
+      </button>
 
       {/* Table Section */}
       <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
@@ -319,18 +322,24 @@ const OrderedPCComponentManagement = () => {
                 const isSelected = selectedOrders.has(order.order_id); // Check if the row is selected
 
                 return (
-                  <tr key={order.order_id}
-                  onClick={() => {
-                    const newSelectedOrders = new Set(selectedOrders);
-                    if (newSelectedOrders.has(order.order_id)) {
-                      newSelectedOrders.delete(order.order_id);
-                    } else {
-                      newSelectedOrders.add(order.order_id);
-                    }
-                    setSelectedOrders(newSelectedOrders);
-                  }}
-                  className={isSelected ? "bg-gray-800" : ""} >
-                    <td className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${isSelected ? "bg-gray-800" : ""}`}>
+                  <tr
+                    key={order.order_id}
+                    onClick={() => {
+                      const newSelectedOrders = new Set(selectedOrders);
+                      if (newSelectedOrders.has(order.order_id)) {
+                        newSelectedOrders.delete(order.order_id);
+                      } else {
+                        newSelectedOrders.add(order.order_id);
+                      }
+                      setSelectedOrders(newSelectedOrders);
+                    }}
+                    className={isSelected ? "bg-gray-800" : ""}
+                  >
+                    <td
+                      className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${
+                        isSelected ? "bg-gray-800" : ""
+                      }`}
+                    >
                       {order.order_id}
                     </td>
                     <td
@@ -534,6 +543,13 @@ const OrderedPCComponentManagement = () => {
                             : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
                         } border-1 px-2 py-1 w-full rounded`}
                         onClick={async () => {
+                          if (order.order_status !== "Cancelled") {
+                            toast.error(
+                              `Why are you refunding the product having ${order.order_status}?`
+                            );
+                            return;
+                          } // Prevent the function from running if not cancelled
+
                           const orderId = order.order_id; // Get order ID
                           const paymentId = order.payment_id; // Get payment ID
                           const amount = order.payment_amount * 100; // Get payment amount (ensure this is part of your order data)
@@ -566,6 +582,7 @@ const OrderedPCComponentManagement = () => {
                             );
                           }
                         }}
+                        disabled={order.order_status !== "Cancelled"} // Disable the button if not cancelled
                       >
                         Refund
                       </button>
