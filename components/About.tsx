@@ -143,7 +143,10 @@ const About: React.FC = () => {
   }
 
   return (
-    <div className="relative flex flex-col gap-5 justify-center items-center w-full h-full mt-12" id="about">
+    <div
+      className="relative flex flex-col gap-5 justify-center items-center w-full h-full mt-12"
+      id="about"
+    >
       <h1 className="text-3xl font-extrabold ">
         About <span className="text-indigo-600">Us</span>
       </h1>
@@ -239,6 +242,62 @@ const About: React.FC = () => {
           </div>
         </div>
       )}
+
+      <div className="flex flex-col gap-3 justify-center items-center">
+        <h1 className="text-2xl font-bold">
+          Why <span className="text-indigo-500">Modern Computer?</span>
+        </h1>
+        <div className="flex justify-center items-center gap-4 flex-wrap">
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-delivery.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">Free Delivery</p>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/technical-support.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">365 Days Servicing </p>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/opinion.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">Proper Suggestion</p>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/best-price.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">Best Price</p>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-shipping.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">Free Shipping</p>
+          </div>
+          <div className="flex flex-col justify-center items-center gap-2">
+            <img
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/warranty.png"
+              alt=""
+              className="w-24 h-24"
+            />
+            <p className="text-lg font-extrabold">Safe Delivery</p>
+          </div>
+        </div>
+      </div>
 
       <div className="w-full p-6">
         <h1 className="text-3xl font-extrabold text-center">
