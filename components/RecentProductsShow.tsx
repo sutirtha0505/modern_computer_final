@@ -121,24 +121,29 @@ const RecentProductsShow: React.FC = () => {
 
   return (
     <div className="pt-8 flex flex-col justify-center items-center gap-4">
-      <h1 className="font-bold text-2xl md:mb-6 mb-0 text-center">
-        Our <span className="text-indigo-500">Recently Launched</span> Products
-      </h1>
-      <div className="embla">
-        <div className="embla__viewport" ref={emblaRef}>
-          <div className="embla__container">
-            {galleryImages.map((image, index) => (
-              <div className="embla__slide" key={index}>
-                <img
-                  src={image.url}
-                  alt={image.name}
-                  className="embla__slide__number"
-                />
+      {galleryImages.length > 0 && (
+        <>
+          <h1 className="font-bold text-2xl md:mb-6 mb-0 text-center">
+            Our <span className="text-indigo-500">Recently Launched</span> Products
+          </h1>
+          <div className="embla">
+            <div className="embla__viewport" ref={emblaRef}>
+              <div className="embla__container">
+                {galleryImages.map((image, index) => (
+                  <div className="embla__slide" key={index}>
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="embla__slide__number"
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
+
     </div>
   );
 };

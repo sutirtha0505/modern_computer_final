@@ -60,40 +60,45 @@ const BannerSection: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full py-16 px-4">
+      {/* Check if there are images to display */}
+      {galleryImages.length > 0 && (
+        <>
       <h1 className="font-bold text-2xl md:mb-6 mb-0 text-center">
         Our <span className="text-indigo-500">Recent Offers</span> on Products
       </h1>
 
-      {/* Embla Carousel */}
-      <div className="embla w-full max-w-4xl overflow-hidden" ref={emblaRef}>
-        <div className="embla__container flex">
-          {galleryImages.map((image, index) => (
-            <div
-              className="embla__slide relative flex-shrink-0 w-full md:w-[33.333%] px-2" // Adjusted width for responsive design
-              key={index}
-            >
-              <div className="embla__slide__inner transition-opacity duration-300"> {/* Apply transition for smooth effect */}
-                <img
-                  src={image.url}
-                  alt={image.name}
-                  className="w-full h-64 object-scale-down rounded-lg shadow-lg" // Use object-cover for better image fit
-                />
-              </div>
+          {/* Embla Carousel */}
+          <div className="embla w-full max-w-4xl overflow-hidden" ref={emblaRef}>
+            <div className="embla__container flex">
+              {galleryImages.map((image, index) => (
+                <div
+                  className="embla__slide relative flex-shrink-0 w-full md:w-[33.333%] px-2" // Adjusted width for responsive design
+                  key={index}
+                >
+                  <div className="embla__slide__inner transition-opacity duration-300"> {/* Apply transition for smooth effect */}
+                    <img
+                      src={image.url}
+                      alt={image.name}
+                      className="w-full h-64 object-scale-down rounded-lg shadow-lg" // Use object-cover for better image fit
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </div>
+          </div>
 
-      {/* Navigation Dots */}
-      <div className="flex justify-center mt-4">
-        {galleryImages.map((_, index) => (
-          <button
-            key={index}
-            className="w-3 h-3 rounded-full mx-1 bg-gray-300 hover:bg-gray-500 transition duration-200"
-            onClick={() => emblaApi?.scrollTo(index)}
-          />
-        ))}
-      </div>
+          {/* Navigation Dots */}
+          <div className="flex justify-center mt-4">
+            {galleryImages.map((_, index) => (
+              <button
+                key={index}
+                className="w-3 h-3 rounded-full mx-1 bg-gray-300 hover:bg-gray-500 transition duration-200"
+                onClick={() => emblaApi?.scrollTo(index)}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };

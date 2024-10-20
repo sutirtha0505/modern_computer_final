@@ -391,7 +391,7 @@ const Header = () => {
                 onClick={toggleProfileMenu}
               />
               {isProfileMenuOpen && (
-                <div className="absolute right-0 w-52 bg-white/50 rounded-md shadow-lg z-10 custom-backdrop-filter backdrop-blur-md mt-2">
+                <div className="absolute right-0 w-52 bg-gray-400 dark:bg-slate-800 rounded-md shadow-lg z-10 custom-backdrop-filter backdrop-blur-md mt-2">
                   {user ? (
                     <>
                       <div

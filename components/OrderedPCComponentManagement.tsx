@@ -178,8 +178,8 @@ const OrderedPCComponentManagement = () => {
           E-Mail: ${customer?.email || "Unknown Email"}
           Address: ${order.order_address}
           Delivery Date: ${dayjs(order.expected_delivery_date).format(
-            "MMM D, YYYY"
-          )}
+          "MMM D, YYYY"
+        )}
         `;
 
         newQrCodes.set(order.order_id, qrData);
@@ -195,11 +195,13 @@ const OrderedPCComponentManagement = () => {
 
     // Create CSV content
     const csvContent = [
-      ["Order ID", "Payment ID", "Customer Name", "Order Status"], // Header
+      ["Order ID", "Customer Name", "Contact No.", "Email", "Address", "Order Status"], // Header
       ...selectedData.map((order) => [
         order.order_id,
-        order.payment_id,
         customersMap.get(order.customer_id)?.customer_name || "Unknown Name",
+        customersMap.get(order.customer_id)?.email,
+        customersMap.get(order.customer_id)?.phone_no,
+        order.order_address,
         order.order_status,
       ]),
     ]
@@ -250,33 +252,34 @@ const OrderedPCComponentManagement = () => {
           Filter
         </button>
       </div>
-
-      {/* Newest to oldest or vice versa dropdown */}
-      <div className="flex items-center gap-2">
-        <label htmlFor="sort-order" className="text-sm font-semibold">
-          Sort by:
-        </label>
-        <select
-          id="sort-order"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="border rounded px-2 py-1"
-        >
-          <option value="Newest">Newest</option>
-          <option value="Oldest">Oldest</option>
-        </select>
-      </div>
-      <button
-        onClick={convertToCSV}
-        className={`${
-          selectedOrders.size === 0
+      <div className="flex justify-center items-center gap-4">
+        {/* Newest to oldest or vice versa dropdown */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort-order" className="text-sm font-semibold">
+            Sort by:
+          </label>
+          <select
+            id="sort-order"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="Newest">Newest</option>
+            <option value="Oldest">Oldest</option>
+          </select>
+        </div>
+        <button
+          onClick={convertToCSV}
+          className={`${selectedOrders.size === 0
             ? "bg-gray-400"
             : "bg-green-500 hover:bg-transparent hover:text-green-500 border-green-500 border-1"
-        } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
-        disabled={selectedOrders.size === 0} // Disable if no rows are selected
-      >
-        <Download /> Convert to CSV
-      </button>
+            } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
+          disabled={selectedOrders.size === 0} // Disable if no rows are selected
+        >
+          <Download /> Convert to CSV
+        </button>
+      </div>
+
 
       {/* Table Section */}
       <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
@@ -324,7 +327,9 @@ const OrderedPCComponentManagement = () => {
                 return (
                   <tr
                     key={order.order_id}
-                    onClick={() => {
+                    className={isSelected ? "bg-gray-800" : ""}
+                  >
+                    <td onClick={() => {
                       const newSelectedOrders = new Set(selectedOrders);
                       if (newSelectedOrders.has(order.order_id)) {
                         newSelectedOrders.delete(order.order_id);
@@ -333,12 +338,8 @@ const OrderedPCComponentManagement = () => {
                       }
                       setSelectedOrders(newSelectedOrders);
                     }}
-                    className={isSelected ? "bg-gray-800" : ""}
-                  >
-                    <td
-                      className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${
-                        isSelected ? "bg-gray-800" : ""
-                      }`}
+                      className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${isSelected ? "bg-gray-800" : ""
+                        }`}
                     >
                       {order.order_id}
                     </td>
@@ -443,9 +444,9 @@ const OrderedPCComponentManagement = () => {
                               {productDetails?.product_name
                                 ? productDetails.product_name.length > 25
                                   ? `${productDetails.product_name.slice(
-                                      0,
-                                      25
-                                    )}...`
+                                    0,
+                                    25
+                                  )}...`
                                   : productDetails.product_name
                                 : "Unknown Product"}
                             </span>
@@ -537,11 +538,10 @@ const OrderedPCComponentManagement = () => {
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
                       <button
-                        className={`${
-                          order.order_status === "Cancelled"
-                            ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
-                            : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
-                        } border-1 px-2 py-1 w-full rounded`}
+                        className={`${order.order_status === "Cancelled"
+                          ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
+                          : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
+                          } border-1 px-2 py-1 w-full rounded`}
                         onClick={async () => {
                           if (order.order_status !== "Cancelled") {
                             toast.error(

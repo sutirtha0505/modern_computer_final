@@ -3,12 +3,10 @@ import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { XCircle } from "lucide-react";
+import { Download, XCircle } from "lucide-react";
+import { useQRCode } from "next-qrcode";
 
 // Interfaces for types
-interface OrderedProduct {
-  product_id: string;
-}
 
 interface Product {
   id: string;
@@ -35,6 +33,11 @@ const OrderedPreBuildPCManagement = () => {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
+
+  const [sortOrder, setSortOrder] = useState<string>("Newest");
+  const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
+  const { Image } = useQRCode();
+  const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
     const image = images.find((img) => img.url.includes("_first"));
@@ -126,6 +129,16 @@ const OrderedPreBuildPCManagement = () => {
     fetchOrders();
   }, []);
 
+  // Sorting logic
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    if (sortOrder === "Newest") {
+      return dayjs(b.created_at).isAfter(dayjs(a.created_at)) ? 1 : -1;
+    } else if (sortOrder === "Oldest") {
+      return dayjs(a.created_at).isAfter(dayjs(b.created_at)) ? 1 : -1;
+    }
+    return 0;
+  });
+
   // Function to handle filtering
   const handleFilter = () => {
     const query = searchQuery.toLowerCase();
@@ -149,6 +162,72 @@ const OrderedPreBuildPCManagement = () => {
     setSearchQuery(""); // Reset search query
     setFilteredOrders(orders); // Reset filtered orders to original orders
   };
+  // Generate QR codes when orders and customersMap are ready
+  useEffect(() => {
+    if (orders.length > 0 && customersMap.size > 0) {
+      generateQRCodes(orders, customersMap);
+    }
+  }, [orders, customersMap]);
+
+  // Function to generate QR codes automatically on load
+  const generateQRCodes = (
+    ordersData: any[],
+    customerMap: Map<string, Customer>
+  ) => {
+    const newQrCodes = new Map<string, string>();
+
+    ordersData.forEach((order) => {
+      const customer = customerMap.get(order.customer_id);
+      if (customer) {
+        const qrData = `
+          Order ID: ${order.order_id}
+          Customer Name: ${customer?.customer_name || "Unknown Name"}
+          Phone No: ${customer?.phone_no}
+          E-Mail: ${customer?.email || "Unknown Email"}
+          Address: ${order.order_address}
+          Delivery Date: ${dayjs(order.expected_delivery_date).format(
+          "MMM D, YYYY"
+        )}
+        `;
+
+        newQrCodes.set(order.order_id, qrData);
+      }
+    });
+
+    setQrCodes(newQrCodes); // Store the generated QR code data in state
+  };
+  const convertToCSV = () => {
+    const selectedData = sortedOrders.filter((order) =>
+      selectedOrders.has(order.order_id)
+    );
+
+    // Create CSV content
+    const csvContent = [
+      ["Order ID", "Customer Name", "Contact No.", "Email", "Address", "Order Status"], // Header
+      ...selectedData.map((order) => [
+        order.order_id,
+        customersMap.get(order.customer_id)?.customer_name || "Unknown Name",
+        customersMap.get(order.customer_id)?.email,
+        customersMap.get(order.customer_id)?.phone_no,
+        order.order_address,
+        order.order_status,
+      ]),
+    ]
+      .map((e) => e.join(",")) // Join rows
+      .join("\n"); // Join with newline
+
+    // Create a Blob and download it
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "selected_orders.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   return (
     <div className="w-full h-full justify-center items-center flex flex-col pt-8 mb-12">
@@ -182,6 +261,33 @@ const OrderedPreBuildPCManagement = () => {
           Filter
         </button>
       </div>
+      <div className="flex justify-center items-center gap-4">
+        {/* Newest to oldest or vice versa dropdown */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort-order" className="text-sm font-semibold">
+            Sort by:
+          </label>
+          <select
+            id="sort-order"
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border rounded px-2 py-1"
+          >
+            <option value="Newest">Newest</option>
+            <option value="Oldest">Oldest</option>
+          </select>
+        </div>
+        <button
+          onClick={convertToCSV}
+          className={`${selectedOrders.size === 0
+            ? "bg-gray-400"
+            : "bg-green-500 hover:bg-transparent hover:text-green-500 border-green-500 border-1"
+            } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
+          disabled={selectedOrders.size === 0} // Disable if no rows are selected
+        >
+          <Download /> Convert to CSV
+        </button>
+      </div>
 
       {/* Table Section */}
       <div className="w-full flex items-center overflow-x-auto p-8 scrollbar-hide">
@@ -198,7 +304,7 @@ const OrderedPreBuildPCManagement = () => {
               <th className="px-4 py-2 border text-center w-[5%]">
                 Customer Address
               </th>
-              <th className="px-4 py-2 border text-center w-[35%]">
+              <th className="px-4 py-2 border text-center w-[30%]">
                 Ordered Products
               </th>
               <th className="px-4 py-2 border text-center w-[12%]">
@@ -211,6 +317,7 @@ const OrderedPreBuildPCManagement = () => {
                 Contact Customer
               </th>
               <th className="px-4 py-2 border text-center w-[5%]">Refund</th>
+              <th className="px-4 py-2 border text-center w-[5%]">QR Code</th>
             </tr>
           </thead>
           <tbody>
@@ -221,12 +328,24 @@ const OrderedPreBuildPCManagement = () => {
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => {
+              sortedOrders.map((order) => {
                 const customer = customersMap.get(order.customer_id);
-
+                const isSelected = selectedOrders.has(order.order_id); // Check if the row is selected
                 return (
-                  <tr key={order.order_id}>
-                    <td className="px-4 py-2 border w-[5%] break-all text-xs select-text">
+                  <tr key={order.order_id}
+                    className={isSelected ? "bg-gray-800" : ""}>
+                    <td onClick={() => {
+                      const newSelectedOrders = new Set(selectedOrders);
+                      if (newSelectedOrders.has(order.order_id)) {
+                        newSelectedOrders.delete(order.order_id);
+                      } else {
+                        newSelectedOrders.add(order.order_id);
+                      }
+                      setSelectedOrders(newSelectedOrders);
+                    }}
+                      className={`px-4 py-2 border w-[5%] break-all text-xs select-text ${isSelected ? "bg-gray-800" : ""
+                        }`}
+                    >
                       {order.order_id}
                     </td>
                     <td
@@ -299,7 +418,7 @@ const OrderedPreBuildPCManagement = () => {
                       {order.order_address}
                     </td>
 
-                    <td className="px-4 py-2 border w-[35%]">
+                    <td className="px-4 py-2 border w-[30%]">
                       {order.ordered_products?.map((productId: string) => {
                         const product = productsMap.get(productId);
                         const imageUrl = product?.image_urls
@@ -309,15 +428,18 @@ const OrderedPreBuildPCManagement = () => {
                         return (
                           <div
                             key={productId}
-                            className="flex flex-col items-center"
+                            className="flex flex-col items-center cursor-pointer hover:text-indigo-500"
+                            onClick={() => {
+                              window.open(`/pre-build-pc/${productId}`)
+                            }}
                           >
                             <img
                               src={imageUrl ?? undefined} // Use nullish coalescing to ensure undefined if null
                               alt={product?.build_name || "Product Image"}
                               className="w-16 h-16 object-cover"
                             />
-                            <p className="text-center">
-                              {product?.build_name || "Unknown Product"}
+                            <p className="text-center text-xs">
+                              {product?.build_name || "Unknown Product"} - {product?.build_type}
                             </p>
                           </div>
                         );
@@ -384,7 +506,7 @@ const OrderedPreBuildPCManagement = () => {
                     </td>
 
                     <td className="px-4 py-2 border w-[18%]">
-                      <div className="flex justify-center items-center">
+                      <div className="flex justify-center items-center text-xs">
                         {dayjs(order.expected_delivery_date).format(
                           "MMM D, YYYY"
                         )}
@@ -407,12 +529,17 @@ const OrderedPreBuildPCManagement = () => {
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
                       <button
-                        className={`${
-                          order.order_status === "Cancelled"
+                        className={`${order.order_status === "Cancelled"
                             ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
                             : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
-                        } border-1 px-2 py-1 w-full rounded`}
+                          } border-1 px-2 py-1 w-full rounded`}
                         onClick={async () => {
+                          if (order.order_status !== "Cancelled") {
+                            toast.error(
+                              `Why are you refunding the product having ${order.order_status}?`
+                            );
+                            return;
+                          } // Prevent the function from running if not cancelled
                           const orderId = order.order_id; // Get order ID
                           const paymentId = order.payment_id; // Get payment ID
                           const amount = order.payment_amount * 100; // Get payment amount (ensure this is part of your order data)
@@ -448,6 +575,27 @@ const OrderedPreBuildPCManagement = () => {
                       >
                         Refund
                       </button>
+                    </td>
+                    <td className="px-4 py-2 border w-[5%]">
+                      {qrCodes.has(order.order_id) ? (
+                        <Image
+                          text={qrCodes.get(order.order_id) || ""}
+                          options={{
+                            type: "image/jpeg",
+                            quality: 0.9,
+                            errorCorrectionLevel: "M",
+                            margin: 1,
+                            scale: 8,
+                            width: 200,
+                            color: {
+                              dark: "#000000",
+                              light: "#FFFFFF",
+                            },
+                          }}
+                        />
+                      ) : (
+                        "Loading..."
+                      )}
                     </td>
                   </tr>
                 );
