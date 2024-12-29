@@ -282,7 +282,7 @@ const About: React.FC = () => {
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
             <img
-              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-shipping.png"
+              src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-delivery%20truck.png"
               alt=""
               className="w-24 h-24"
             />
