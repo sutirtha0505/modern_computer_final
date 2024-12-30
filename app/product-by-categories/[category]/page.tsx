@@ -1,7 +1,7 @@
 "use client";
 import ProductByCategoriesItemList from "@/components/ProductByCategoriesItemList";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 
 interface Product {
@@ -15,7 +15,6 @@ interface Product {
 }
 
 const ProductByCategoriesItemListPage = () => {
-  const router = useRouter();
   const { category } = useParams<{ category: string }>();
   const decodedCategory = decodeURIComponent(category);
   const [products, setProducts] = useState<Product[]>([]);

@@ -1,13 +1,13 @@
 "use client"
-import PreBuildTable from '@/components/PreBuildTable';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
 import ProductUploadForm from '@/components/ProductForm';
 import { supabase } from '@/lib/supabaseClient';
+import { User } from '@supabase/supabase-js';
 import React, { useState, useEffect } from 'react';
 
 
 const ProductUploadPage = () => {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User |null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

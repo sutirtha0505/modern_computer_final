@@ -2,23 +2,37 @@
 import React, { useEffect, useState, useRef } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { X } from "lucide-react";
+import Image from "next/image";
+
+// Define types for your data structures
+type AboutData = {
+  id: number;
+  about_image: string;
+  about_description: string;
+  about_yt_1?: string;
+  about_yt_2?: string;
+};
+
+type GalleryImage = {
+  name: string;
+  url: string;
+};
+
+type ProfilePhoto = {
+  profile_photo: string;
+  email: string;
+  customer_name: string;
+  UX_star: number;
+  comment: string;
+};
 
 const About: React.FC = () => {
-  const [aboutData, setAboutData] = useState<any>(null);
+  const [aboutData, setAboutData] = useState<AboutData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [galleryImages, setGalleryImages] = useState<
-    { name: string; url: string }[]
-  >([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [profilePhotos, setProfilePhotos] = useState<
-    {
-      profile_photo: string;
-      email: string;
-      customer_name: string;
-      UX_star: number;
-      comment: string;
-    }[]
-  >([]); // Updated to store profile photo and details
+  const [profilePhotos, setProfilePhotos] = useState<ProfilePhoto[]>([]);
+
   const galleryRef = useRef<HTMLDivElement | null>(null);
   const scrollIntervalRef = useRef<number | null>(null);
 
@@ -30,12 +44,11 @@ const About: React.FC = () => {
       console.error("Error fetching gallery items:", error);
     }
     if (data) {
-      const imageUrls = data.map((file) => {
+      const imageUrls: GalleryImage[] = data.map((file) => {
         const { data: publicUrlData } = supabase.storage
           .from("product-image")
           .getPublicUrl(`gallery/${file.name}`);
-        const publicUrl = publicUrlData.publicUrl;
-        return { name: file.name, url: publicUrl };
+        return { name: file.name, url: publicUrlData.publicUrl };
       });
       setGalleryImages(imageUrls);
     }
@@ -50,15 +63,7 @@ const About: React.FC = () => {
     if (error) {
       console.error("Error fetching profile photos:", error);
     } else if (data) {
-      setProfilePhotos(
-        data.map((profile) => ({
-          profile_photo: profile.profile_photo,
-          email: profile.email,
-          customer_name: profile.customer_name,
-          UX_star: profile.UX_star,
-          comment: profile.comment,
-        }))
-      );
+      setProfilePhotos(data as ProfilePhoto[]);
     }
   };
 
@@ -67,13 +72,13 @@ const About: React.FC = () => {
       const { data, error } = await supabase
         .from("about")
         .select("*")
-        .order("id", { ascending: false }) // Order by 'id' in descending order
-        .limit(1); // Limit to the first row
+        .order("id", { ascending: false })
+        .limit(1);
 
       if (error) {
         console.error("Error fetching about data:", error);
       } else {
-        setAboutData(data?.[0] || null); // Safely access the first item if it exists
+        setAboutData(data?.[0] || null);
       }
       setLoading(false);
     };
@@ -83,9 +88,11 @@ const About: React.FC = () => {
     fetchProfilePhotos();
   }, []);
 
+  // Auto-scroll and hover handling logic remains the same
   useEffect(() => {
+    const gallery = galleryRef.current;
+
     const startAutoScroll = () => {
-      const gallery = galleryRef.current;
       if (gallery && galleryImages.length > 0) {
         const scrollSpeed = 2;
 
@@ -118,18 +125,19 @@ const About: React.FC = () => {
       }
     };
 
-    if (galleryRef.current) {
-      galleryRef.current.addEventListener("mouseenter", handleMouseEnter);
-      galleryRef.current.addEventListener("mouseleave", handleMouseLeave);
+    if (gallery) {
+      gallery.addEventListener("mouseenter", handleMouseEnter);
+      gallery.addEventListener("mouseleave", handleMouseLeave);
     }
 
     startAutoScroll();
 
     return () => {
       stopAutoScroll();
-      if (galleryRef.current) {
-        galleryRef.current.removeEventListener("mouseenter", handleMouseEnter);
-        galleryRef.current.removeEventListener("mouseleave", handleMouseLeave);
+
+      if (gallery) {
+        gallery.removeEventListener("mouseenter", handleMouseEnter);
+        gallery.removeEventListener("mouseleave", handleMouseLeave);
       }
     };
   }, [galleryImages]);
@@ -174,11 +182,20 @@ const About: React.FC = () => {
               className="h-auto flex justify-start items-center gap-2 overflow-x-scroll hide-scrollbar"
             >
               {galleryImages.map((image, index) => (
-                <img
+                // <img
+                //   key={index}
+                //   src={image.url}
+                //   alt={image.name}
+                //   className="w-96 h-96 rounded-md cursor-pointer object-contain"
+                //   onClick={() => setSelectedImage(image.url)}
+                // />
+                <Image
                   key={index}
                   src={image.url}
                   alt={image.name}
-                  className="w-96 h-96 rounded-md cursor-pointer object-contain"
+                  width={500}
+                  height={500}
+                  className="w-96 h-96 rounded-md cursor-pointer object-cover"
                   onClick={() => setSelectedImage(image.url)}
                 />
               ))}
@@ -228,10 +245,12 @@ const About: React.FC = () => {
       {selectedImage && (
         <div className="fixed inset-0 z-[50] flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-md">
           <div className="relative">
-            <img
+            <Image
               src={selectedImage}
               alt="Selected"
-              className="w-auto h-[90vh] max-w-[90vw] rounded-md object-cover "
+              width={window.innerWidth}
+              height={window.innerHeight}
+              className="w-auto h-[90vh] max-w-[90vw] rounded-md object-contain"
             />
             <button
               onClick={() => setSelectedImage(null)}
@@ -249,7 +268,9 @@ const About: React.FC = () => {
         </h1>
         <div className="flex justify-center items-center gap-4 flex-wrap">
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-delivery.png"
               alt=""
               className="w-24 h-24"
@@ -257,7 +278,9 @@ const About: React.FC = () => {
             <p className="text-lg font-extrabold">Free Delivery</p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/technical-support.png"
               alt=""
               className="w-24 h-24"
@@ -265,7 +288,9 @@ const About: React.FC = () => {
             <p className="text-lg font-extrabold">365 Days Servicing </p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/opinion.png"
               alt=""
               className="w-24 h-24"
@@ -273,7 +298,9 @@ const About: React.FC = () => {
             <p className="text-lg font-extrabold">Proper Suggestion</p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/best-price.png"
               alt=""
               className="w-24 h-24"
@@ -281,7 +308,9 @@ const About: React.FC = () => {
             <p className="text-lg font-extrabold">Best Price</p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/free-delivery%20truck.png"
               alt=""
               className="w-24 h-24"
@@ -289,7 +318,9 @@ const About: React.FC = () => {
             <p className="text-lg font-extrabold">Free Shipping</p>
           </div>
           <div className="flex flex-col justify-center items-center gap-2">
-            <img
+            <Image
+              width={250}
+              height={250}
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/warranty.png"
               alt=""
               className="w-24 h-24"
@@ -310,10 +341,10 @@ const About: React.FC = () => {
               key={index}
               className="w-96 h-96 p-6 bg-white/90 dark:bg-slate-900 rounded-md shadow-lg flex flex-col justify-center gap-6 items-center relative"
             >
-              <img
-                src={profile.profile_photo}
+              <Image src={profile.profile_photo}
                 alt={`Profile ${index}`}
                 className="w-24 h-24 rounded-full mx-auto absolute -top-9"
+                width={250} height={250}
               />
               <h2 className="text-xl font-semibold text-center">
                 {profile.customer_name}

@@ -2,11 +2,12 @@
 import BestSeller from '@/components/BestSeller';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
 import { supabase } from '@/lib/supabaseClient';
+import { User } from '@supabase/supabase-js';
 import React, { useState, useEffect } from 'react';
 
 
 const BestSellerPage = () => {
-    const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User| null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

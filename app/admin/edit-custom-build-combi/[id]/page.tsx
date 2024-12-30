@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DropdownForCPCEdit from "@/components/DropdownForCPCEdit";
@@ -13,6 +13,9 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string;
+};
+type ProductImage = {
+  url: string;
 };
 
 type Build = {
@@ -120,20 +123,6 @@ const EditCustomPCCombination = () => {
   }, [build]);
 
   useEffect(() => {
-    if (buildType) {
-      fetchProcessorProducts();
-      fetchMotherboardProducts();
-      fetchRamProducts();
-      fetchSsdProducts();
-      fetchGraphicsCardProducts();
-      fetchCabinetProducts();
-      fetchPsuProducts();
-      fetchHddProducts();
-      fetchCoolerProducts();
-    }
-  }, [buildType]);
-
-  useEffect(() => {
     if (build) {
       setSelectedOptionsForCategory(
         "processor",
@@ -166,6 +155,8 @@ const EditCustomPCCombination = () => {
       );
     }
   }, [build]);
+  
+  
 
   useEffect(() => {
     const buildTypeOption = buildType
@@ -216,14 +207,14 @@ const EditCustomPCCombination = () => {
           product_id: string;
           product_name: string;
           product_SP: number;
-          product_image: { [key: string]: any }[];
+          product_image: ProductImage[];
         }) => ({
           id: product.product_id,
           name: product.product_name,
           price: `₹${product.product_SP.toLocaleString()}`,
-          image: product.product_image?.find((img: any) =>
+          image: product.product_image?.find((img: ProductImage) =>
             img.url.includes("_first")
-          )?.url,
+          )?.url || "",
         })
       );
 
@@ -236,26 +227,47 @@ const EditCustomPCCombination = () => {
     }
   };
 
-  const fetchProcessorProducts = () => {
+  const fetchProcessorProducts = useCallback(() => {
     if (buildType === "AMD") {
       fetchProductsByCategory("AMD_CPU", setProcessorOptions);
     } else if (buildType === "Intel") {
       fetchProductsByCategory("INTEL_CPU", setProcessorOptions);
     }
-  };
-
-  const fetchMotherboardProducts = () =>
-    fetchProductsByCategory("Motherboard", setMotherboardOptions);
-  const fetchRamProducts = () => fetchProductsByCategory("RAM", setRamOptions);
-  const fetchSsdProducts = () => fetchProductsByCategory("SSD", setSsdOptions);
-  const fetchGraphicsCardProducts = () =>
-    fetchProductsByCategory("GPU", setGraphicsCardOptions);
-  const fetchCabinetProducts = () =>
-    fetchProductsByCategory("Cabinet", setCabinetOptions);
-  const fetchPsuProducts = () => fetchProductsByCategory("PSU", setPsuOptions);
-  const fetchHddProducts = () => fetchProductsByCategory("HDD", setHddOptions);
-  const fetchCoolerProducts = () =>
-    fetchProductsByCategory("Cooler", setCoolerOptions);
+  }, [buildType]);
+  
+  // Similarly, memoize other fetch functions
+  const fetchMotherboardProducts = useCallback(() => fetchProductsByCategory("Motherboard", setMotherboardOptions), []);
+  const fetchRamProducts = useCallback(() => fetchProductsByCategory("RAM", setRamOptions), []);
+  const fetchSsdProducts = useCallback(() => fetchProductsByCategory("SSD", setSsdOptions), []);
+  const fetchGraphicsCardProducts = useCallback(() => fetchProductsByCategory("GPU", setGraphicsCardOptions), []);
+  const fetchCabinetProducts = useCallback(() => fetchProductsByCategory("Cabinet", setCabinetOptions), []);
+  const fetchPsuProducts = useCallback(() => fetchProductsByCategory("PSU", setPsuOptions), []);
+  const fetchHddProducts = useCallback(() => fetchProductsByCategory("HDD", setHddOptions), []);
+  const fetchCoolerProducts = useCallback(() => fetchProductsByCategory("Cooler", setCoolerOptions), []);
+  useEffect(() => {
+    if (buildType) {
+      fetchProcessorProducts();
+      fetchMotherboardProducts();
+      fetchRamProducts();
+      fetchSsdProducts();
+      fetchGraphicsCardProducts();
+      fetchCabinetProducts();
+      fetchPsuProducts();
+      fetchHddProducts();
+      fetchCoolerProducts();
+    }
+  }, [
+    buildType,
+    fetchProcessorProducts,
+    fetchMotherboardProducts,
+    fetchRamProducts,
+    fetchSsdProducts,
+    fetchGraphicsCardProducts,
+    fetchCabinetProducts,
+    fetchPsuProducts,
+    fetchHddProducts,
+    fetchCoolerProducts,
+  ]);
 
   const setSelectedOptionsForCategory = (
     category: string,
@@ -275,7 +287,7 @@ const EditCustomPCCombination = () => {
         name: product.product_name,
         price: "", // Assuming price isn't needed for selected options
         image:
-          product.product_image?.find((img: any) => img.url.includes("_first"))
+          product.product_image?.find((img: ProductImage) => img.url.includes("_first"))
             ?.url || "",
       }));
     setSelectedOptions(selectedOptions);
@@ -286,56 +298,12 @@ const EditCustomPCCombination = () => {
     setSelectedOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>,
     category: string
   ) => {
+    console.log(`Selected options for ${category}:`, options);
     setSelectedOptions(options);
   };
 
   const handleBuildTypeSelect = (option: DropdownOption) => {
     setBuildType(option.name);
-  };
-
-  const saveSelectedOptions = async (
-    category: string,
-    selectedIds: string[]
-  ) => {
-    if (!id) return;
-
-    const updateData: Partial<Build> = { [category]: selectedIds };
-
-    try {
-      const { error } = await supabase
-        .from("custom_build")
-        .update(updateData)
-        .eq("id", id);
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success(`${category} updated successfully`);
-    } catch (error) {
-      toast.error(`Error updating ${category}`);
-      console.error(error);
-    }
-  };
-
-  const saveBuildType = async (buildType: string) => {
-    if (!id) return;
-
-    try {
-      const { error } = await supabase
-        .from("custom_build")
-        .update({ build_type: buildType })
-        .eq("id", id);
-
-      if (error) {
-        throw error;
-      }
-
-      toast.success(`Build type updated successfully`);
-    } catch (error) {
-      toast.error(`Error updating build type`);
-      console.error(error);
-    }
   };
 
   const handleSaveBuild = async () => {
@@ -392,7 +360,7 @@ const EditCustomPCCombination = () => {
 
   return (
     <div className="w-screen  justify-center flex p-24">
-      <div className=" w-[80%] bg-white/50 flex flex-col items-center  gap-3 rounded-md custom-backdrop-filter p-3">
+      <div className=" w-[80%] bg-gray-800 flex flex-col items-center  gap-3 rounded-md custom-backdrop-filter p-3">
         <h2>Build Type</h2>
         <DropdownForCPCEdit
           options={[

@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
@@ -13,6 +13,10 @@ type DropdownOption = {
   price: string;
   image: string;
 };
+type ProductImage = {
+  url: string;
+};
+
 
 const CustomPCCombo = () => {
   const router = useRouter();
@@ -60,6 +64,99 @@ const CustomPCCombo = () => {
   const [coolerOptions, setCoolerOptions] = useState<DropdownOption[]>([]);
   const [resetDropdown, setResetDropdown] = useState(false);
 
+
+  const fetchProductsByCategory = useCallback(
+    async (
+      category: string,
+      setOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>
+    ) => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select(
+            "product_id, product_name, product_SP, product_category, product_image"
+          )
+          .eq("product_category", category);
+
+        if (error) {
+          throw error;
+        }
+
+        const formattedOptions = data.map(
+          (product: {
+            product_id: string;
+            product_name: string;
+            product_SP: number;
+            product_image: ProductImage[];
+          }) => ({
+            id: product.product_id,
+            name: product.product_name,
+            price: `₹${product.product_SP.toLocaleString()}`,
+            image:
+              product.product_image?.find((img: ProductImage) =>
+                img.url.includes("_first")
+              )?.url || "",
+          })
+        );
+
+        setOptions(formattedOptions);
+      } catch (error) {
+        console.error(
+          `Error fetching ${category} products:`,
+          (error as Error).message
+        );
+      }
+    },
+    [] // No external dependencies
+  );
+
+  const fetchProcessorProducts = useCallback(() => {
+    if (buildType === "AMD") {
+      fetchProductsByCategory("AMD_CPU", setProcessorOptions);
+    } else if (buildType === "Intel") {
+      fetchProductsByCategory("INTEL_CPU", setProcessorOptions);
+    }
+  }, [buildType, fetchProductsByCategory]);
+
+  const fetchMotherboardProducts = useCallback(
+    () => fetchProductsByCategory("Motherboard", setMotherboardOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchRamProducts = useCallback(
+    () => fetchProductsByCategory("RAM", setRamOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchSsdProducts = useCallback(
+    () => fetchProductsByCategory("SSD", setSsdOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchGraphicsCardProducts = useCallback(
+    () => fetchProductsByCategory("GPU", setGraphicsCardOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchCabinetProducts = useCallback(
+    () => fetchProductsByCategory("Cabinet", setCabinetOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchPsuProducts = useCallback(
+    () => fetchProductsByCategory("PSU", setPsuOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchHddProducts = useCallback(
+    () => fetchProductsByCategory("HDD", setHddOptions),
+    [fetchProductsByCategory]
+  );
+
+  const fetchCoolerProducts = useCallback(
+    () => fetchProductsByCategory("Cooler", setCoolerOptions),
+    [fetchProductsByCategory]
+  );
   useEffect(() => {
     if (buildType) {
       fetchProcessorProducts();
@@ -72,65 +169,18 @@ const CustomPCCombo = () => {
       fetchHddProducts();
       fetchCoolerProducts();
     }
-  }, [buildType]);
-
-  const fetchProductsByCategory = async (
-    category: string,
-    setOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>
-  ) => {
-    try {
-      const { data, error } = await supabase
-        .from("products")
-        .select("product_id, product_name, product_SP, product_category, product_image")
-        .eq("product_category", category);
-
-      if (error) {
-        throw error;
-      }
-
-      const formattedOptions = data.map(
-        (product: {
-          product_id: string;
-          product_name: string;
-          product_SP: number;
-          product_image: { [key: string]: any }[];
-        }) => ({
-          id: product.product_id,
-          name: product.product_name,
-          price: `₹${product.product_SP.toLocaleString()}`,
-          image: product.product_image?.find((img: any) => img.url.includes('_first'))?.url,
-        })
-      );
-
-      setOptions(formattedOptions);
-    } catch (error) {
-      console.error(
-        `Error fetching ${category} products:`,
-        (error as Error).message
-      );
-    }
-  };
-
-  const fetchProcessorProducts = () => {
-    if (buildType === "AMD") {
-      fetchProductsByCategory("AMD_CPU", setProcessorOptions);
-    } else if (buildType === "Intel") {
-      fetchProductsByCategory("INTEL_CPU", setProcessorOptions);
-    }
-  };
-
-  const fetchMotherboardProducts = () =>
-    fetchProductsByCategory("Motherboard", setMotherboardOptions);
-  const fetchRamProducts = () => fetchProductsByCategory("RAM", setRamOptions);
-  const fetchSsdProducts = () => fetchProductsByCategory("SSD", setSsdOptions);
-  const fetchGraphicsCardProducts = () =>
-    fetchProductsByCategory("GPU", setGraphicsCardOptions);
-  const fetchCabinetProducts = () =>
-    fetchProductsByCategory("Cabinet", setCabinetOptions);
-  const fetchPsuProducts = () => fetchProductsByCategory("PSU", setPsuOptions);
-  const fetchHddProducts = () => fetchProductsByCategory("HDD", setHddOptions);
-  const fetchCoolerProducts = () =>
-    fetchProductsByCategory("Cooler", setCoolerOptions);
+  }, [
+    buildType,
+    fetchProcessorProducts,
+    fetchMotherboardProducts,
+    fetchRamProducts,
+    fetchSsdProducts,
+    fetchGraphicsCardProducts,
+    fetchCabinetProducts,
+    fetchPsuProducts,
+    fetchHddProducts,
+    fetchCoolerProducts,
+  ]);
 
   const handleSelect = (
     options: DropdownOption[],
@@ -213,9 +263,8 @@ const CustomPCCombo = () => {
     <div className={`pt-20 pb-20 w-full ${buildType ? 'h-full' : 'h-screen'} gap-3 flex flex-col items-center justify-center`}>
       <ToastContainer />
       <div className="w-[40%] flex items-center flex-col">
-        <h1>Dropdown Menu Example</h1>
-        <div className="w-full flex flex-col items-center">
-          <h2>Choose your build type</h2>
+        <div className="w-full flex flex-col items-center justify-between">
+          <h2 className="text-indigo-600 text-2xl font-bold pb-9">Choose your build type</h2>
           <Dropdown
             options={[
               {
@@ -241,7 +290,7 @@ const CustomPCCombo = () => {
       </div>
 
       {buildType && (
-        <div className="w-[80%] flex bg-white/50 rounded-md justify-center flex-col items-center gap-2 p-4 custom-backdrop-filter">
+        <div className="w-[80%] flex bg-gray-800 rounded-md justify-center flex-col items-center gap-2 p-4 custom-backdrop-filter">
           <div className="w-full flex flex-col justify-center items-center">
             <h2>Select Processors</h2>
             <Dropdown

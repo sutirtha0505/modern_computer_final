@@ -8,8 +8,10 @@ const ProductPage = () => {
     const {product_id} = useParams();
     const {singleProduct, getSingleProduct} = UseSupabase();
     useEffect(() => {
-        getSingleProduct(String(product_id));
-    },[])
+      if (product_id) {
+          getSingleProduct(String(product_id));
+      }
+  }, [product_id, getSingleProduct])
     console.log(singleProduct);
   return (
     <div>

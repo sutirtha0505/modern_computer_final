@@ -5,7 +5,7 @@ import { CiViewTable } from "react-icons/ci";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import { TbTableOptions } from "react-icons/tb";
 import { useRouter } from "next/navigation";
-import { Sparkles, TableProperties, TicketPercent, Truck } from "lucide-react";
+import { TableProperties, TicketPercent, Truck } from "lucide-react";
 import { FaComputer, FaHouseChimney } from "react-icons/fa6";
 import { MdOutlineCategory } from "react-icons/md";
 import { TiInfoLargeOutline } from "react-icons/ti";

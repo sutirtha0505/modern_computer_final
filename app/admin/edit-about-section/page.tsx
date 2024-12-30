@@ -3,11 +3,12 @@ import EditAboutSection from '@/components/EditAboutSection';
 import PreventAdminAccess from '@/components/PreventAdminAccess';
 import ShopPhotoGallery from '@/components/ShopPhotoGallery';
 import { supabase } from '@/lib/supabaseClient';
+import { User } from '@supabase/supabase-js';
 import React, { useState, useEffect } from 'react';
 
 
 const EditAboutSectionPage = () => {
-    const [user, setUser] = useState<any>(null);
+    const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
