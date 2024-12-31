@@ -42,7 +42,7 @@ const AllPBPCOffer = () => {
       <p className='text-medium p-6 text-center'>
         From this Section, you can apply a <span className='text-indigo-500'>coupon code</span> for a{' '}
         <span className='text-indigo-600'>specific time period</span>. If you enter a coupon code here, it will be applied to all{' '}
-        <span className='text-indigo-500'>Pre-Build Products.</span> You'll also need to enter the <span className='text-indigo-500'>
+        <span className='text-indigo-500'>Pre-Build Products.</span> You will also need to enter the <span className='text-indigo-500'>
         Discount percentage
         </span>. The discount percentage will be applied to the <span className='text-indigo-500'>Selling price</span>.
       </p>
