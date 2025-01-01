@@ -5,6 +5,13 @@ import { toast, ToastContainer } from "react-toastify"; // Import ToastContainer
 import { supabase } from "@/lib/supabaseClient";
 import { ImageUp, X } from "lucide-react";
 import 'react-toastify/dist/ReactToastify.css'; // Make sure this is imported
+import Image from "next/image";
+
+interface HeroSectionData {
+  hero_paragraph: string;
+  hero_button_link: string;
+  hero_image?: string; // Optional because it might not always be present
+}
 
 const EditHeroSection: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -40,7 +47,7 @@ const EditHeroSection: React.FC = () => {
 
       // Upload image to Supabase storage if an image is selected
       if (image) {
-        const { data, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("product-image")
           .upload(`Hero/${image.name}`, image);
 
@@ -60,7 +67,7 @@ const EditHeroSection: React.FC = () => {
       }
 
       // Prepare the data to be saved
-      const dataToSave: any = {
+      const dataToSave: HeroSectionData = {
         hero_paragraph: paragraph,
         hero_button_link: link,
       };
@@ -104,10 +111,12 @@ const EditHeroSection: React.FC = () => {
             <p>Drop the image here...</p>
           ) : image ? (
             <>
-              <img
+              <Image
                 src={URL.createObjectURL(image)}
                 alt="Preview"
                 className="h-full w-full object-cover rounded-lg"
+                width={200}
+                height={200}
               />
               <button
                 onClick={handleRemoveImage}

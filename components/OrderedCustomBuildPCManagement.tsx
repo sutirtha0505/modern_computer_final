@@ -5,7 +5,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Download, XCircle } from "lucide-react";
 import { useQRCode } from "next-qrcode";
-
 // Interfaces for types
 interface OrderedProduct {
   product_id: string;
@@ -22,24 +21,28 @@ interface OrderedProduct {
   quantity?: number;
 }
 
-interface Product {
-  id: string;
-  build_type: string;
-}
-
 interface Customer {
+  id: string;
   email: string;
   customer_name: string;
   phone_no: string;
   profile_photo: string;
 }
+interface Order {
+  order_id: string;
+  customer_id: string;
+  payment_id: string;
+  order_status: string;
+  order_address: string;
+  created_at: string;
+  expected_delivery_date: string;
+  ordered_products: OrderedProduct[]; // Add this line
+  payment_amount: number; // Add this line
+}
 
 const OrderedCustomBuildPCManagement = () => {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]); // State to hold filtered orders
-  const [productsMap, setProductsMap] = useState<Map<string, Product>>(
-    new Map()
-  );
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [customersMap, setCustomersMap] = useState<Map<string, Customer>>(
     new Map()
   );
@@ -49,11 +52,6 @@ const OrderedCustomBuildPCManagement = () => {
   const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
   const { Image } = useQRCode();
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
-
-  const getFirstImageUrl = (images: { url: string }[]): string | null => {
-    const image = images.find((img) => img.url.includes("_first"));
-    return image ? image.url : null;
-  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -90,8 +88,9 @@ const OrderedCustomBuildPCManagement = () => {
           return;
         }
 
+        // Cast customersData to an array of Customer
         const customerMap = new Map<string, Customer>();
-        customersData?.forEach((customer: any) => {
+        (customersData as Customer[])?.forEach((customer) => {
           customerMap.set(customer.id, customer);
         });
 
@@ -115,7 +114,6 @@ const OrderedCustomBuildPCManagement = () => {
     }
     return 0;
   });
-
 
   // Function to handle filtering
   const handleFilter = () => {
@@ -150,7 +148,7 @@ const OrderedCustomBuildPCManagement = () => {
 
   // Function to generate QR codes automatically on load
   const generateQRCodes = (
-    ordersData: any[],
+    ordersData: Order[],
     customerMap: Map<string, Customer>
   ) => {
     const newQrCodes = new Map<string, string>();
@@ -165,8 +163,8 @@ const OrderedCustomBuildPCManagement = () => {
           E-Mail: ${customer?.email || "Unknown Email"}
           Address: ${order.order_address}
           Delivery Date: ${dayjs(order.expected_delivery_date).format(
-          "MMM D, YYYY"
-        )}
+            "MMM D, YYYY"
+          )}
         `;
 
         newQrCodes.set(order.order_id, qrData);
@@ -183,7 +181,14 @@ const OrderedCustomBuildPCManagement = () => {
 
     // Create CSV content
     const csvContent = [
-      ["Order ID", "Customer Name", "Contact No.", "Email", "Address", "Order Status"], // Header
+      [
+        "Order ID",
+        "Customer Name",
+        "Contact No.",
+        "Email",
+        "Address",
+        "Order Status",
+      ], // Header
       ...selectedData.map((order) => [
         order.order_id,
         customersMap.get(order.customer_id)?.customer_name || "Unknown Name",
@@ -207,7 +212,6 @@ const OrderedCustomBuildPCManagement = () => {
     link.click();
     document.body.removeChild(link);
   };
-
 
   // Logic to render each product
   const renderProduct = (product: OrderedProduct) => {
@@ -330,10 +334,11 @@ const OrderedCustomBuildPCManagement = () => {
         </div>
         <button
           onClick={convertToCSV}
-          className={`${selectedOrders.size === 0
-            ? "bg-gray-400"
-            : "bg-green-500 hover:bg-transparent hover:text-green-500 border-green-500 border-1"
-            } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
+          className={`${
+            selectedOrders.size === 0
+              ? "bg-gray-400"
+              : "bg-green-500 hover:bg-transparent hover:text-green-500 border-green-500 border-1"
+          } font-bold py-2 px-4 rounded-md cursor-pointer text-xs flex gap-2 justify-center items-center`}
           disabled={selectedOrders.size === 0} // Disable if no rows are selected
         >
           <Download /> Convert to CSV
@@ -383,16 +388,22 @@ const OrderedCustomBuildPCManagement = () => {
                 const customer = customersMap.get(order.customer_id);
                 const isSelected = selectedOrders.has(order.order_id); // Check if the row is selected
                 return (
-                  <tr key={order.order_id} className={isSelected ? "bg-gray-800" : ""}>
-                    <td onClick={() => {
-                      const newSelectedOrders = new Set(selectedOrders);
-                      if (newSelectedOrders.has(order.order_id)) {
-                        newSelectedOrders.delete(order.order_id);
-                      } else {
-                        newSelectedOrders.add(order.order_id);
-                      }
-                      setSelectedOrders(newSelectedOrders);
-                    }} className="px-4 py-2 border w-[5%] break-all text-xs select-text ">
+                  <tr
+                    key={order.order_id}
+                    className={isSelected ? "bg-gray-800" : ""}
+                  >
+                    <td
+                      onClick={() => {
+                        const newSelectedOrders = new Set(selectedOrders);
+                        if (newSelectedOrders.has(order.order_id)) {
+                          newSelectedOrders.delete(order.order_id);
+                        } else {
+                          newSelectedOrders.add(order.order_id);
+                        }
+                        setSelectedOrders(newSelectedOrders);
+                      }}
+                      className="px-4 py-2 border w-[5%] break-all text-xs select-text "
+                    >
                       {order.order_id}
                     </td>
                     <td
@@ -557,10 +568,11 @@ const OrderedCustomBuildPCManagement = () => {
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
                       <button
-                        className={`${order.order_status === "Cancelled"
-                          ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
-                          : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
-                          } border-1 px-2 py-1 w-full rounded`}
+                        className={`${
+                          order.order_status === "Cancelled"
+                            ? "bg-red-500 border-red-500 hover:bg-transparent hover:text-red-500 text-white"
+                            : "bg-gray-300 border-gray-300 text-gray-600 cursor-not-allowed"
+                        } border-1 px-2 py-1 w-full rounded`}
                         onClick={async () => {
                           if (order.order_status !== "Cancelled") {
                             toast.error(

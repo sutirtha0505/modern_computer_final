@@ -125,7 +125,7 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
             : order
         )
       );
-    } catch (error) {
+    } catch {
       toast.error("Error canceling the order.");
     }
   };

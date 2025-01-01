@@ -4,21 +4,44 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Razorpay from "razorpay";
 import dayjs from "dayjs"; // For date manipulation
 
 interface CartSingleProductFinalCheckOutProps {
   userId: string; // Explicitly typing the userId as a string
 }
-
+interface ProductData {
+  product_image: string;
+  product_name: string;
+  product_SP: number;
+  coupon_code: string;
+  code_equiv_percent: number;
+  product_amount: number;
+  date_applicable: string;
+}
+interface CustomerDetails {
+  customer_name: string;
+  customer_house_no: string;
+  customer_house_street: string;
+  customer_house_city: string;
+  customer_house_pincode: number;
+  customer_house_landmark: string;
+  profile_photo: string;
+  email: string;
+  phone_no: string;
+}
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
 const CartSingleProductFinalCheckOut: React.FC<
   CartSingleProductFinalCheckOutProps
 > = ({ userId }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [productId, setProductId] = useState<string | null>(null);
-  const [productData, setProductData] = useState<any>(null);
-  const [customerDetails, setCustomerDetails] = useState<any>(null);
+  const [productData, setProductData] = useState<ProductData | null>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null);
   const [couponCode, setCouponCode] = useState<string>("");
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
@@ -131,7 +154,7 @@ const CartSingleProductFinalCheckOut: React.FC<
 
   const handleApplyCoupon = () => {
     const currentDate = dayjs(); // Get the current date
-    const applicableDate = dayjs(productData.date_applicable); // Convert date_applicable to dayjs object
+    const applicableDate = dayjs(productData?.date_applicable); // Convert date_applicable to dayjs object
 
     // Check if the coupon code is correct and the current date hasn't passed the applicable date
     if (currentDate.isAfter(applicableDate)) {
@@ -141,7 +164,7 @@ const CartSingleProductFinalCheckOut: React.FC<
       return; // Stop further execution if the coupon has expired
     }
 
-    if (couponCode === productData.coupon_code) {
+    if (couponCode === productData?.coupon_code) {
       const discount =
         productData.product_SP * (productData.code_equiv_percent / 100);
       setDiscountedTotal(productData.product_SP - discount);
@@ -180,11 +203,11 @@ const CartSingleProductFinalCheckOut: React.FC<
         amount: data.amount,
         currency: data.currency,
         app_name: "Modern Computer",
-        description: productData.product_name,
+        description: productData?.product_name,
         image:
           "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
-        handler: async (response: any) => {
+        handler: async (response: RazorpayResponse) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
 
@@ -195,12 +218,12 @@ const CartSingleProductFinalCheckOut: React.FC<
           );
         },
         prefill: {
-          name: customerDetails.customer_name,
-          email: customerDetails.email,
-          contact: customerDetails.phone_no,
+          name: customerDetails?.customer_name,
+          email: customerDetails?.email,
+          contact: customerDetails?.phone_no,
         },
         notes: {
-          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+          address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         },
         theme: {
           color: "#6366F1",
@@ -227,7 +250,7 @@ const CartSingleProductFinalCheckOut: React.FC<
         customer_id: userId,
         payment_amount: discountedTotal,
         ordered_products: [{ product_id: productId, quantity: 1 }], // Save product_id in array
-        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        order_address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(), // Set current timestamp
       },
@@ -240,7 +263,8 @@ const CartSingleProductFinalCheckOut: React.FC<
     }
 
     // Update product quantity in the 'products' table
-    const updatedQuantity = productData.product_amount - 1;
+    const updatedQuantity = (productData?.product_amount ?? 0) - 1;
+
     const { error: updateError } = await supabase
       .from("products")
       .update({ product_amount: updatedQuantity })
@@ -290,10 +314,12 @@ const CartSingleProductFinalCheckOut: React.FC<
             Order <span className="text-indigo-500">Summary</span>
           </h1>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/money.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Product Amount:
@@ -303,10 +329,12 @@ const CartSingleProductFinalCheckOut: React.FC<
             </p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/fast-delivery.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Delivery Amount:
@@ -314,10 +342,12 @@ const CartSingleProductFinalCheckOut: React.FC<
             <p className="text-sm font-bold text-indigo-600">&#x20B9;0</p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/voucher.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <input
               type="text"
@@ -343,10 +373,12 @@ const CartSingleProductFinalCheckOut: React.FC<
           </div>
           <hr />
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/cashless-payment.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <p className="font-bold text-sm">
               Total Amount Payable <br />

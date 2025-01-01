@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import build from "next/dist/build";
+import Image from "next/image";
 
 type Build = {
   id: number;
@@ -147,10 +147,12 @@ const CustomBuildTable = () => {
               <tr key={build.id}>
                 <td className="border px-4 py-2">{build.build_type}</td>
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageById(build.processor)}
                     alt={getProductNameById(build.processor)}
                     className="w-16 h-16 mx-auto"
+                    width={512}
+                    height={512}
                   />
                   {truncateProductName(getProductNameById(build.processor), 5)}
                 </td>
@@ -158,10 +160,12 @@ const CustomBuildTable = () => {
                   {build.motherboards.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          height={512}
+                          width={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -175,10 +179,12 @@ const CustomBuildTable = () => {
                   {build.ram.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          width={512}
+                          height={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -192,10 +198,12 @@ const CustomBuildTable = () => {
                   {build.ssd.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          width={512}
+                          height={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -209,10 +217,12 @@ const CustomBuildTable = () => {
                   {build.graphics_cards.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          width={512}
+                          height={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -226,10 +236,12 @@ const CustomBuildTable = () => {
                   {build.cabinets.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          height={512}
+                          width={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -243,10 +255,12 @@ const CustomBuildTable = () => {
                   {build.psu.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          height={512}
+                          width={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -260,10 +274,12 @@ const CustomBuildTable = () => {
                   {build.hdd.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          width={512}
+                          height={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>
@@ -277,10 +293,12 @@ const CustomBuildTable = () => {
                   {build.cooling_systems.map((item, index) => (
                     <React.Fragment key={index}>
                       <div>
-                        <img
+                        <Image
                           src={getProductImageById(item)}
                           alt={getProductNameById(item)}
                           className="w-16 h-16 mx-auto"
+                          width={512}
+                          height={512}
                         />
                         {truncateProductName(getProductNameById(item), 5)}
                       </div>

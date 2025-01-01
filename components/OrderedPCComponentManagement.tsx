@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import dayjs from "dayjs";
 import { ToastContainer, toast } from "react-toastify";
@@ -18,15 +18,27 @@ interface Product {
 }
 
 interface Customer {
+  id: string;
   email: string;
   customer_name: string;
   phone_no: string;
   profile_photo: string;
 }
+interface Order {
+  order_id: string;
+  customer_id: string;
+  payment_id: string;
+  order_status: string;
+  order_address: string;
+  created_at: string;
+  expected_delivery_date: string;
+  ordered_products: OrderedProduct[]; // Add this line
+  payment_amount: number; // Add this line
+}
 
 const OrderedPCComponentManagement = () => {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]); // State to hold filtered orders
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]); // State to hold filtered orders
   const [productsMap, setProductsMap] = useState<Map<string, Product>>(
     new Map()
   );
@@ -163,7 +175,7 @@ const OrderedPCComponentManagement = () => {
 
   // Function to generate QR codes automatically on load
   const generateQRCodes = (
-    ordersData: any[],
+    ordersData: Order[],
     customerMap: Map<string, Customer>
   ) => {
     const newQrCodes = new Map<string, string>();

@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation"; // Import useRouter
+import Image from "next/image";
 
 interface CustomerDetailsProps {
   userId: string; // Define the type for userId
 }
+interface CustomerDetailsType {
+  customer_name: string;
+  customer_house_no: string;
+  customer_house_street: string;
+  customer_house_city: string;
+  customer_house_pincode: string;
+  customer_house_landmark: string;
+  profile_photo: string;
+  email: string;
+  phone_no: string;
+}
+
 
 const CustomerDetails: React.FC<CustomerDetailsProps> = ({ userId }) => {
-  const [customerDetails, setCustomerDetails] = useState<any>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetailsType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter(); // Initialize router
 
@@ -64,10 +77,12 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ userId }) => {
   return (
     <div className="w-full p-8 flex justify-center items-center">
       <div className="w-72 bg-white/50 custom-backdrop-filter p-4 rounded-md flex flex-col justify-between items-center gap-2">
-        <img
+        <Image
           src={customerDetails.profile_photo}
           alt="Customer Profile"
           className="w-24 h-24 rounded-full"
+          width={500}
+          height={500}
         />
         <h1 className="text-lg font-bold">Order for</h1>
         <h1 className="text-xl font-bold text-indigo-500">
@@ -99,10 +114,12 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ userId }) => {
           </p>
         </div>
         <div className="w-full flex gap-3 justify-center items-center">
-          <img
+          <Image
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/email.png"
             alt=""
             className="w-4 h-4"
+            width={200}
+            height={200}
           />
           <label htmlFor="email" className="text-sm font-bold text-indigo-500">
             Email:
@@ -112,10 +129,12 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ userId }) => {
           </p>
         </div>
         <div className="w-full flex gap-3 justify-center items-center">
-          <img
+          <Image
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/call.png"
             alt=""
             className="w-4 h-4"
+            width={200}
+            height={200}
           />
           <label htmlFor="phone" className="text-sm font-bold text-indigo-500">
             Phone:
@@ -123,14 +142,6 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ userId }) => {
           <p className="text-sm font-light">{customerDetails.phone_no}</p>
         </div>
       </div>
-      {/* <h2>Customer Details</h2>
-      <p><strong>Name:</strong> {customerDetails.customer_name}</p>
-      <p><strong>House No:</strong> {customerDetails.customer_house_no}</p>
-      <p><strong>Street:</strong> {customerDetails.customer_house_street}</p>
-      <p><strong>City:</strong> {customerDetails.customer_house_city}</p>
-      <p><strong>Pincode:</strong> {customerDetails.customer_house_pincode}</p>
-      <p><strong>Landmark:</strong> {customerDetails.customer_house_landmark}</p>
-      <img src={customerDetails.profile_photo} alt="Customer Profile" /> */}
     </div>
   );
 };

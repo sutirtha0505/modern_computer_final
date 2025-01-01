@@ -1,6 +1,6 @@
 // components/Dropdown.tsx
 "use client";
-import { Badge, BadgeCheck, ChevronDown, X, Check, MinusCircle } from "lucide-react";
+import { ChevronDown, X, Check, MinusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 
 type DropdownOption = {

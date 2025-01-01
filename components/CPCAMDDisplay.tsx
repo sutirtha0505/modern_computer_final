@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "./Dropdown";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 type DropdownOption = {
   id: string;
@@ -56,7 +57,7 @@ const CPCAMDDisplay = () => {
     DropdownOption[]
   >([]);
   const [coolerOptions, setCoolerOptions] = useState<DropdownOption[]>([]);
-  const [resetDropdown, setResetDropdown] = useState(false);
+  const [resetDropdown] = useState(false);
   const [customBuildId, setCustomBuildId] = useState<string | null>(null);
 
   const [processorSP, setProcessorSP] = useState("");
@@ -71,7 +72,7 @@ const CPCAMDDisplay = () => {
   const [coolerSP, setCoolerSP] = useState("");
   const [totalPrice, setTotalPrice] = useState(0);
   const excludeProductId = (options: DropdownOption[]) => {
-    return options.map(({ id, name, price, image }) => ({
+    return options.map(({ name, price, image }) => ({
       name,
       price,
       image,
@@ -105,26 +106,7 @@ const CPCAMDDisplay = () => {
     router.push(`/checkout-custom-build`);
   };
 
-  useEffect(() => {
-    fetchProcessorProducts();
-  }, []);
-
-  useEffect(() => {
-    calculateTotalPrice();
-  }, [
-    processorSP,
-    motherboardSP,
-    ramSP,
-    ramQuantity,
-    ssdSP,
-    graphicsCardSP,
-    cabinetSP,
-    psuSP,
-    hddSP,
-    coolerSP,
-  ]);
-
-  const fetchProcessorProducts = async () => {
+  const fetchProcessorProducts = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from("custom_build")
@@ -144,7 +126,7 @@ const CPCAMDDisplay = () => {
         (error as Error).message
       );
     }
-  };
+  }, []);
 
   const fetchProductsByUUIDs = async (
     uuids: string[],
@@ -164,9 +146,9 @@ const CPCAMDDisplay = () => {
         id: product.product_id,
         name: product.product_name.split(" ").slice(0, 10).join(" "),
         price: product.product_SP,
-        image: product.product_image?.find((img: any) =>
-          img.url.includes("_first")
-        )?.url,
+        image: product.product_image?.find((img: { url?: string }) =>
+          img.url?.includes("_first")
+        )?.url,        
       }));
 
       setOptions(formattedOptions);
@@ -218,7 +200,7 @@ const CPCAMDDisplay = () => {
     setRamQuantity(quantity);
   };
 
-  const calculateTotalPrice = () => {
+  const calculateTotalPrice = useCallback(() => {
     const total =
       Number(processorSP) +
       Number(motherboardSP) +
@@ -230,7 +212,15 @@ const CPCAMDDisplay = () => {
       Number(hddSP) +
       Number(coolerSP);
     setTotalPrice(total);
-  };
+  },[processorSP,motherboardSP,ramSP,ramQuantity,graphicsCardSP, cabinetSP, coolerSP,psuSP, hddSP,ssdSP]);
+
+  useEffect(() => {
+    fetchProcessorProducts();
+  }, [fetchProcessorProducts]);
+
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [calculateTotalPrice]);
 
   return (
     <div className="w-full h-full flex-wrap p-4 justify-center items-center flex">
@@ -239,87 +229,115 @@ const CPCAMDDisplay = () => {
           <div className="w-72 scale-110 md:scale-150 absolute flex justify-center items-center h-40  z-[2]">
             {selectedMotherboardOptions.length < 1 ? (
               <div className="flex flex-col">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_amd/AMD_Custom.png"
                   className="hover:scale-105 duration-300 ease-in-out"
                   alt="Default Image"
+                  width={512}
+                  height={512}
                 />
                 <h1 className="text-sm text-center font-semibold">
                   Choose Your components to See the Computer
                 </h1>
               </div>
             ) : (
-              <img
+              <Image
                 src={selectedMotherboardOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedMotherboardOptions.length ? "" : "invisible"
                 }`}
                 alt="Selected Motherboard Image"
+                width={512}
+                height={512}
               />
             )}
 
             <div className="w-32 h-48 border-0 -right-1 absolute -z-[1] md:-right-9 ">
-              <img
+              <Image
                 src={selectedCabinetOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedCabinetOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="cabinet"
               />
               <div className="w-16 h-28  absolute -top-12">
-                <img
+                <Image
                   src={selectedHDDOptions[0]?.image || ""}
                   className={`w-full h-full object-contain ${
                     selectedHDDOptions.length ? "" : "invisible"
                   }`}
+                  width={512}
+                  height={512}
+                  alt="Hard disk"
                 />
               </div>
             </div>
             <div className="w-40 h-10 absolute z-[3]  left-5 -bottom-5">
-              <img
+              <Image
                 src={selectedRAMOptions[0]?.image || ""}
                 className={`w-full h-full object-contain border-none ${
                   selectedRAMOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="RAM"
               />
             </div>
             <div className="w-40 h-10 absolute z-[3]  left-5 -top-5">
-              <img
+              <Image
                 src={selectedSSDOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedSSDOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="SSD"
               />
             </div>
             <div className="w-20 h-20 absolute z-[3] -bottom-3 -left-3 md:-left-3">
-              <img
+              <Image
                 src={selectedPSUOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedCoolerOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="Power Supply Unit"
               />
             </div>
             <div className="w-20 h-20 absolute z-[3] -top-3 -left-3 md:-left-3">
-              <img
+              <Image
                 src={selectedProcessorOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedPSUOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="Processor"
               />
             </div>
             <div className="w-20 h-20 absolute z-[4] -top-9 -right-3 md:-right-3">
-              <img
+              <Image
                 src={selectedGraphicsCardOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedGraphicsCardOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="Graphics Card"
               />
             </div>
             <div className="w-20 h-20 absolute z-[4] -bottom-9 -right-3 md:-right-3">
-              <img
+              <Image
                 src={selectedCoolerOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
                   selectedCoolerOptions.length ? "" : "invisible"
                 }`}
+                width={512}
+                height={512}
+                alt="Cooler"
               />
             </div>
           </div>
@@ -338,9 +356,12 @@ const CPCAMDDisplay = () => {
             <div className="w-full flex flex-col">
               <div className="w-full flex flex-col gap-2 justify-between items-start">
                 <div className="flex justify-center items-center gap-2">
-                  <img
+                  <Image
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
                     className="w-8 h-8"
+                    height={512}
+                    width={512}
+                    alt="processor"
                   />
                   <h1 className="text-xl font-bold">Processor: </h1>
                 </div>
@@ -359,9 +380,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
                   className="w-8 h-8"
+                  height={512}
+                  width={512}
+                  alt="motherboard"
                 />
                 <h1 className="text-xl font-bold">Motherboard: </h1>
               </div>
@@ -386,9 +410,12 @@ const CPCAMDDisplay = () => {
             <div className="flex w-full justify-center gap-5 items-center"></div>
             <div className="w-full flex-wrap flex gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
                   className="w-8 h-8"
+                  height={512}
+                  width={512}
+                  alt="RAM"
                 />
                 <h1 className="text-xl font-bold">RAM: </h1>
               </div>
@@ -424,9 +451,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="SSD"
                 />
                 <h1 className="text-xl font-bold">SSD: </h1>
               </div>
@@ -446,9 +476,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="Graphics Card"
                 />
                 <h1 className="text-xl font-bold">Graphics Card: </h1>
               </div>
@@ -472,9 +505,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="Cabinet"
                 />
                 <h1 className="text-xl font-bold">Cabinet: </h1>
               </div>
@@ -498,9 +534,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="Power Supply"
                 />
                 <h1 className="text-xl font-bold">Power Supply: </h1>
               </div>
@@ -520,9 +559,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="Hard Disk"
                 />
                 <h1 className="text-xl font-bold">Hard Disk: </h1>
               </div>
@@ -542,9 +584,12 @@ const CPCAMDDisplay = () => {
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cooler/cooler.png"
                   className="w-8 h-8"
+                  width={512}
+                  height={512}
+                  alt="Cooler"
                 />
                 <h1 className="text-xl font-bold">Cooling System: </h1>
               </div>

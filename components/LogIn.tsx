@@ -3,7 +3,6 @@ import React from "react";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/lib/supabaseClient";
-import { createClient } from "@supabase/supabase-js";
 import "@/app/globals.css";
 import Image from "next/image";
 

@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { XCircle, TextSearch } from 'lucide-react';
+import Image from 'next/image';
 
 type Product = {
   product_id: number;
@@ -140,7 +141,7 @@ const BestSeller = () => {
       </div>
       <div className="flex justify-center gap-2 flex-wrap h-[500px] overflow-y-scroll bg-slate-700">
         {filteredProducts.map((product) => {
-          const imageUrl = product.product_image?.find((img: any) => img.url.includes('_first'))?.url;
+          const imageUrl = product.product_image?.find((img: { url: string }) => img.url.includes('_first'))?.url;
           const isSelected = selectedProducts.includes(product.product_id);
 
           return (
@@ -153,11 +154,16 @@ const BestSeller = () => {
                 {isSelected && <span className="text-blue-500">✔</span>}
               </div>
               <div className='flex flex-col overflow-hidden'>
-                <img
+                {imageUrl && (
+                  <Image
                   src={imageUrl}
                   alt={product.product_name}
                   className="w-full h-44 rounded-lg hover:scale-[110%] transition duration-300 ease-in-out"
+                  width={500}
+                  height={500}
                 />
+
+                )}
                 <p className='text-wrap'>
                   {product.product_name.length > 30 ? `${product.product_name.substring(0, 30)}...` : product.product_name}
                 </p>

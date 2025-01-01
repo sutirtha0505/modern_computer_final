@@ -2,6 +2,7 @@
 import { Badge, BadgeCheck, ChevronDown, X, Check, MinusCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient"; // Import the existing Supabase client
+import Image from "next/image";
 
 type DropdownOption = {
   product_main_category: string;
@@ -107,10 +108,12 @@ const DropdownCategory: React.FC<DropdownProps> = ({ onSelect, multiple = true, 
             {selectedOptions.map((option) => (
               <div key={option.product_main_category} className="flex items-center justify-between cursor-pointer">
                 <div className="flex flex-wrap justify-center items-center">
-                  <img
+                  <Image
                     src={option.category_product_image}
                     alt={option.product_main_category}
                     className="w-8 h-8 mr-2"
+                    width={200}
+                    height={200}
                   />{" "}
                   <p>{truncateName(option.product_main_category)}</p>
                 </div>
@@ -173,10 +176,12 @@ const DropdownCategory: React.FC<DropdownProps> = ({ onSelect, multiple = true, 
                   )}
                 </div>
                 <div className="w-[30%] flex justify-center items-center">
-                  <img
+                  <Image
                     src={option.category_product_image}
                     alt={option.product_main_category}
                     className="w-8 h-8 mr-2"
+                    width={200}
+                    height={200}
                   />{" "}
                 </div>
                 <div className="flex flex-col w-[60%]">

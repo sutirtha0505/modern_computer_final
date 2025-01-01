@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaFacebook, FaWhatsapp, FaYoutube } from "react-icons/fa";
 import { IoCall } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const DraggableCircularNav: React.FC = () => {
   const router = useRouter();
@@ -52,7 +53,7 @@ const DraggableCircularNav: React.FC = () => {
           onMouseEnter={toggleNav}
           onClick={toggleNav}
         >
-          <img
+          <Image
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/customer-service.png"
             alt="customer service"
             height={30}
@@ -80,7 +81,7 @@ const DraggableCircularNav: React.FC = () => {
             }}
           >
             {/* <FaInstagram className="gradient-icon icons" /> */}
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/Instagram-Logo.png"
               alt=""
               width={50}
@@ -128,7 +129,7 @@ const DraggableCircularNav: React.FC = () => {
               window.location.href = "mailto:moderncomputer1997@gmail.com";
             }}
           >
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gmail.png"
               className="gmail"
               alt=""

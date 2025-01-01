@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Product {
   product_id: string;
@@ -105,9 +106,11 @@ const BestSellerSlider = () => {
               {products.length >= 1 && (
                 <label htmlFor="s1" id="slide1">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[0].product_image)}
                       alt={products[0].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[0].product_name}</h1>
                     <div className="price">
@@ -127,9 +130,11 @@ const BestSellerSlider = () => {
               {products.length >= 2 && (
                 <label htmlFor="s2" id="slide2">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[1].product_image)}
                       alt={products[1].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[1].product_name}</h1>
                     <div className="price">
@@ -149,9 +154,11 @@ const BestSellerSlider = () => {
               {products.length >= 3 && (
                 <label htmlFor="s3" id="slide3">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[2].product_image)}
                       alt={products[2].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[2].product_name}</h1>
                     <div className="price">
@@ -171,9 +178,11 @@ const BestSellerSlider = () => {
               {products.length >= 4 && (
                 <label htmlFor="s4" id="slide4">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[3].product_image)}
                       alt={products[3].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[3].product_name}</h1>
                     <div className="price">
@@ -193,9 +202,11 @@ const BestSellerSlider = () => {
               {products.length >= 5 && (
                 <label htmlFor="s5" id="slide5">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[4].product_image)}
                       alt={products[4].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[4].product_name}</h1>
                     <div className="price">
@@ -215,9 +226,11 @@ const BestSellerSlider = () => {
               {products.length >= 6 && (
                 <label htmlFor="s6" id="slide6">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[5].product_image)}
                       alt={products[5].product_name}
+                      height={512}
+                      width={512}
                     />
                     <h1 className="text-center text-sm">{products[5].product_name}</h1>
                     <div className="price">
@@ -237,9 +250,11 @@ const BestSellerSlider = () => {
               {products.length >= 7 && (
                 <label htmlFor="s7" id="slide7">
                   <div className="card">
-                    <img
+                    <Image
                       src={getProductImage(products[6].product_image)}
                       alt={products[6].product_name}
+                      width={512}
+                      height={512}
                     />
                     <h1 className="text-center text-sm">{products[6].product_name}</h1>
                     <div className="price">

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
+import Image from 'next/image';
 
 const BannerSection: React.FC = () => {
   const [galleryImages, setGalleryImages] = useState<{ name: string; url: string }[]>([]);
@@ -76,10 +77,12 @@ const BannerSection: React.FC = () => {
                   key={index}
                 >
                   <div className="embla__slide__inner transition-opacity duration-300"> {/* Apply transition for smooth effect */}
-                    <img
+                    <Image
                       src={image.url}
                       alt={image.name}
                       className="w-full h-64 object-scale-down rounded-lg shadow-lg" // Use object-cover for better image fit
+                      width={1920}
+                      height={1080}
                     />
                   </div>
                 </div>

@@ -6,9 +6,15 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { SendHorizonal } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+interface User {
+  id: string;
+  // Add other fields if needed, e.g., email, name, etc.
+}
 
 interface CharacterCounterInputForProductProps {
-  user: any;
+  user: User | null;
   rating: number;
   onResetRating: () => void;
   productId: string; // Add productId prop
@@ -114,9 +120,11 @@ const CharacterCounterInputForproduct: React.FC<
         setInputValue("");
         onResetRating(); // Reset the rating
       }
-    } catch (error: any) {
-      console.error("Catch Error:", error); // Debug: Log any caught errors
-      toast.error("Error adding review: " + (error.message || "Unknown error"));
+    } catch (error: unknown) {
+      console.error("Catch Error:", error); // Log the error
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error("Error adding review: " + errorMessage);
     }
   };
 
@@ -125,10 +133,15 @@ const CharacterCounterInputForproduct: React.FC<
       onSubmit={handleSubmit}
       className="relative gap-4 w-full p-10 md:p-4 justify-center items-center h-full flex"
     >
-      <img
-        src={profilePhoto || "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/user.png"} // Fallback to a default image if profilePhoto is not available
+      <Image
+        src={
+          profilePhoto ||
+          "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/user.png"
+        } // Fallback to a default image if profilePhoto is not available
         alt="Profile"
         className="rounded-full w-12 h-12"
+        width={500}
+        height={500}
       />
       <div className="relative h-full w-96 justify-center items-center flex flex-col">
         <textarea

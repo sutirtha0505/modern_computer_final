@@ -6,15 +6,42 @@ import { toast, ToastContainer } from "react-toastify"; // To display toasts
 import "react-toastify/dist/ReactToastify.css";
 import dayjs from "dayjs"; // For date manipulation
 
-interface CartFinalCheckOutProps {
-  userId: string; // Explicitly typing the userId as a string
+interface CartItem {
+  product_id: string;
+  product_SP: number;
+  quantity: number;
+  imageUrl?: string;
+  product_name: string;
 }
 
+interface CustomerDetails {
+  customer_name: string;
+  customer_house_no: string;
+  customer_house_street: string;
+  customer_house_city: string;
+  customer_house_pincode: number;
+  customer_house_landmark: string;
+  profile_photo: string;
+  email: string;
+  phone_no: string;
+}
+
+interface CartFinalCheckOutProps {
+  userId: string;
+}
+interface DiscountMap {
+  [key: string]: number; // Keys are strings, values are numbers
+}
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
 const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
   const router = useRouter();
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [totalSum, setTotalSum] = useState<number>(0);
-  const [customerDetails, setCustomerDetails] = useState<any>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null);
   const [couponCode, setCouponCode] = useState<string>(""); // Capture coupon code input
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false); // Track loading state
@@ -42,7 +69,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
       const data = await response.json();
 
       if (!window.Razorpay) {
-        console.error("Razorpay is not loaded");
         toast.error("Payment gateway is not available. Please try again.");
         return;
       }
@@ -56,9 +82,8 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         image:
           "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
-        handler: async (response: any) => {
+        handler: async (response: RazorpayResponse) => {
           toast.success("Payment successful!");
-          console.log("Payment Response:", response);
 
           // Save order in the database and update product amount
           await saveOrder(
@@ -67,12 +92,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
           );
         },
         prefill: {
-          name: customerDetails.customer_name,
-          email: customerDetails.email,
-          contact: customerDetails.phone_no,
+          name: customerDetails?.customer_name,
+          email: customerDetails?.email,
+          contact: customerDetails?.phone_no,
         },
         notes: {
-          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+          address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         },
         theme: {
           color: "#6366F1",
@@ -81,8 +106,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
 
       const razorpay = new window.Razorpay(options);
       razorpay.open();
-    } catch (error) {
-      console.error("Error during payment:", error);
+    } catch {
       toast.error("Payment failed!");
     } finally {
       setLoading(false);
@@ -93,7 +117,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     const expectedDeliveryDate = dayjs().add(7, "day").format("YYYY-MM-DD"); // Calculate expected delivery date
 
     // Create an array of objects with product ID and quantity
-    const orderedProducts = cart.map((product: any) => ({
+    const orderedProducts = cart.map((product: CartItem) => ({
       product_id: product.product_id,
       quantity: product.quantity,
     }));
@@ -106,14 +130,13 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         customer_id: userId,
         payment_amount: discountedTotal,
         ordered_products: orderedProducts, // Insert product_id and quantity
-        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        order_address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(), // Set current timestamp
       },
     ]);
 
     if (error) {
-      console.error("Error saving order:", error);
       toast.error("Failed to save the order. Please try again.");
       return;
     } else {
@@ -134,7 +157,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         .single();
 
       if (fetchError) {
-        console.error("Error fetching product details:", fetchError);
         toast.error("Error updating product quantities. Please try again.");
         return;
       }
@@ -149,7 +171,6 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
         .eq("product_id", product.product_id);
 
       if (updateError) {
-        console.error("Error updating product amount:", updateError);
         toast.error("Error updating product quantities. Please try again.");
       }
     }
@@ -165,7 +186,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
 
       // Calculate total sum directly from the cart
       const total = parsedCart.reduce(
-        (sum: number, product: any) =>
+        (sum: number, product: CartItem) =>
           sum + product.product_SP * product.quantity,
         0
       );
@@ -286,10 +307,10 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     }
 
     // Create a map of product ID to its discount percentage
-    const discountMap = matchedProducts.reduce((acc, product) => {
+    const discountMap: DiscountMap = matchedProducts.reduce((acc, product) => {
       acc[product.product_id] = product.code_equiv_percent;
       return acc;
-    }, {} as Record<number, number>);
+    }, {} as DiscountMap);
 
     // Simulate coupon application and calculate the total with discount
     const newTotal = cart.reduce((sum, product) => {
@@ -308,7 +329,7 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
     <>
       <div className="w-full flex justify-center items-center p-6 gap-2 flex-col md:flex-row">
         <div className="w-full md:w-1/2 flex flex-col overflow-y-auto gap-4">
-          {cart.map((product: any, index: number) => (
+          {cart.map((product: CartItem, index: number) => (
             <div
               key={index}
               className="flex items-center gap-4 p-4 border rounded-lg bg-slate-300 dark:bg-slate-800"
@@ -345,10 +366,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
               Order <span className="text-indigo-500">Summary</span>
             </h1>
             <div className="w-full flex gap-2 justify-center items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/money.png"
                 alt=""
                 className="w-8 h-8"
+                width={200}
+                height={200}
               />
               <label htmlFor="amount" className="text-sm font-bold">
                 Product Amount:
@@ -358,10 +381,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
               </p>
             </div>
             <div className="w-full flex gap-2 justify-center items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/fast-delivery.png"
                 alt=""
                 className="w-8 h-8"
+                width={200}
+                height={200}
               />
               <label htmlFor="amount" className="text-sm font-bold">
                 Delivery Amount:
@@ -369,10 +394,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
               <p className="text-sm font-bold text-indigo-600">&#x20B9;0</p>
             </div>
             <div className="w-full flex gap-2 justify-center items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/voucher.png"
                 alt=""
                 className="w-6 h-6"
+                width={200}
+                height={200}
               />
               <input
                 type="text"
@@ -398,10 +425,12 @@ const CartFinalCheckOut: React.FC<CartFinalCheckOutProps> = ({ userId }) => {
             </div>
             <hr />
             <div className="w-full flex gap-2 justify-center items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/cashless-payment.png"
                 alt=""
                 className="w-6 h-6"
+                width={200}
+                height={200}
               />
               <p className="font-bold text-sm">
                 Total Amount Payable <br />

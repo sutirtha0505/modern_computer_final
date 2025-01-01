@@ -15,6 +15,7 @@ import { useAppSelector } from "@/lib/hooks/redux";
 import { getCart } from "@/redux/cartSlice";
 import { supabase } from "@/lib/supabaseClient";
 import "@/app/globals.css";
+import { User } from "@supabase/supabase-js";
 
 interface Product {
   product_id: string;
@@ -34,7 +35,7 @@ const Header = () => {
   const pathname = usePathname();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isMouseInside, setIsMouseInside] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState<string | null>(null);
@@ -132,7 +133,7 @@ const Header = () => {
   };
 
   // Fetch function using ILIKE
-  const fetchProducts = async (query: any) => {
+  const fetchProducts = async (query: string) => {
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -143,7 +144,7 @@ const Header = () => {
       return [];
     }
 
-    return data;
+    return data as Product[];
   };
 
   const handleSuggestionClick = (product: Product) => {
@@ -189,7 +190,9 @@ const Header = () => {
           .select("role, profile_photo, customer_name")
           .eq("id", user.id)
           .single();
-
+        if (error) {
+          console.error("Error fetching profile:", error); // Log the error
+        }
         if (profile) {
           setRole(profile.role);
           setProfilePhoto(profile.profile_photo);
@@ -217,20 +220,26 @@ const Header = () => {
             <div className="relative group">
               <Link href="#" className="responsive-font font-bold">
                 Products
-                <span className="block h-0.5 w-0 
-                bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
+                <span
+                  className="block h-0.5 w-0 
+                bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"
+                ></span>
               </Link>
               <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
                 <ul className="py-2 text-gray-800">
                   {products.map((category, index) => (
-                    <div className="flex items-center justify-start">
-                      <img
+                    <div
+                      className="flex items-center justify-start"
+                      key={index}
+                    >
+                      <Image
                         src={category.category_product_image}
                         alt=""
                         className="w-8 h-8"
+                        height={500}
+                        width={500}
                       />
                       <li
-                        key={index}
                         onClick={() =>
                           router.push(
                             `/product-by-categories/${encodeURIComponent(
@@ -255,10 +264,12 @@ const Header = () => {
               <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_intel/INTEL_Prebuild.png"
                       alt="Intel Pre-Build"
                       className="w-8 h-8"
+                      width={500}
+                      height={500}
                     />
                     <li
                       onClick={() => {
@@ -270,10 +281,12 @@ const Header = () => {
                     </li>
                   </div>
                   <div className="flex items-center justify-start">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pbpc_amd/AMD_Prebuild.png"
                       alt="AMD Pre-Build"
                       className="w-8 h-8"
+                      height={500}
+                      width={500}
                     />
                     <li
                       onClick={() => {
@@ -296,10 +309,12 @@ const Header = () => {
               <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_intel/INTEL_Custom.png"
                       alt=""
                       className="w-8 h-8"
+                      height={500}
+                      width={500}
                     />
                     <li
                       onClick={() => {
@@ -311,10 +326,12 @@ const Header = () => {
                     </li>
                   </div>
                   <div className="flex items-center justify-start">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_amd/AMD_Custom.png"
                       alt=""
                       className="w-8 h-8"
+                      height={500}
+                      width={500}
                     />
                     <li
                       onClick={() => {
@@ -355,15 +372,18 @@ const Header = () => {
                   <div
                     className="w-full justify-center hover:bg-gray-200  dark:hover:bg-gray-700 items-center flex flex-wrap gap-2"
                     onClick={() => handleSuggestionClick(product)}
+                    key={product.product_id}
                   >
-                    <img
+                    <Image
                       src={
-                        product.product_image?.find((img: any) =>
+                        product.product_image?.find((img: { url: string }) =>
                           img.url.includes("_first")
-                        )?.url
+                        )?.url || "/fallback-image.jpg" // Provide a fallback URL
                       }
-                      alt=""
+                      alt="Product Image"
                       className="w-12 h-12 rounded-full object-cover"
+                      width={500}
+                      height={500}
                     />
 
                     <li
@@ -431,10 +451,12 @@ const Header = () => {
                             router.push("/admin");
                           }}
                         >
-                          <img
+                          <Image
                             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/web-administrator.png"
                             alt=""
                             className="w-6 h-6"
+                            width={200}
+                            height={200}
                           />
                           <p>Admin Panel</p>
                         </div>
@@ -446,10 +468,12 @@ const Header = () => {
                           router.push("/orders");
                         }}
                       >
-                        <img
+                        <Image
                           src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-box.png"
                           alt=""
                           className="w-6 h-6"
+                          width={200}
+                          height={200}
                         />
                         <p>Your Orders</p>
                       </div>
@@ -457,7 +481,7 @@ const Header = () => {
                         <button
                           onClick={async () => {
                             toggleProfileMenu();
-                            const { error } = await supabase.auth.signOut();
+                            await supabase.auth.signOut();
                             window.location.reload();
                           }}
                           className="bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 h-10 w-28 rounded-md text-xs hover:text-l hover:font-bold duration-200"

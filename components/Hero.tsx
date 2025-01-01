@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import BannerSection from "./BannerSection";
 import RecentProductsShow from "./RecentProductsShow";
+import { User } from "@supabase/supabase-js";
 
 // TypeScript type for the VanillaTilt options
 interface VanillaTiltOptions {
@@ -20,7 +21,7 @@ interface VanillaTiltOptions {
 function Hero() {
   const router = useRouter();
   const tiltRef = useRef<HTMLDivElement | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [heroImage, setHeroImage] = useState<string | null>(null);
   const [heroParagraph, setHeroParagraph] = useState<string>("");
   const [heroButtonLink, setHeroButtonLink] = useState<string>("");
@@ -66,7 +67,7 @@ function Hero() {
       setUser(user);
 
       if (user) {
-        const { data: profile, error } = await supabase
+        const { data: profile } = await supabase
           .from("profile")
           .select("customer_name")
           .eq("id", user.id)

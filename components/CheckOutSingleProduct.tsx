@@ -5,9 +5,10 @@ import CustomerDetails from "./CustomerDetails";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import CartSingleProductFinalCheckOut from "./CartSingleProductFinalCheckOut";
+import { User } from "@supabase/supabase-js";
 
 const CheckOutSingleProduct = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 

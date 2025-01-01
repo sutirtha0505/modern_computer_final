@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { ImageUp } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Image from "next/image";
 
 const EditAboutSection: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -53,7 +54,7 @@ const EditAboutSection: React.FC = () => {
       }
 
       // Upload the new image
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from("product-image")
         .upload(`About/${image.name}`, image);
 
@@ -68,7 +69,7 @@ const EditAboutSection: React.FC = () => {
       imageUrl = publicUrlData.publicUrl;
     }
 
-    const { data, error } = await supabase.from("about").insert({
+    const { error } = await supabase.from("about").insert({
       about_image: imageUrl,
       about_description: description,
       about_yt_1: yt1,
@@ -99,10 +100,12 @@ const EditAboutSection: React.FC = () => {
         >
           <input {...getInputProps()} />
           {image ? (
-            <img
+            <Image
               src={URL.createObjectURL(image)}
               alt="Uploaded"
               className="w-full h-full rounded-full"
+              width={500}
+              height={500}
             />
           ) : (
             <ImageUp />
@@ -122,7 +125,7 @@ const EditAboutSection: React.FC = () => {
           placeholder="Add business description"
         />
         <label htmlFor="yt1" className="text-left w-full text-xs font-bold">
-          Latest YouTube video's Embeded URL(1):
+           Embeded URL of first YouTube video(1):
         </label>
         <input
           type="text"
@@ -132,7 +135,7 @@ const EditAboutSection: React.FC = () => {
           placeholder="YouTube video 1 URL"
         />
         <label htmlFor="yt2" className="text-left w-full text-xs font-bold">
-          Latest YouTube video's Embeded URL(2):
+        Embeded URL of first YouTube video(2):
         </label>
         <input
           type="text"

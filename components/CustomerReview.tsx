@@ -6,9 +6,10 @@ import { supabase } from '@/lib/supabaseClient';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Rating from './Rating';
+import { User } from '@supabase/supabase-js';
 
 const CustomerReview: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [rating, setRating] = useState<number>(0);
   const [resetRating, setResetRating] = useState<boolean>(false);

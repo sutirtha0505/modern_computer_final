@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { Star } from "lucide-react"; // Importing the Star icon
 import { toast } from "react-toastify"; // Assuming you are using react-toastify for toasts
+import Image from "next/image";
 
 interface Review {
   UX_star: number;
@@ -140,10 +141,12 @@ const EditReview: React.FC = () => {
             onClick={() => handleSelect(index)}
           >
             <div className="w-full flex justify-center items-center">
-              <img
+              <Image
                 src={review.profile_photo}
                 alt="Profile photo"
                 className="w-12 h-12 rounded-full absolute -top-5"
+                width={300}
+                height={300}
               />
             </div>
             <div className="flex">{renderStars(review.UX_star)}</div>

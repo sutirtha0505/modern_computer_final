@@ -4,6 +4,7 @@ import SVGblob2 from "./SVGBlob2";
 import VanillaTilt from "vanilla-tilt";
 import SVGblob3 from "./SVGBlob3";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface VanillaTiltOptions {
   max: number;
@@ -51,9 +52,12 @@ const CustomBuildPCINHomePage = () => {
             <div className="w-full h-full absolute -z-10">
               <SVGblob2 />
             </div>
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_intel/INTEL_Custom.png"
               className="hover:scale-105 duration-300 ease-in-out"
+              height={1000}
+              width={1000}
+              alt="Custom Build Intel Image"
             />
             <h2 className="text-xl font-semibold text-center">
               Custom-Build <span className="text-red-500">Intel </span>PC
@@ -67,9 +71,12 @@ const CustomBuildPCINHomePage = () => {
             <div className="w-full h-full absolute -z-10">
               <SVGblob3 />
             </div>
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_amd/AMD_Custom.png"
               className="hover:scale-105 duration-300 ease-in-out"
+              width={1000}
+              height={1000}
+              alt="Custom Build AMD Image"
             />
             <h2 className="text-xl font-semibold text-center">
               Custom-Build <span className="text-cyan-500">AMD </span>PC

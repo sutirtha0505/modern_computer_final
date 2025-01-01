@@ -1,4 +1,3 @@
-import { MoveUp } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';

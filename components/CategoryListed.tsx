@@ -1,12 +1,17 @@
 // components/CategoryListed.tsx
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 type Product = {
   product_category: string;
   product_main_category: string | null;
   category_product_image: string | null;
 };
+type ProductItem = {
+  product_category: string; // Define other properties if needed
+};
+
 
 const CategoryListed: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -53,7 +58,7 @@ const CategoryListed: React.FC = () => {
           return;
         }
 
-        const matchingCategories = data.map((item: any) => item.product_category);
+        const matchingCategories = data.map((item: ProductItem) => item.product_category);
         const uniqueMatchingCategories = Array.from(new Set(matchingCategories)).join(", ");
 
         setMatchingCategories((prevState) => ({
@@ -74,10 +79,12 @@ const CategoryListed: React.FC = () => {
           className="flex flex-col items-center space-y-4 bg-slate-900 p-4 rounded shadow-md"
         >
           {product.category_product_image && (
-            <img
+            <Image
               src={product.category_product_image}
               alt="Category"
               className="w-24 h-24 object-cover rounded-full"
+              width={1000}
+              height={1000}
             />
           )}
           <input

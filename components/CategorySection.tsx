@@ -3,21 +3,25 @@ import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { supabase } from '@/lib/supabaseClient';
 import DropdownForPBC from './DropdownForPBC';
-import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AiOutlineCloudUpload } from "react-icons/ai";
+import Image from 'next/image';
 
 type DropdownOption = {
   product_category: string;
 };
+interface Product {
+  product_category: string;
+  product_main_category?: string; // Add other fields as needed
+  category_product_image?: string;
+}
 
 const CategorySection: React.FC = () => {
   const [category, setCategory] = useState('');
   const [dropdownOptions, setDropdownOptions] = useState<DropdownOption[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<DropdownOption[]>([]);
   const [image, setImage] = useState<File | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -31,7 +35,7 @@ const CategorySection: React.FC = () => {
       }
 
       // Extract distinct categories
-      const distinctCategories = Array.from(new Set(data.map((item: any) => item.product_category)))
+      const distinctCategories = Array.from(new Set(data.map((item: Product) => item.product_category)))
         .map((category) => ({
           product_category: category
         }));
@@ -60,7 +64,7 @@ const CategorySection: React.FC = () => {
 
     // Find rows with matching product_category
     const productCategories = selectedOptions.map(option => option.product_category);
-    const { data, error: fetchError } = await supabase
+    const { error: fetchError } = await supabase
       .from('products')
       .select('*')
       .in('product_category', productCategories);
@@ -121,7 +125,7 @@ const CategorySection: React.FC = () => {
       <div {...getRootProps({ className: 'w-24 h-24 border-dashed border-2 border-gray-300 rounded-full flex items-center justify-center cursor-pointer' })}>
         <input {...getInputProps()} />
         {image ? (
-          <img src={URL.createObjectURL(image)} alt="Uploaded" className="w-full h-full object-cover rounded-full" />
+          <Image src={URL.createObjectURL(image)} alt="Uploaded" className="w-full h-full object-cover rounded-full" width={500} height={500} />
         ) : (
           <AiOutlineCloudUpload className='w-8 h-8'/>
         )}

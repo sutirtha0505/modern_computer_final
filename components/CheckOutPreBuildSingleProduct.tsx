@@ -4,11 +4,11 @@ import HeaderCart from './HeaderCart'
 import CustomerDetails from './CustomerDetails'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import CartSingleProductFinalCheckOut from './CartSingleProductFinalCheckOut'
 import PreBuildSingleProductFinalCheckOut from './PreBuildSingleProductFinalCheckOut'
+import { User } from '@supabase/supabase-js'
 
 const CheckOutPreBuildSingleProduct = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 

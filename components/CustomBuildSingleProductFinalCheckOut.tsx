@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import dayjs from "dayjs";
 import { InfoIcon } from "lucide-react";
+import Image from "next/image";
 
 interface Product {
   name: string;
@@ -13,6 +14,33 @@ interface Product {
 }
 interface CustomBuildSingleProductFinalCheckOutProps {
   userId: string;
+}
+
+interface ProductDetails {
+  processor: string;
+  build_type: string;
+  coupon_code: string;
+  code_equiv_percent: number;
+  date_applicable: string;
+  product_name?: string;
+}
+
+interface CustomerDetails {
+  customer_name: string;
+  customer_house_no: string;
+  customer_house_street: string;
+  customer_house_city: string;
+  customer_house_pincode: number;
+  customer_house_landmark: string;
+  profile_photo: string;
+  email: string;
+  phone_no: string;
+}
+
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
 }
 
 const CustomBuildSingleProductFinalCheckOut: React.FC<
@@ -35,8 +63,8 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [product, setProduct] = useState<any>(null);
-  const [customerDetails, setCustomerDetails] = useState<any>(null);
+  const [product, setProduct] = useState<ProductDetails | null>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null);
   const [isPincodeValid, setIsPincodeValid] = useState<boolean>(true);
   useEffect(() => {
     // Fetch the stored data from localStorage
@@ -189,11 +217,11 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
         amount: data.amount,
         currency: data.currency,
         app_name: "Modern Computer",
-        description: product.product_name,
+        description: product?.product_name || "",
         image:
           "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
-        handler: async (response: any) => {
+        handler: async (response: RazorpayResponse) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
 
@@ -205,12 +233,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
           );
         },
         prefill: {
-          name: customerDetails.customer_name,
-          email: customerDetails.email,
-          contact: customerDetails.phone_no,
+          name: customerDetails?.customer_name,
+          email: customerDetails?.email,
+          contact: customerDetails?.phone_no,
         },
         notes: {
-          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+          address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         },
         theme: {
           color: "#6265F1",
@@ -287,7 +315,7 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
             image_url: graphicsCard[0]?.image,
           },
         ],
-        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        order_address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(),
       },
@@ -336,10 +364,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
             Your <span className="text-indigo-500">Configuration</span>
           </h1>
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Processor:</h2>
             {processor.map((item, index) => (
@@ -348,20 +378,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
               className="w-6 h-6"
               alt="Default Image"
+              height={200}
+              width={200}
             />
             <h2>Motherboard:</h2>
             {motherboard.map((item, index) => (
@@ -370,20 +404,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
               className="w-6 h-6"
               alt="Default Image"
+              height={200}
+              width={200}
             />
             <h2>RAM:</h2>
             {ram.map((item, index) => (
@@ -392,10 +430,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  height={200}
+                  width={200}
                 />
               </div>
             ))}
@@ -403,10 +443,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>SSD:</h2>
             {ssd.map((item, index) => (
@@ -415,20 +457,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Graphics Card:</h2>
             {graphicsCard.map((item, index) => (
@@ -437,20 +483,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Cabinet:</h2>
             {cabinet.map((item, index) => (
@@ -459,19 +509,23 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Power Supply:</h2>
             {psu.map((item, index) => (
@@ -480,20 +534,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/cbpc_intel/INTEL_Custom.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Hard Disk:</h2>
             {hdd.map((item, index) => (
@@ -502,20 +560,24 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
           </div>
 
           <div className="flex justify-start gap-4 items-center w-full">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
               className="w-6 h-6"
               alt="Default Image"
+              width={200}
+              height={200}
             />
             <h2>Cooler:</h2>
             {cooler.map((item, index) => (
@@ -524,10 +586,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
                 className="flex gap-2 flex-row-reverse bg-gray-600 border p-2 rounded-md w-full justify-center items-center "
               >
                 <p className="text-xs font-bold">{item.name.slice(0, 50)}...</p>
-                <img
+                <Image
                   src={item.image}
                   alt={item.name.slice(0, 50)}
                   className="rounded-full w-4 h-4"
+                  width={200}
+                  height={200}
                 />
               </div>
             ))}
@@ -549,10 +613,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
             Order <span className="text-indigo-500">Summary</span>
           </h1>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/money.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Product Amount:
@@ -562,10 +628,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
             </p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/fast-delivery.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Delivery Amount:
@@ -573,10 +641,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
             <p className="text-sm font-bold text-indigo-600">&#x20B9;0</p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/voucher.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <input
               type="text"
@@ -602,10 +672,12 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
           </div>
           <hr />
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/cashless-payment.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <p className="font-bold text-sm">
               Total Amount Payable <br />

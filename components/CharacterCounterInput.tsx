@@ -5,11 +5,17 @@ import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface User {
+  id: string;
+  // Add other fields if needed, such as email, name, etc.
+}
+
 interface CharacterCounterInputProps {
-  user: any;
+  user: User | null; // Allow null to handle cases where the user isn't logged in
   rating: number;
   onResetRating: () => void;
 }
+
 
 const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
   user,
@@ -49,11 +55,11 @@ const CharacterCounterInput: React.FC<CharacterCounterInputProps> = ({
         setInputValue("");
         onResetRating(); // Reset the rating
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Catch Error:", error); // Debug: Log any caught errors
-      toast.error(
-        "Error adding comment: " + (error.message || "Unknown error"),
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error("Error adding comment: " + errorMessage);    
     }
   };
 

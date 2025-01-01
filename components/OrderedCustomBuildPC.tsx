@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { CircleX, InfoIcon } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 interface OrderedProduct {
   quantity: number;
@@ -72,11 +73,13 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
   if (orders.length === 0) {
     return (
       <div className="flex gap-4 justify-center items-center h-full pb-20 md:pb-0">
-        <img
+        <Image
           src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/CBPC-Not%20ordered-Photoroom.png"
           alt=""
           loading="lazy"
           className="w-20 h-20"
+          width={500}
+          height={500}
         />
         <p className="text-center font-bold">
           No <span className="text-indigo-500">Custom-Build PC</span> orders
@@ -103,10 +106,12 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
       if (name && product.image_url) {
         return (
           <li key={index} className="flex gap-4 items-center justify-start">
-            <img
+            <Image
               src={product.image_url}
               alt={`${key} Image`}
               className="w-16 h-16 object-cover"
+              width={500}
+              height={500}
             />
             <p className="text-sm font-semibold hover:text-indigo-600 text-left">
               <span className="font-bold text-indigo-500 text-lg">{key}</span>:{" "}
@@ -149,7 +154,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
             : order
         )
       );
-    } catch (error) {
+    } catch {
       toast.error("Error canceling the order.");
     }
   };
@@ -192,10 +197,12 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
                 </ol>
                 <div className="w-auto flex flex-col justify-center items-center gap-2">
                   <div className="flex gap-2 justify-center items-center">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
                       alt=""
                       className="w-8 h-8"
+                      width={500}
+                      height={500}
                     />
                     <p className="text-sm font-semibold text-indigo-600">
                       Order Status:
@@ -244,10 +251,12 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
 
                 <div className="w-auto flex flex-col justify-center items-center gap-4">
                   <div className="flex gap-2 justify-center items-center">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
                       alt=""
                       className="w-8 h-8"
+                      width={500}
+                      height={500}
                     />
                     <p className="text-sm font-semibold text-indigo-600">
                       Expected Delivery Date:

@@ -1,6 +1,7 @@
 // components/Dropdown.tsx
 "use client";
 import { Badge, BadgeCheck, ChevronDown, X, Check, MinusCircle } from "lucide-react"; // Import Check and MinusCircle from lucide-react for the select all and deselect all buttons
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 type DropdownOption = {
@@ -92,10 +93,12 @@ const Dropdown = ({ options, onSelect, multiple = true, reset }: DropdownProps) 
             {selectedOptions.map((option) => (
               <div key={option.id} className="flex items-center justify-between cursor-pointer">
                 <div className="flex justify-center items-center">
-                  <img
+                  <Image
                     src={option.image}
                     alt={option.name}
                     className="w-8 h-8 mr-2"
+                    width={200}
+                    height={200}
                   />{" "}
                   {/* Display selected image */}
                   <p>{truncateName(option.name)}</p> {/* Truncate name here */}
@@ -159,9 +162,11 @@ const Dropdown = ({ options, onSelect, multiple = true, reset }: DropdownProps) 
                   )}
                 </div>
                 <div className="w-[30%] flex justify-center items-center">
-                  <img
+                  <Image
                     src={option.image}
                     alt={option.name}
+                    width={200}
+                    height={200}
                   />{" "}
                 </div>
                 {/* Display option image */}

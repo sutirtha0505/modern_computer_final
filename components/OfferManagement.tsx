@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Pen, TableProperties } from "lucide-react";
 import { MdOutlineDashboardCustomize } from "react-icons/md";
 import DensitySmallIcon from "@mui/icons-material/DensitySmall";
@@ -16,6 +15,7 @@ import AMDCBPCOffer from "./AMDCBPCOffer"; // Import the component
 import { supabase } from "@/lib/supabaseClient";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 const OfferManagement = () => {
   const [selectedDiv, setSelectedDiv] = useState<number | null>(null);
@@ -31,7 +31,6 @@ const OfferManagement = () => {
   const [showAllCBPCOffer, setShowAllCBPCOffer] = useState<boolean>(false);
   const [showIntelCBPCOffer, setShowIntelCBPCOffer] = useState<boolean>(false);
   const [showAMDCBPCOffer, setShowAMDCBPCOffer] = useState<boolean>(false);
-  const router = useRouter();
 
   const resetOffers = async () => {
     // Execute the update query with a condition where show_product is TRUE
@@ -141,10 +140,12 @@ const OfferManagement = () => {
             className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center"
             onClick={() => setShowAMDPBPCOffer(true)}
           >
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <p className="text-xs text-center">AMD Prebuild PC Offers</p>
           </div>
@@ -152,10 +153,12 @@ const OfferManagement = () => {
             className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center"
             onClick={() => setShowIntelPBPCOffer(true)}
           >
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <p className="text-xs text-center">Intel Prebuild PC Offers</p>
           </div>
@@ -175,9 +178,11 @@ const OfferManagement = () => {
             className="p-8 gap-4 rounded-sm bg-yellow-500 border-yellow-500 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-yellow-500 justify-center items-center"
             onClick={() => setShowIntelCBPCOffer(true)}
           >
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
               alt=""
+              height={200}
+              width={200}
               className="w-6 h-6"
             />
             
@@ -187,9 +192,11 @@ const OfferManagement = () => {
             className="p-8 gap-4 rounded-sm bg-emerald-400 border-emerald-400 border-2 cursor-pointer flex flex-col hover:bg-transparent hover:text-emerald-400 justify-center items-center"
             onClick={() => setShowAMDCBPCOffer(true)}
           >
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png"
               alt=""
+              height={200}
+              width={200}
               className="w-6 h-6"
             />
             <p className="text-xs text-center">AMD Custom Build PC Offers</p>

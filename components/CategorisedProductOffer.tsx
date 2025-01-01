@@ -22,20 +22,27 @@ const CategorisedProductOffer = () => {
 
   // Fetch product categories from Supabase
   useEffect(() => {
-    const fetchProducts = async () => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("product_main_category, category_product_image");
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from("products")
+      .select("product_main_category, category_product_image");
 
-      if (error) {
-        console.error("Error fetching products:", error);
-      } else {
-        setProducts(data || []);
-      }
-    };
+    if (error) {
+      console.error("Error fetching products:", error);
+    } else {
+      setProducts(data || []);
 
-    fetchProducts();
-  }, []);
+      // Example usage of `products`
+      const filteredProducts = data?.filter(
+        (product) => product.product_main_category === "SpecificCategory"
+      );
+      console.log("Filtered products:", filteredProducts);
+    }
+  };
+
+  fetchProducts();
+}, [products]);
+
 
   // Handle product selection from DropdownCategory
   const handleProductSelection = (selectedOptions: Product[]) => {
@@ -98,7 +105,7 @@ const CategorisedProductOffer = () => {
         <span className="text-indigo-500">
           The selected categorised Products.
         </span>{" "}
-        You'll also need to enter the{" "}
+        You will also need to enter the{" "}
         <span className="text-indigo-500">Discount percentage</span>. The
         discount percentage will be applied to the{" "}
         <span className="text-indigo-500">Selling price</span>.

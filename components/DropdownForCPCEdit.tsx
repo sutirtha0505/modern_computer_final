@@ -6,6 +6,7 @@ import {
     Check,
     MinusCircle,
   } from "lucide-react";
+import Image from "next/image";
   import { useState, useEffect } from "react";
   
   type DropdownOption = {
@@ -126,10 +127,12 @@ import {
                   className="flex items-center justify-between cursor-pointer"
                 >
                   <div className="flex items-center">
-                    <img
+                    <Image
                       src={option.image}
                       alt={option.name}
                       className="w-8 h-8 mr-2"
+                      width={200}
+                      height={200}
                     />{" "}
                     <p>{truncateName(option.name)}</p>
                   </div>
@@ -194,7 +197,7 @@ import {
                     )}
                   </div>
                   <div className="w-[30%] flex justify-center items-center">
-                    <img src={option.image} alt={option.name} />{" "}
+                    <Image src={option.image} alt={option.name} />{" "}
                   </div>
                   <div className="flex flex-col w-[60%]">
                     <p className="text-sm">{option.name}</p>

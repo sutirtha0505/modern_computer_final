@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "@/lib/supabaseClient"; // Import your Supabase client
+import Image from "next/image";
 
 const IntelPBPCOffer = () => {
   const [couponCode, setCouponCode] = useState("");
@@ -45,7 +46,7 @@ const IntelPBPCOffer = () => {
         <span className="text-indigo-600">specific time period</span>. If you
         enter a coupon code here, it will be applied to all{" "}
         <span className="text-indigo-500">Pre Intel-Build Products.</span>{" "}
-        You'll also need to enter the{" "}
+        You will also need to enter the{" "}
         <span className="text-indigo-500">Discount percentage</span>. The
         discount percentage will be applied to the{" "}
         <span className="text-indigo-500">Selling price</span>.
@@ -58,10 +59,12 @@ const IntelPBPCOffer = () => {
             Build type:
           </label>
           <div className="w-[60%] rounded-md bg-slate-700 flex justify-center items-center gap-4">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png"
               alt=""
               className="w-6 h-6"
+              width={500}
+              height={500}
             />
             <p className="text-sm">INTEL</p>
           </div>
