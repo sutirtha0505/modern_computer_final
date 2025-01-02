@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
@@ -135,13 +135,13 @@ const PBPCListing = () => {
     }
   };
 
-  const fetchProcessorProducts = () => {
+  const fetchProcessorProducts = useCallback(() => {
     if (buildType === "AMD") {
       fetchProductsByCategory("AMD_CPU", setProcessorOptions);
     } else if (buildType === "Intel") {
       fetchProductsByCategory("INTEL_CPU", setProcessorOptions);
     }
-  };
+  }, [buildType]);
 
   const fetchMotherboardProducts = () =>
     fetchProductsByCategory("Motherboard", setMotherboardOptions);
@@ -191,9 +191,8 @@ const PBPCListing = () => {
           id: product.product_id,
           name: product.product_name,
           price: `₹${product.product_SP.toLocaleString()}`,
-          image: product.product_image?.find((img: any) =>
-            img.url.includes("_first")
-          )?.url,
+          image: product.product_image.find((img) => img.url.includes("_first"))
+            ?.url,
         })
       );
 
@@ -328,7 +327,7 @@ const PBPCListing = () => {
 
         await Promise.all(uploadPromises);
 
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from("pre_build")
           .insert([{ ...payload, id: buildId, image_urls: imageUrls }]);
 
