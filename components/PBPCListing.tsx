@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Dropdown from "@/components/Dropdown";
 import { useRouter } from "next/navigation";
 import { BadgeInfo, CloudUpload } from "lucide-react";
+import Image from "next/image";
 
 type DropdownOption = {
   id: string;
@@ -15,6 +16,11 @@ type DropdownOption = {
   price: string;
   image: string;
 };
+
+interface ProductImage {
+  url: string; // Adjust fields based on your database schema
+}
+
 
 const PBPCListing = () => {
   const router = useRouter();
@@ -79,83 +85,42 @@ const PBPCListing = () => {
     },
   });
 
-  useEffect(() => {
-    if (buildType) {
-      fetchProcessorProducts();
-      fetchMotherboardProducts();
-      fetchRamProducts();
-      fetchSsdProducts();
-      fetchGraphicsCardProducts();
-      fetchCabinetProducts();
-      fetchPsuProducts();
-      fetchHddProducts();
-      fetchCoolerProducts();
-      fetchAdditionalProducts();
-    }
-  }, [buildType]);
 
-  const fetchProductsByCategory = async (
-    category: string,
-    setOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>
-  ) => {
-    try {
-      const { data, error } = await supabase
-        .from("products")
-        .select(
-          "product_id, product_name, product_SP, product_category, product_image"
-        )
-        .eq("product_category", category);
+  const fetchProductsByCategory = useCallback(
+    async (category: string, setOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>) => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("product_id, product_name, product_SP, product_image")
+          .eq("product_category", category);
 
-      if (error) {
-        throw error;
+        if (error) {
+          throw error;
+        }
+
+        const formattedOptions = data.map(
+          (product: {
+            product_id: string;
+            product_name: string;
+            product_SP: number;
+            product_image: ProductImage[];
+          }) => ({
+            id: product.product_id,
+            name: product.product_name,
+            price: `₹${product.product_SP.toLocaleString()}`,
+            image: product.product_image?.find((img) => img.url.includes("_first"))?.url || "",
+          })
+        );
+
+        setOptions(formattedOptions);
+      } catch (error) {
+        console.error(`Error fetching ${category} products:`, error);
       }
+    },
+    []
+  );
 
-      const formattedOptions = data.map(
-        (product: {
-          product_id: string;
-          product_name: string;
-          product_SP: number;
-          product_image: { [key: string]: any }[];
-        }) => ({
-          id: product.product_id,
-          name: product.product_name,
-          price: `₹${product.product_SP.toLocaleString()}`,
-          image: product.product_image?.find((img: any) =>
-            img.url.includes("_first")
-          )?.url,
-        })
-      );
-
-      setOptions(formattedOptions);
-    } catch (error) {
-      console.error(
-        `Error fetching ${category} products:`,
-        (error as Error).message
-      );
-    }
-  };
-
-  const fetchProcessorProducts = useCallback(() => {
-    if (buildType === "AMD") {
-      fetchProductsByCategory("AMD_CPU", setProcessorOptions);
-    } else if (buildType === "Intel") {
-      fetchProductsByCategory("INTEL_CPU", setProcessorOptions);
-    }
-  }, [buildType]);
-
-  const fetchMotherboardProducts = () =>
-    fetchProductsByCategory("Motherboard", setMotherboardOptions);
-  const fetchRamProducts = () => fetchProductsByCategory("RAM", setRamOptions);
-  const fetchSsdProducts = () => fetchProductsByCategory("SSD", setSsdOptions);
-  const fetchGraphicsCardProducts = () =>
-    fetchProductsByCategory("GPU", setGraphicsCardOptions);
-  const fetchCabinetProducts = () =>
-    fetchProductsByCategory("Cabinet", setCabinetOptions);
-  const fetchPsuProducts = () => fetchProductsByCategory("PSU", setPsuOptions);
-  const fetchHddProducts = () => fetchProductsByCategory("HDD", setHddOptions);
-  const fetchCoolerProducts = () =>
-    fetchProductsByCategory("Cooler", setCoolerOptions);
-  const fetchAdditionalProducts = async () => {
+  const fetchAdditionalProducts = useCallback(async () => {
     try {
       const excludedCategories = [
         "Motherboard",
@@ -172,9 +137,7 @@ const PBPCListing = () => {
 
       const { data, error } = await supabase
         .from("products")
-        .select(
-          "product_id, product_name, product_SP, product_category, product_image"
-        )
+        .select("product_id, product_name, product_SP, product_image")
         .not("product_category", "in", `(${excludedCategories.join(",")})`);
 
       if (error) {
@@ -186,24 +149,35 @@ const PBPCListing = () => {
           product_id: string;
           product_name: string;
           product_SP: number;
-          product_image: { [key: string]: any }[];
+          product_image: ProductImage[];
         }) => ({
           id: product.product_id,
           name: product.product_name,
           price: `₹${product.product_SP.toLocaleString()}`,
-          image: product.product_image.find((img) => img.url.includes("_first"))
-            ?.url,
+          image: product.product_image?.find((img) => img.url.includes("_first"))?.url || "",
         })
       );
 
       setAdditionalProductOptions(formattedOptions);
     } catch (error) {
-      console.error(
-        `Error fetching additional products:`,
-        (error as Error).message
-      );
+      console.error("Error fetching additional products:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (buildType) {
+      fetchProductsByCategory(buildType === "AMD" ? "AMD_CPU" : "INTEL_CPU", setProcessorOptions);
+      fetchProductsByCategory("Motherboard", setMotherboardOptions);
+      fetchProductsByCategory("RAM", setRamOptions);
+      fetchProductsByCategory("SSD", setSsdOptions);
+      fetchProductsByCategory("GPU", setGraphicsCardOptions);
+      fetchProductsByCategory("Cabinet", setCabinetOptions);
+      fetchProductsByCategory("PSU", setPsuOptions);
+      fetchProductsByCategory("HDD", setHddOptions);
+      fetchProductsByCategory("Cooler", setCoolerOptions);
+      fetchAdditionalProducts();
+    }
+  }, [buildType, fetchProductsByCategory, fetchAdditionalProducts]);
 
   const handleSelect = (
     options: DropdownOption[],
@@ -564,10 +538,12 @@ const PBPCListing = () => {
               <div className="mt-4 flex flex-wrap gap-4">
                 {images.map((image, index) => (
                   <div key={index} className="relative">
-                    <img
+                    <Image
                       src={URL.createObjectURL(image)}
                       alt={`Upload Preview ${index}`}
                       className="h-20 w-20 object-cover rounded-md"
+                      width={500}
+                      height={500}
                     />
                     <button
                       className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"

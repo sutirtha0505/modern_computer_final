@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { ImageUp, X, Trash2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 const ShopPhotoGallery: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -115,10 +116,12 @@ const ShopPhotoGallery: React.FC = () => {
           <div className="mt-4 h-40 overflow-y-scroll flex flex-wrap justify-center gap-4">
             {selectedFiles.map((file) => (
               <div key={file.name} className="relative w-20 h-20">
-                <img
+                <Image
                   src={URL.createObjectURL(file)}
                   alt={file.name}
                   className="w-full h-full object-cover rounded-md"
+                  width={500}
+                  height={500}
                 />
                 <button
                   className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
@@ -140,10 +143,12 @@ const ShopPhotoGallery: React.FC = () => {
       <div className="h-30 flex justify-start items-center w-full gap-2 p-2 overflow-x-scroll">
         {galleryImages.map((image, index) => (
           <div key={index} className="relative flex-shrink-0 w-32 h-32">
-            <img
+            <Image
               src={image.url}
               alt={`Gallery image ${index}`}
               className="w-full h-full object-cover rounded-md"
+              width={500}
+              height={500}
             />
             <button
               className="absolute bottom-0 right-0 bg-red-500 text-white rounded-full p-1"

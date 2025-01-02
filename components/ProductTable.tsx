@@ -5,6 +5,7 @@ import { useDropzone } from "react-dropzone";
 import { supabase } from "../lib/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 import { CloudUpload, TextSearch, XCircle } from "lucide-react";
+import Image from "next/image";
 
 interface Product {
   product_id: string;
@@ -351,10 +352,12 @@ const ProductTable: React.FC = () => {
                 <td className="py-2 px-4 border hover:bg-[#283c4f]">
                   {product.product_image.map((image, index) => (
                     <div key={index} className="relative flex flex-col w-full ">
-                      <img
+                      <Image
                         src={image.url}
                         alt={`Product ${product.product_id} Image ${index}`}
                         className="max-h-20 max-w-20 object-cover rounded-md"
+                        width={500}
+                        height={500}
                       />
                       {editingProduct?.product_id === product.product_id && (
                         <button

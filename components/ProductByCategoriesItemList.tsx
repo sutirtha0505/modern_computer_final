@@ -1,5 +1,6 @@
 import React from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Product {
   product_id: string;
@@ -43,10 +44,12 @@ const ProductByCategoriesItemList: React.FC<ProductListProps> = ({
             className="p-4 mb-16 flex rounded-md flex-col cursor-pointer w-60 h-80 gap-5 justify-center items-center bg-white/50 custom-backdrop-filter"
           >
             {productImage && (
-              <img
+              <Image
                 src={productImage.url}
                 className="w-44 h-96 object-contain hover:scale-105 overflow-hidden ease-in-out duration-[0.5s]"
                 alt={product.product_name}
+                height={500}
+                width={500}
               />
             )}
             <h1 className="font-bold text-sm text-center">

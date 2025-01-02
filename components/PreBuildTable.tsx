@@ -1,7 +1,7 @@
 "use client";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 type PreBuild = {
   id: number;
@@ -34,7 +34,6 @@ const PreBuildTable = () => {
   const [editingBuildId, setEditingBuildId] = useState<number | null>(null);
   const [editingBuildName, setEditingBuildName] = useState<string>("");
   const [editingSellingPrice, setEditingSellingPrice] = useState<number>(0);
-  const router = useRouter();
 
   useEffect(() => {
     fetchPreBuilds();
@@ -190,92 +189,112 @@ const PreBuildTable = () => {
                 <td className="border px-4 py-2">
                   {build.image_urls.map((image_url, index) => (
                     <div key={index} className="relative flex flex-col w-full">
-                      <img
+                      <Image
                         src={image_url.url}
                         alt={`Build ${build.id} Image ${index}`}
                         className="max-h-60 max-w-60 object-cover rounded-md"
+                        width={200}
+                        height={200}
                       />
                     </div>
                   ))}
                 </td>
                 <td className=" border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.processor)}
                     alt={getProductNameById(build.processor)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.processor), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.motherboard)}
                     alt={getProductNameById(build.motherboard)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.motherboard), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.ram)}
                     alt={getProductNameById(build.ram)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.ram), 5)} X{" "}
                   {build.ram_quantity}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.ssd)}
                     alt={getProductNameById(build.ssd)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.ssd), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.graphics_card)}
                     alt={getProductNameById(build.graphics_card)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.graphics_card), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.hdd)}
                     alt={getProductNameById(build.hdd)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.hdd), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.cooling_system)}
                     alt={getProductNameById(build.cooling_system)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.cooling_system), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.psu)}
                     alt={getProductNameById(build.psu)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.psu), 5)}
                 </td>
 
                 <td className="border px-4 py-2">
-                  <img
+                  <Image
                     src={getProductImageByID(build.cabinet)}
                     alt={getProductNameById(build.cabinet)}
                     className="w-16 h-16 mx-auto"
+                    width={200}
+                    height={200}
                   />
                   {truncateProductName(getProductNameById(build.cabinet), 5)}
                 </td>
@@ -284,10 +303,12 @@ const PreBuildTable = () => {
                   {build.additional_products.map((product, index) => (
                     <React.Fragment key={index}>
                       <div key={product}>
-                        <img
+                        <Image
                           src={getProductImageByID(product)}
                           alt={getProductNameById(product)}
                           className="w-8 h-8 mr-2"
+                          width={200}
+                          height={200}
                         />
                         {truncateProductName(getProductNameById(product), 3)}
                       </div>

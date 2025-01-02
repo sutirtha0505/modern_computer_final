@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import SinglePBPCProductReviews from "./SinglePBPCProductReviews";
 import CharacterCounterInputForPBPCProduct from "./CharacterCounterInputForPBPCProduct";
 import RatingForPBPCProduct from "./RatingForPBPCProduct";
+import { User } from "@supabase/supabase-js";
 
 interface Product {
   id: string;
@@ -32,14 +33,27 @@ interface Product {
   image_urls?: { url: string }[];
 }
 
+interface ProductItem {
+  product_id: string;
+  product_image: { url: string }[];
+  product_name: string;
+}
+
+interface ProductImage {
+  url: string; // Assuming `url` is the property being used
+}
+
+interface AdditionalProduct {
+  id: string; // Use the actual type and key properties
+}
 const PreBuildPCSingleProduct: React.FC = () => {
   const { id } = useParams();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<ProductItem[]>([]);
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false); // New state for mounted check
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [rating, setRating] = useState<number>(0);
   const [resetRating, setResetRating] = useState<boolean>(false);
@@ -306,7 +320,7 @@ const PreBuildPCSingleProduct: React.FC = () => {
               infiniteLoop={true}
               showStatus={false}
             >
-              {productImages.map((image: any, index: number) => (
+              {productImages.map((image: ProductImage, index: number) => (
                 <div key={index} className="relative">
                   <Image
                     src={image.url}
@@ -327,9 +341,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
 
           <div className="flex gap-4 items-center">
             <div className="flex justify-center items-center gap-2">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
                 className="w-8 h-8"
+                alt=""
+                width={500}
+                height={500}
               />
               <h1 className="text-xl font-bold">Processor: </h1>
             </div>
@@ -339,9 +356,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
               }}
               className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
             >
-              <img
+              <Image
                 src={getProductImageByID(product.processor)}
                 className="w-8 h-8 rounded-full"
+                alt=""
+                width={500}
+                height={500}
               />
               <p className="text-sm font-semibold hover:text-indigo-600">
                 {getProductNameById(product.processor)}
@@ -352,9 +372,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.motherboard && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Motherboard: </h1>
               </div>
@@ -364,9 +387,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.motherboard)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.motherboard)}
@@ -377,9 +403,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.ram && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/RAM/RAM.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">RAM: </h1>
               </div>
@@ -389,9 +418,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.ram)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.ram)}
@@ -403,9 +435,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.ssd && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SSD/ssd.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">SSD: </h1>
               </div>
@@ -415,9 +450,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.ssd)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.ssd)}
@@ -428,9 +466,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.hdd && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/hard%20disk/hard_disk.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Hard Disk: </h1>
               </div>
@@ -440,9 +481,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.hdd)}
                   className="w-8 h-8 rounded-full"
+                  width={500}
+                  height={500}
+                  alt=""
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.hdd)}
@@ -453,9 +497,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.graphics_card && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/graphics%20card/graphic_card.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Graphics Card: </h1>
               </div>
@@ -471,9 +518,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                     : "opacity-50 cursor-not-allowed"
                 }`}
               >
-                <img
+                <Image
                   src={getProductImageByID(product.graphics_card)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.graphics_card)}
@@ -484,9 +534,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.psu && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/SMPS/power_supply.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Power Supply: </h1>
               </div>
@@ -496,9 +549,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.psu)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.psu)}
@@ -509,9 +565,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.cabinet && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cabinet/high_tower.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Cabinet: </h1>
               </div>
@@ -521,9 +580,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                 }}
                 className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
               >
-                <img
+                <Image
                   src={getProductImageByID(product.cabinet)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.cabinet)}
@@ -534,9 +596,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.cooling_system && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/cooler/cooler.png"
                   className="w-8 h-8"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-xl font-bold">Cooling System: </h1>
               </div>
@@ -552,9 +617,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                     : "opacity-50 cursor-not-allowed"
                 }`}
               >
-                <img
+                <Image
                   src={getProductImageByID(product.cooling_system)}
                   className="w-8 h-8 rounded-full"
+                  alt=""
+                  width={500}
+                  height={500}
                 />
                 <p className="text-sm font-semibold hover:text-indigo-600">
                   {getProductNameById(product.cooling_system)}
@@ -565,9 +633,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
           {product.additional_products && (
             <div className="flex gap-4 items-center">
               <div className="flex justify-center items-center gap-2">
-                <img
+                <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/gifts/gift_box.png"
                   className="w-8 h-8"
+                  width={500}
+                  height={500}
+                  alt=""
                 />
                 <h1 className="text-xl font-bold">Gift Items: </h1>
               </div>
@@ -580,9 +651,12 @@ const PreBuildPCSingleProduct: React.FC = () => {
                     }}
                     className="flex gap-2 p-2 justify-center items-center bg-white/50 custom-backdrop-filter rounded-lg cursor-pointer"
                   >
-                    <img
+                    <Image
                       src={getProductImageByID(item)}
                       className="w-8 h-8 rounded-full"
+                      width={200}
+                      height={200}
+                      alt=""
                     />
                     <p
                       key={index}

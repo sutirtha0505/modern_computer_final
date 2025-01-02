@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 interface Review {
   time: string;
@@ -179,10 +180,12 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
           >
             <div className="flex justify-start items-center gap-4">
               {review.profile_photo && (
-                <img
+                <Image
                   src={review.profile_photo}
                   alt={`${review.customer_name}'s profile photo`}
                   className="w-12 h-12 rounded-full"
+                  width={500}
+                  height={500}
                 />
               )}
               <p className="text-sm font-bold">{review.customer_name}</p>
@@ -199,10 +202,12 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
         ))
       ) : (
         <div className="w-full px-20 py-0 justify-center items-center flex gap-2">
-          <img
+          <Image
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/no-comment.png"
             alt=""
             className="w-20 h-20 opacity-85"
+            width={500}
+            height={500}
           />
 
           <p className="text-sm text-center">

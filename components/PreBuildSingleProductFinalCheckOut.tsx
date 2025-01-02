@@ -297,10 +297,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
             Order <span className="text-indigo-500">Summary</span>
           </h1>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/money.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Product Amount:
@@ -310,10 +312,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
             </p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/fast-delivery.png"
               alt=""
               className="w-8 h-8"
+              width={200}
+              height={200}
             />
             <label htmlFor="amount" className="text-sm font-bold">
               Delivery Amount:
@@ -321,10 +325,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
             <p className="text-sm font-bold text-indigo-600">&#x20B9;0</p>
           </div>
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/voucher.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <input
               type="text"
@@ -350,10 +356,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
           </div>
           <hr />
           <div className="w-full flex gap-2 justify-center items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/cashless-payment.png"
               alt=""
               className="w-6 h-6"
+              width={200}
+              height={200}
             />
             <p className="font-bold text-sm">
               Total Amount Payable <br />

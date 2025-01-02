@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabaseClient";
 import { BadgeInfo, CloudUpload } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 const ProductUploadForm: React.FC = () => {
   const [productName, setProductName] = useState<string>("");
@@ -93,7 +94,7 @@ const ProductUploadForm: React.FC = () => {
 
     const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
 
-    const { data, error: insertError } = await supabase
+    const { error: insertError } = await supabase
         .from("products")
         .insert([
             {
@@ -308,10 +309,12 @@ const ProductUploadForm: React.FC = () => {
           <div className="flex flex-wrap">
             {images.map((file, index) => (
               <div key={index} className="relative">
-                <img
+                <Image
                   src={URL.createObjectURL(file)}
                   alt={`Product Image ${index}`}
                   className="max-h-20 max-w-20 object-cover rounded-md m-2"
+                  width={500}
+                  height={500}
                 />
                 <button
                   type="button"

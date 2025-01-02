@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 const UserProfile = () => {
   const params = useParams();
@@ -99,7 +100,7 @@ if (!user || user && user.id !== id) {
 
         // Upload the profile photo if there's a new one
         if (profilePhoto) {
-          const { data, error: uploadError } = await supabase.storage
+          const { error: uploadError } = await supabase.storage
             .from("product-image")
             .upload(`profile_photos/${id}/${profilePhoto.name}`, profilePhoto);
 
@@ -156,22 +157,28 @@ if (!user || user && user.id !== id) {
       >
         <input {...getInputProps()} />
         {profilePhoto ? (
-          <img
+          <Image
             src={URL.createObjectURL(profilePhoto)}
             alt="Profile"
             className="w-full h-full object-cover"
+            width={500}
+            height={500}
           />
         ) : photoUrl ? (
-          <img
+          <Image
             src={photoUrl}
             alt="Profile"
             className="w-full h-full object-cover"
+            height={500}
+            width={500}
           />
         ) : (
-          <img
+          <Image
             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/profile_display.png"
             alt=""
             className="w-10 h-10"
+            height={500}
+            width={500}
           />
         )}
       </div>
@@ -182,10 +189,12 @@ if (!user || user && user.id !== id) {
         </h1>
         <div className="w-full">
           <div className="flex gap-3 items-center ">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/email.png"
               alt=""
               className="w-4 h-4"
+              width={200}
+              height={200}
             />
             <label htmlFor="email" className="text-xs font-bold">
               Email:
@@ -202,10 +211,12 @@ if (!user || user && user.id !== id) {
         </div>
         <div className="w-full">
           <div className="flex gap-3 items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/profile.png"
               alt=""
               className="w-4 h-4"
+              width={200}
+              height={200}
             />
 
             <label htmlFor="name" className="text-xs font-bold">
@@ -223,10 +234,12 @@ if (!user || user && user.id !== id) {
         </div>
         <div className="w-full">
           <div className="flex gap-3 items-center">
-            <img
+            <Image
               src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/call.png"
               alt=""
               className="w-4 h-4"
+              width={200}
+              height={200}
             />
             <label htmlFor="phoneNo" className="text-xs font-bold">
               Phone No:
@@ -244,10 +257,12 @@ if (!user || user && user.id !== id) {
         <div className="flex gap-2 w-full">
           <div className="w-1/3">
             <div className="flex gap-3 items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/house.png"
                 alt=""
                 className="w-4 h-4"
+                width={200}
+                height={200}
               />
               <label htmlFor="houseNo" className="text-xs font-bold">
                 House No.:
@@ -264,10 +279,12 @@ if (!user || user && user.id !== id) {
           </div>
           <div className="w-2/3">
             <div className="flex gap-3 items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/streets.png"
                 alt=""
                 className="w-4 h-4"
+                width={200}
+                height={200}
               />
               <label htmlFor="streetName" className="text-xs font-bold">
                 Street Name:
@@ -286,10 +303,12 @@ if (!user || user && user.id !== id) {
         <div className="flex gap-2 w-full">
           <div className="w-1/3">
             <div className="flex gap-3 items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/landmark.png"
                 alt=""
                 className="w-4 h-4"
+                width={200}
+                height={200}
               />
               <label htmlFor="landmark" className="text-xs font-bold">
                 Landmark:
@@ -306,10 +325,12 @@ if (!user || user && user.id !== id) {
           </div>
           <div className="w-1/3">
             <div className="flex gap-3 items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/architecture-and-city.png"
                 alt=""
                 className="w-4 h-4"
+                width={200}
+                height={200}
               />
               <label htmlFor="city" className="font-bold text-xs">
                 City:
@@ -326,10 +347,12 @@ if (!user || user && user.id !== id) {
           </div>
           <div className="w-1/3">
             <div className="flex gap-3 items-center">
-              <img
+              <Image
                 src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/mailbox.png"
                 alt=""
                 className="w-4 h-4"
+                width={200}
+                height={200}
               />
               <label htmlFor="pinCode" className="text-xs font-bold">
                 Pin Code:

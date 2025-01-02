@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Product {
   category_product_image: string;
@@ -100,10 +101,12 @@ const ProductByCategoriesSlider: React.FC = () => {
               }}
               className="cursor-pointer hover:scale-105 ease-in-out duration-[0.5s]"
             >
-              <img
+              <Image
                 src={product.category_product_image}
                 className="w-40 h-40 mx-auto"
                 alt={product.product_main_category}
+                width={500}
+                height={500}
               />
               <h1 className="text-center font-bold">
                 {product.product_main_category}

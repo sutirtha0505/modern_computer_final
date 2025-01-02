@@ -159,7 +159,7 @@ const ShoppingCart = () => {
             <div className="flex items-center gap-2 justify-center">
               <BadgeCheck className="text-green-800 dark:text-green-400" />
               <p className="text-md text-green-700 dark:text-green-400">
-                You've saved &#x20B9;{totalSavings} successfully
+                You have saved &#x20B9;{totalSavings} successfully
               </p>
             </div>
             <div className="flex justify-center">

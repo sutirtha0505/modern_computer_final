@@ -4,6 +4,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { supabase } from "@/lib/supabaseClient";
 import { EmblaCarouselType } from "embla-carousel";
 import './carousel.css';
+import Image from "next/image";
 
 const TWEEN_FACTOR_BASE = 0.52;
 
@@ -131,10 +132,12 @@ const RecentProductsShow: React.FC = () => {
               <div className="embla__container">
                 {galleryImages.map((image, index) => (
                   <div className="embla__slide" key={index}>
-                    <img
+                    <Image
                       src={image.url}
                       alt={image.name}
                       className="embla__slide__number"
+                      width={500}
+                      height={500}
                     />
                   </div>
                 ))}
