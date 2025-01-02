@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Download, XCircle } from "lucide-react";
 import { useQRCode } from "next-qrcode";
+import Image from "next/image";
 
 // Interfaces for types
 interface OrderedProduct {
@@ -49,7 +50,7 @@ const OrderedPCComponentManagement = () => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
-  const { Image } = useQRCode();
+  const { Image:QRCodeImage } = useQRCode();
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
 
   const getFirstImageUrl = (images: { url: string }[]): string | null => {
@@ -368,10 +369,12 @@ const OrderedPCComponentManagement = () => {
                     <td className="px-4 py-2 border w-[25%] text-xs">
                       <div className="flex flex-wrap items-center gap-2 justify-center mb-3">
                         {customer?.profile_photo && (
-                          <img
+                          <Image
                             src={customer.profile_photo}
                             alt={customer.customer_name}
                             className="w-8 h-8 rounded-full object-cover"
+                            width={500}
+                            height={500}
                           />
                         )}
                         <p className="text-center">
@@ -388,10 +391,12 @@ const OrderedPCComponentManagement = () => {
                             );
                           }}
                         >
-                          <img
+                          <Image
                             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gmail.png"
                             alt=""
                             className="w-4 h-4"
+                            width={200}
+                            height={200}
                           />
                           <p className="break-all">
                             {customer?.email || "Unknown Email"}
@@ -403,10 +408,12 @@ const OrderedPCComponentManagement = () => {
                             window.open(`tel:${customer?.phone_no}`);
                           }}
                         >
-                          <img
+                          <Image
                             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/call.png"
                             alt=""
                             className="w-4 h-4"
+                            width={200}
+                            height={200}
                           />
                           <p>{customer?.phone_no}</p>
                         </div>
@@ -443,13 +450,15 @@ const OrderedPCComponentManagement = () => {
                             }}
                           >
                             {firstImageUrl && (
-                              <img
+                              <Image
                                 src={firstImageUrl}
                                 alt={
                                   productDetails?.product_name ||
                                   "Product Image"
                                 }
                                 className="w-8 h-8 object-cover"
+                                width={500}
+                                height={500}
                               />
                             )}
                             <span className="text-xs hover:text-indigo-500">
@@ -601,7 +610,7 @@ const OrderedPCComponentManagement = () => {
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
                       {qrCodes.has(order.order_id) ? (
-                        <Image
+                        <QRCodeImage
                           text={qrCodes.get(order.order_id) || ""}
                           options={{
                             type: "image/jpeg",

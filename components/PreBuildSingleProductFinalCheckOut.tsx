@@ -9,17 +9,42 @@ import { useRouter } from "next/navigation";
 interface PreBuildPCSingleProductFinalCheckOutProps {
   userId: string; // Explicitly typing the userId as a string
 }
+interface Product {
+  build_name: string;
+  image_urls: { url: string }[];
+  build_type: string;
+  coupon_code: string;
+  code_equiv_percent: number;
+  date_applicable: string;
+}
+interface CustomerDetails {
+  customer_name: string;
+  customer_house_no: string;
+  customer_house_street: string;
+  customer_house_city: string;
+  customer_house_pincode: number;
+  customer_house_landmark: string;
+  profile_photo: string;
+  email: string;
+  phone_no: string;
+}
+
+interface RazorpayResponse {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+}
 const PreBuildSingleProductFinalCheckOut: React.FC<
   PreBuildPCSingleProductFinalCheckOutProps
 > = ({ userId }) => {
   const router = useRouter();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [productId, setProductId] = useState<string | null>(null);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [couponCode, setCouponCode] = useState<string>("");
   const [discountedTotal, setDiscountedTotal] = useState<number>(0);
   const [couponApplied, setCouponApplied] = useState<boolean>(false);
-  const [customerDetails, setCustomerDetails] = useState<any>(null);
+  const [customerDetails, setCustomerDetails] = useState<CustomerDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [sellingPrice, setSellingPrice] = useState<number>(0); // State for selling price
 
@@ -187,11 +212,11 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
         amount: data.amount,
         currency: data.currency,
         app_name: "Modern Computer",
-        description: product.product_name,
+        description: product?.build_name,
         image:
           "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/About/Logo.gif",
         order_id: data.id,
-        handler: async (response: any) => {
+        handler: async (response: RazorpayResponse) => {
           toast.success("Payment successful!");
           console.log("Payment Response:", response);
 
@@ -203,12 +228,12 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
           );
         },
         prefill: {
-          name: customerDetails.customer_name,
-          email: customerDetails.email,
-          contact: customerDetails.phone_no,
+          name: customerDetails?.customer_name,
+          email: customerDetails?.email,
+          contact: customerDetails?.phone_no,
         },
         notes: {
-          address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+          address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         },
         theme: {
           color: "#6265F1",
@@ -239,7 +264,7 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
         customer_id: userId,
         payment_amount: amount, // Use the amount passed from the payment handler
         ordered_products: [productId],
-        order_address: `${customerDetails.customer_house_no}, ${customerDetails.customer_house_street}, ${customerDetails.customer_house_city}, ${customerDetails.customer_house_pincode}`,
+        order_address: `${customerDetails?.customer_house_no}, ${customerDetails?.customer_house_street}, ${customerDetails?.customer_house_city}, ${customerDetails?.customer_house_pincode}`,
         expected_delivery_date: expectedDeliveryDate,
         created_at: new Date(),
       },

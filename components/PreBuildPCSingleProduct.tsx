@@ -42,10 +42,6 @@ interface ProductItem {
 interface ProductImage {
   url: string; // Assuming `url` is the property being used
 }
-
-interface AdditionalProduct {
-  id: string; // Use the actual type and key properties
-}
 const PreBuildPCSingleProduct: React.FC = () => {
   const { id } = useParams();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
@@ -644,8 +640,8 @@ const PreBuildPCSingleProduct: React.FC = () => {
               </div>
               {product.additional_products &&
               product.additional_products.length > 0 ? (
-                product.additional_products.map((item: any, index: number) => (
-                  <div
+                product.additional_products.map((item: string, index: number) => (
+                  <div key={item}
                     onClick={() => {
                       router.push(`/product/${item}`);
                     }}

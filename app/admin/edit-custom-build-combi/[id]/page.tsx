@@ -123,42 +123,6 @@ const EditCustomPCCombination = () => {
   }, [build]);
 
   useEffect(() => {
-    if (build) {
-      setSelectedOptionsForCategory(
-        "processor",
-        build.processor,
-        setSelectedProcessorOptions
-      );
-      setSelectedOptionsForCategory(
-        "motherboards",
-        build.motherboards,
-        setSelectedMotherboardOptions
-      );
-      setSelectedOptionsForCategory("ram", build.ram, setSelectedRAMOptions);
-      setSelectedOptionsForCategory("ssd", build.ssd, setSelectedSSDOptions);
-      setSelectedOptionsForCategory(
-        "graphics_cards",
-        build.graphics_cards,
-        setSelectedGraphicsCardOptions
-      );
-      setSelectedOptionsForCategory(
-        "cabinets",
-        build.cabinets,
-        setSelectedCabinetOptions
-      );
-      setSelectedOptionsForCategory("psu", build.psu, setSelectedPSUOptions);
-      setSelectedOptionsForCategory("hdd", build.hdd, setSelectedHDDOptions);
-      setSelectedOptionsForCategory(
-        "cooling_systems",
-        build.cooling_systems,
-        setSelectedCoolerOptions
-      );
-    }
-  }, [build]);
-  
-  
-
-  useEffect(() => {
     const buildTypeOption = buildType
       ? {
           id: buildType.toLowerCase(),
@@ -269,7 +233,7 @@ const EditCustomPCCombination = () => {
     fetchCoolerProducts,
   ]);
 
-  const setSelectedOptionsForCategory = (
+  const setSelectedOptionsForCategory = useCallback((
     category: string,
     items: string[] | string,
     setSelectedOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>
@@ -291,7 +255,7 @@ const EditCustomPCCombination = () => {
             ?.url || "",
       }));
     setSelectedOptions(selectedOptions);
-  };
+  },[products]);
 
   const handleSelect = (
     options: DropdownOption[],
@@ -305,6 +269,40 @@ const EditCustomPCCombination = () => {
   const handleBuildTypeSelect = (option: DropdownOption) => {
     setBuildType(option.name);
   };
+
+  useEffect(() => {
+    if (build) {
+      setSelectedOptionsForCategory(
+        "processor",
+        build.processor,
+        setSelectedProcessorOptions
+      );
+      setSelectedOptionsForCategory(
+        "motherboards",
+        build.motherboards,
+        setSelectedMotherboardOptions
+      );
+      setSelectedOptionsForCategory("ram", build.ram, setSelectedRAMOptions);
+      setSelectedOptionsForCategory("ssd", build.ssd, setSelectedSSDOptions);
+      setSelectedOptionsForCategory(
+        "graphics_cards",
+        build.graphics_cards,
+        setSelectedGraphicsCardOptions
+      );
+      setSelectedOptionsForCategory(
+        "cabinets",
+        build.cabinets,
+        setSelectedCabinetOptions
+      );
+      setSelectedOptionsForCategory("psu", build.psu, setSelectedPSUOptions);
+      setSelectedOptionsForCategory("hdd", build.hdd, setSelectedHDDOptions);
+      setSelectedOptionsForCategory(
+        "cooling_systems",
+        build.cooling_systems,
+        setSelectedCoolerOptions
+      );
+    }
+  }, [build, setSelectedOptionsForCategory]);
 
   const handleSaveBuild = async () => {
     const selectedProcessorIds = selectedProcessorOptions.map(

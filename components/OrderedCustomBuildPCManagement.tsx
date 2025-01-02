@@ -5,6 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Download, XCircle } from "lucide-react";
 import { useQRCode } from "next-qrcode";
+import Image from "next/image";
 // Interfaces for types
 interface OrderedProduct {
   product_id: string;
@@ -50,7 +51,7 @@ const OrderedCustomBuildPCManagement = () => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // State to hold the search query
   const [sortOrder, setSortOrder] = useState<string>("Newest");
   const [qrCodes, setQrCodes] = useState<Map<string, string>>(new Map());
-  const { Image } = useQRCode();
+  const { Image:QRCodeImage } = useQRCode();
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -264,10 +265,12 @@ const OrderedCustomBuildPCManagement = () => {
             className="flex gap-4 items-center justify-center cursor-pointer flex-wrap"
             onClick={() => handleProductClick(name)} // Fetch product ID on click
           >
-            <img
+            <Image
               src={product.image_url}
               alt={`${key} Image`}
               className="w-16 h-16 object-cover"
+              width={500}
+              height={500}
             />
             <p className="text-xs font-semibold hover:text-indigo-600 text-center">
               <span className="font-bold text-indigo-500 text-sm">{key}</span>:{" "}
@@ -419,10 +422,12 @@ const OrderedCustomBuildPCManagement = () => {
                     <td className="px-4 py-2 border w-[25%] text-xs">
                       <div className="flex flex-wrap items-center gap-2 justify-center mb-3">
                         {customer?.profile_photo && (
-                          <img
+                          <Image
                             src={customer.profile_photo}
                             alt={customer.customer_name}
                             className="w-8 h-8 rounded-full object-cover"
+                            width={500}
+                            height={500}
                           />
                         )}
                         <p className="text-center">
@@ -439,10 +444,12 @@ const OrderedCustomBuildPCManagement = () => {
                             );
                           }}
                         >
-                          <img
+                          <Image
                             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gmail.png"
                             alt=""
                             className="w-4 h-4"
+                            width={500}
+                            height={500}
                           />
                           <p className="break-all">
                             {customer?.email || "Unknown Email"}
@@ -454,10 +461,12 @@ const OrderedCustomBuildPCManagement = () => {
                             window.open(`tel:${customer?.phone_no}`);
                           }}
                         >
-                          <img
+                          <Image
                             src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/call.png"
                             alt=""
                             className="w-4 h-4"
+                            width={500}
+                            height={500}
                           />
                           <p>{customer?.phone_no}</p>
                         </div>
@@ -621,7 +630,7 @@ const OrderedCustomBuildPCManagement = () => {
                     </td>
                     <td className="px-4 py-2 border w-[5%]">
                       {qrCodes.has(order.order_id) ? (
-                        <Image
+                        <QRCodeImage
                           text={qrCodes.get(order.order_id) || ""}
                           options={{
                             type: "image/jpeg",
