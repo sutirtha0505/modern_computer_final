@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import { CircleX } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 interface Order {
   order_id: string;
@@ -149,11 +150,13 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
   if (orders.length === 0) {
     return (
       <div className="flex gap-4 justify-center items-center h-full">
-        <img
+        <Image
           src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/Prebuild-Not%20ordered-Photoroom.png"
           alt=""
           loading="lazy"
           className="w-28 h-28"
+          width={500}
+          height={500}
         />
         <p className="text-center font-bold">
           No <span className="text-indigo-500">Pre-Build PC</span> orders found.
@@ -200,10 +203,12 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                       <li key={idx} className="flex gap-4 items-center">
                         <div className="flex items-center justify-between gap-6 cursor-pointer">
                           {firstImageUrl && (
-                            <img
+                            <Image
                               src={firstImageUrl}
                               alt="Product Image"
                               className="w-16 h-16 object-cover"
+                              width={500}
+                              height={500}
                             />
                           )}
                           <p className="text-sm font-semibold hover:text-indigo-600">
@@ -220,10 +225,12 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
                 </ol>
                 <div className="w-auto flex flex-col justify-center items-center gap-2">
                   <div className="flex gap-2 justify-center items-center">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
                       alt=""
                       className="w-8 h-8"
+                      width={500}
+                      height={500}
                     />
                     <p className="text-sm font-semibold text-indigo-600">
                       Order Status:
@@ -263,10 +270,12 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
 
                 <div className="w-auto flex flex-col justify-center items-center gap-4">
                   <div className="flex gap-2 justify-center items-center">
-                    <img
+                    <Image
                       src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
                       alt=""
                       className="w-8 h-8"
+                      height={500}
+                      width={500}
                     />
                     <p className="text-sm font-semibold text-indigo-600">
                       Expected Delivery Date:

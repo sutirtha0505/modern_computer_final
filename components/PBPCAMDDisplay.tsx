@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Product {
   id: number;
@@ -49,10 +50,12 @@ const PBPCAMDDisplay: React.FC = () => {
                 key={product.id}
                 className="p-2 border-2 rounded-md bg-white/50 custom-backdrop-filter justify-center items-center flex flex-col gap-3 hover:text-indigo-600 cursor-pointer"
               >
-                <img
+                <Image
                   src={productImage.url}
                   alt={`Product ${product.id}`}
                   className="w-60 h-40 object-cover p-2 items-center hover:scale-105 duration-300 ease-in-out"
+                  width={500}
+                  height={500}
                 />
                 <h1 className="text-center text-medium font-semibold">
                   {product.build_name}

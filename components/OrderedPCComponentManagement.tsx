@@ -118,7 +118,7 @@ const OrderedPCComponentManagement = () => {
         }
 
         const customerMap = new Map<string, Customer>();
-        customersData?.forEach((customer: any) => {
+        customersData?.forEach((customer: Customer) => {
           customerMap.set(customer.id, customer);
         });
 

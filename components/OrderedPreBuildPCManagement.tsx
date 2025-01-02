@@ -16,15 +16,28 @@ interface Product {
 }
 
 interface Customer {
+  id: string;
   email: string;
   customer_name: string;
   phone_no: string;
   profile_photo: string;
 }
 
+interface Order {
+  order_id: string;
+  customer_id: string;
+  ordered_products: string[];
+  order_status: string;
+  payment_id: string;
+  order_address: string;
+  created_at: string;
+  expected_delivery_date: string;
+  payment_amount: number;
+}
+
 const OrderedPreBuildPCManagement = () => {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<any[]>([]); // State to hold filtered orders
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]); // State to hold filtered orders
   const [productsMap, setProductsMap] = useState<Map<string, Product>>(
     new Map()
   );
@@ -114,7 +127,7 @@ const OrderedPreBuildPCManagement = () => {
         }
 
         const customerMap = new Map<string, Customer>();
-        customersData?.forEach((customer: any) => {
+        customersData?.forEach((customer: Customer) => {
           customerMap.set(customer.id, customer);
         });
 
@@ -171,7 +184,7 @@ const OrderedPreBuildPCManagement = () => {
 
   // Function to generate QR codes automatically on load
   const generateQRCodes = (
-    ordersData: any[],
+    ordersData: Order[],
     customerMap: Map<string, Customer>
   ) => {
     const newQrCodes = new Map<string, string>();
