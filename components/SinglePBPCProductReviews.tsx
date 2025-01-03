@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
@@ -15,16 +15,16 @@ interface SinglePBPCProductReviewsProps {
   productId: string;
 }
 
-const Star = ({
+const Star: React.FC<{
+  color?: string;
+  fill?: string;
+  strokeWidth?: number;
+  className?: string;
+}> = ({
   color = "#fa9302",
   fill = "none",
   strokeWidth = 1,
   className = "",
-}: {
-  color: string;
-  fill: string;
-  strokeWidth: number;
-  className?: string;
 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -49,6 +49,7 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
 
+  // Fetch reviews and their associated user profiles
   useEffect(() => {
     const fetchReviewsWithProfiles = async () => {
       setLoading(true);
@@ -61,11 +62,10 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
 
         if (productError) {
           setError("Error fetching reviews");
-          setLoading(false);
           return;
         }
 
-        if (productData && productData.user_rating) {
+        if (productData?.user_rating) {
           const reviewsWithProfiles: Review[] = await Promise.all(
             productData.user_rating.map(async (review: Review) => {
               const { data: profileData } = await supabase
@@ -76,8 +76,7 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
 
               return {
                 ...review,
-                customer_name:
-                  profileData?.customer_name || "Non-Verified User",
+                customer_name: profileData?.customer_name || "Non-Verified User",
                 profile_photo: profileData?.profile_photo || null,
               };
             })
@@ -86,7 +85,7 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
           setReviews(reviewsWithProfiles);
           setFilteredReviews(reviewsWithProfiles);
         }
-      } catch (error) {
+      } catch {
         setError("Failed to load reviews");
       } finally {
         setLoading(false);
@@ -96,20 +95,18 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
     fetchReviewsWithProfiles();
   }, [productId]);
 
+  // Filter reviews based on selected rating
+  const filterReviews = useCallback(() => {
+    setFilteredReviews(
+      selectedRating !== null
+        ? reviews.filter((review) => review.review === selectedRating)
+        : reviews
+    );
+  }, [reviews, selectedRating]);
+
   useEffect(() => {
     filterReviews();
-  }, [selectedRating]);
-
-  const filterReviews = () => {
-    let filtered = reviews;
-
-    // Filter reviews based on the selected rating
-    if (selectedRating !== null) {
-      filtered = reviews.filter((review) => review.review === selectedRating);
-    }
-
-    setFilteredReviews(filtered);
-  };
+  }, [filterReviews]);
 
   // Render stars based on rating value
   const renderStars = (rating: number) => (
@@ -117,7 +114,7 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
       {[...Array(5)].map((_, index) => (
         <Star
           key={index}
-          color={index < rating ? "#fa9302" : "#fa9302"}
+          color={index < rating ? "#fa9302" : "#ccc"}
           fill={index < rating ? "#fa9302" : "none"}
           strokeWidth={1}
           className="cursor-pointer"
@@ -136,85 +133,71 @@ const SinglePBPCProductReviews: React.FC<SinglePBPCProductReviewsProps> = ({
     const hours = Math.floor(timeDiff / (1000 * 60 * 60));
     const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
 
-    if (minutes < 1) {
-      return "Just now";
-    } else if (minutes < 60) {
-      return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-    } else if (hours < 24) {
-      return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-    } else {
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    }
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    return `${days} day${days > 1 ? "s" : ""} ago`;
   };
 
+  // Handle loading and error states
   if (loading) return <p>Loading reviews...</p>;
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="flex flex-col items-start justify-start w-full px-4 py-0 md:px-24">
-      <div className="flex justify-center items-center w-full mb-4">
-        <label className="mr-2 font-bold text-indigo-500">
-          Filter by rating:
-        </label>
-        <select
-          value={selectedRating || ""}
-          onChange={(e) =>
-            setSelectedRating(e.target.value ? parseInt(e.target.value) : null)
-          }
-          className="border p-2 rounded-md"
-        >
-          <option value="">All Ratings</option>
+    <div className="reviews-container">
+      <div className="filter-options">
+        <p>Filter by Rating:</p>
+        <div className="stars-filter flex">
           {[...Array(5)].map((_, index) => (
-            <option key={index} value={index + 1}>
-              {index + 1} Star{index + 1 > 1 && "s"}
-            </option>
+            <div
+              key={index}
+              onClick={() =>
+                setSelectedRating(selectedRating === index + 1 ? null : index + 1)
+              }
+              className="cursor-pointer"
+            >
+              <Star
+                color="#fa9302"
+                fill={selectedRating === index + 1 ? "#fa9302" : "none"}
+                strokeWidth={1}
+              />
+            </div>
           ))}
-        </select>
-      </div>
-
-      {filteredReviews.length > 0 ? (
-        filteredReviews.map((review, index) => (
-          <div
-            key={index}
-            className="flex flex-col items-start justify-start mb-4 w-full bg-gray-700 rounded-md p-4"
-          >
-            <div className="flex justify-start items-center gap-4">
-              {review.profile_photo && (
-                <Image
-                  src={review.profile_photo}
-                  alt={`${review.customer_name}'s profile photo`}
-                  className="w-12 h-12 rounded-full"
-                  width={500}
-                  height={500}
-                />
-              )}
-              <p className="text-sm font-bold">{review.customer_name}</p>
-            </div>
-            <div className="flex gap-4 justify-start items-center p-2">
-              {renderStars(review.review)}
-              <p className="text-xs">
-                <span className="font-bold text-indigo-500">Commented: </span>
-                {renderRelativeTime(review.time)}
-              </p>
-            </div>
-            <p className="text-sm mt-2">{review.comment}</p>
-          </div>
-        ))
-      ) : (
-        <div className="w-full px-20 py-0 justify-center items-center flex gap-2">
-          <Image
-            src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/no-comment.png"
-            alt=""
-            className="w-20 h-20 opacity-85"
-            width={500}
-            height={500}
-          />
-
-          <p className="text-sm text-center">
-            No reviews found for this product.
-          </p>
         </div>
-      )}
+      </div>
+      <div className="reviews-list">
+        {filteredReviews.length === 0 ? (
+          <p>No reviews available for this rating.</p>
+        ) : (
+          filteredReviews.map((review, index) => (
+            <div key={index} className="review-card flex items-start gap-4">
+              <div className="profile-photo">
+                {review.profile_photo ? (
+                  <Image
+                    src={review.profile_photo}
+                    alt={`${review.customer_name}'s Profile`}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <div className="default-avatar bg-gray-300 rounded-full w-10 h-10"></div>
+                )}
+              </div>
+              <div className="review-content">
+                <p className="customer-name font-bold">
+                  {review.customer_name}
+                </p>
+                <div className="review-stars">{renderStars(review.review)}</div>
+                <p className="review-comment">{review.comment}</p>
+                <p className="review-time text-gray-500 text-sm">
+                  {renderRelativeTime(review.time)}
+                </p>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

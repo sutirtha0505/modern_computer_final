@@ -1,69 +1,67 @@
 "use client";
-import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { BadgeCheck, CircleX } from "lucide-react";
-// import VanillaTilt from "vanilla-tilt";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks/redux";
 import { getCart, removeFromTheCart, updateQuantity } from "@/redux/cartSlice";
 import { useRouter } from "next/navigation";
 
+// Define the product type
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_SP: number;
+  product_MRP: number;
+  product_discount: number;
+  product_image: { url: string }[];
+  quantity: number;
+}
+
 const ShoppingCart = () => {
   const router = useRouter();
-  const cart = useAppSelector(getCart);
+  const cart = useAppSelector(getCart) as Product[];
   const dispatch = useAppDispatch();
-  const tiltRefs = useRef<any[]>([]); // Ref to store tilt instances
 
-  const handleQuantityChange = (productId: any, quantity: string) => {
+  const handleQuantityChange = (productId: string, quantity: string) => {
     dispatch(updateQuantity({ productId, quantity: Number(quantity) }));
   };
 
   // Calculate the total sum
   const totalSum = cart
-    .reduce((sum: number, product: any) => {
-      return sum + product.product_SP * product.quantity;
-    }, 0)
+    .reduce((sum, product) => sum + product.product_SP * product.quantity, 0)
     .toFixed(2);
 
   // Calculate the sum of all MRPs
   const totalMRP = cart
-    .reduce((sum: number, product: any) => {
-      return sum + product.product_MRP * product.quantity;
-    }, 0)
+    .reduce((sum, product) => sum + product.product_MRP * product.quantity, 0)
     .toFixed(2);
 
   // Calculate the total savings
   const totalSavings = (parseFloat(totalMRP) - parseFloat(totalSum)).toFixed(2);
+
   const handleProceedToCheckout = () => {
-    // Update the cart data to include the image URLs
-    const updatedCart = cart.map((product: any) => {
-      const imageUrl = product.product_image?.find((img: any) =>
+    const updatedCart = cart.map((product) => {
+      const imageUrl = product.product_image?.find((img) =>
         img.url.includes("_first")
       )?.url;
-  
-      return {
-        ...product,
-        imageUrl, // Add the image URL to each product object
-      };
+
+      return { ...product, imageUrl };
     });
-  
-    // Convert cart array (with imageUrl) to a query-friendly string
+
     const cartString = encodeURIComponent(JSON.stringify(updatedCart));
-  
-    // Navigate to the checkout page without totalSum in the query
     router.push(`/checkout-cart?cart=${cartString}`);
   };
-  
-  
 
   return (
-    <div className="flex flex-col gap-6 mt-5">
-      <h1 className="font-extrabold text-2xl text-center">Shopping Cart</h1>
+    <div className="flex flex-col gap-6 mt-7">
+      <h1 className="font-extrabold text-3xl text-center text-indigo-600">Shopping Cart</h1>
       {cart.length === 0 ? (
-        <p>No items in cart</p>
+        <div className="w-full h-full justify-center items-center">
+          <p className="text-center">No items in cart</p>
+        </div>
+        
       ) : (
-        cart.map((product: any, index: number) => {
-          // Find the image URL that contains "_first"
-          const imageUrl = product.product_image?.find((img: any) =>
+        cart.map((product) => {
+          const imageUrl = product.product_image?.find((img) =>
             img.url.includes("_first")
           )?.url;
 
@@ -84,7 +82,6 @@ const ShoppingCart = () => {
                   <p>No image available</p>
                 )}
               </div>
-
               <div className="md:w-[50%] flex flex-col gap-4 p-4">
                 <p className="text-sm font-extrabold">{product.product_name}</p>
                 <div className="flex gap-6 items-center flex-wrap justify-center">
@@ -100,9 +97,7 @@ const ShoppingCart = () => {
                     </p>
                   </div>
                   <button
-                    onClick={() => {
-                      dispatch(removeFromTheCart(product.product_id));
-                    }}
+                    onClick={() => dispatch(removeFromTheCart(product.product_id))}
                     className="flex gap-2 border-2 font-extrabold text-xs border-red-500 bg-red-500 p-2 rounded-lg items-center hover:text-red-500 hover:bg-transparent"
                   >
                     <CircleX />

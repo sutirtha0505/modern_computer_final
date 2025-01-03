@@ -76,7 +76,7 @@ const RecentProductsShow: React.FC = () => {
 
             if (engine.options.loop) {
               engine.slideLooper.loopPoints.forEach(
-                (loopItem: { target: () => any; index: number }) => {
+                (loopItem: { target: () => number; index: number }) => {
                   const target = loopItem.target();
 
                   if (slideIndex === loopItem.index && target !== 0) {
@@ -105,20 +105,21 @@ const RecentProductsShow: React.FC = () => {
 
   useEffect(() => {
     fetchGalleryImages();
-
+  
     if (!emblaApi) return;
-
+  
     setTweenNodes(emblaApi);
     setTweenFactor(emblaApi);
     tweenScale(emblaApi);
-
+  
     emblaApi
       .on("reInit", setTweenNodes)
       .on("reInit", setTweenFactor)
       .on("reInit", tweenScale)
       .on("scroll", tweenScale)
       .on("slideFocus", tweenScale);
-  }, [emblaApi, tweenScale]);
+  }, [emblaApi, tweenScale, setTweenFactor, setTweenNodes]);
+  
 
   return (
     <div className="pt-8 flex flex-col justify-center items-center gap-4">

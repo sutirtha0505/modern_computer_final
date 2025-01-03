@@ -4,10 +4,19 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-const ProductCard = ({ products }: { products: any }) => {
+
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_image: { url: string }[];
+  product_SP: number; // Selling price
+  product_MRP: number; // Maximum retail price
+  product_amount: number; // Available stock
+}
+const ProductCard = ({ products }: { products: Product }) => {
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const router = useRouter();
-  const productImage = products.product_image?.find((img: any) =>
+  const productImage = products.product_image.find((img) =>
     img.url.includes("_first")
   );
 
@@ -31,7 +40,7 @@ const ProductCard = ({ products }: { products: any }) => {
           </div>
           <div className="w-44 h-96 flex items-center overflow-hidden object-fill">
             <Image
-              src={productImage?.url}
+              src={productImage?.url || ""}
               width={200}
               height={100}
               alt={products.product_name}
@@ -74,7 +83,7 @@ const ProductCard = ({ products }: { products: any }) => {
           </div>
           <div className="w-44 h-96 flex items-center overflow-hidden object-fill">
             <Image
-              src={productImage?.url}
+              src={productImage?.url || ""}
               width={200}
               height={100}
               alt={products.product_name}
@@ -117,7 +126,7 @@ const ProductCard = ({ products }: { products: any }) => {
           </div>
           <div className="w-44 h-96 flex items-center overflow-hidden object-fill">
             <Image
-              src={productImage?.url}
+              src={productImage?.url || ""}
               width={200}
               height={100}
               alt={products.product_name}

@@ -65,7 +65,7 @@ const ProductUploadForm: React.FC = () => {
     }
 
     const productId = uuidv4();
-    const imageUrls: any[] = [];
+    const imageUrls: { url: string }[] = []; // Replace `any[]` with a proper type
     const uploadPromises = images.map(async (image) => {
         const filePath = `${productId}/${uuidv4()}_${image.name}`;
         const { error: uploadError } = await supabase.storage

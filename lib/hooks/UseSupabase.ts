@@ -1,13 +1,21 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
 
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_description: string;
+  product_category: string;
+  // Add other fields based on your `products` table structure
+}
+
 export const UseSupabase = () => {
-  const [products, setProducts] = useState<any>([]);
-  const [filterData, setFilterData] = useState<any>([]);
-  const [singleProduct, setSingleProduct] = useState<any>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filterData, setFilterData] = useState<Product[]>([]);
+  const [singleProduct, setSingleProduct] = useState<Product | null>(null);
 
   const getDataFromSupabase = async () => {
-    let { data, error } = await supabase.from("products").select("*");
+    const { data, error } = await supabase.from("products").select("*");
     if (data) {
       setProducts(data);
       console.log(data);
@@ -19,10 +27,12 @@ export const UseSupabase = () => {
 
   const getFilterData = async (query: string) => {
     const decodedQuery = decodeURIComponent(query); // Decode the URL-encoded query string
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from("products")
       .select("*")
-      .or(`product_name.ilike.%${decodedQuery}%, product_description.ilike.%${decodedQuery}%, product_category.ilike.%${decodedQuery}%`);
+      .or(
+        `product_name.ilike.%${decodedQuery}%, product_description.ilike.%${decodedQuery}%, product_category.ilike.%${decodedQuery}%`
+      );
     if (data) {
       setFilterData(data);
       console.log(data);
@@ -34,7 +44,7 @@ export const UseSupabase = () => {
 
   const getSingleProduct = async (product_id: string) => {
     try {
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("product_id", product_id)

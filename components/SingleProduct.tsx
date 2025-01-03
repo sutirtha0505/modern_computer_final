@@ -12,12 +12,25 @@ import RatingForProduct from "./RatingForProduct";
 import CharacterCounterInputForProduct from "./CharacterCounterInputForProduct";
 import { supabase } from "@/lib/supabaseClient";
 import SingleProductReviews from "./SingleProductReviews";
+import { User } from "@supabase/supabase-js";
 
-const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
+
+interface Product {
+  product_id: string;
+  product_name: string;
+  product_SP: number;
+  product_MRP: number;
+  product_image?: { url: string }[];
+  product_description: string;
+  quantity: number;
+  product_discount: number;
+}
+
+const SingleProduct = ({ singleProduct }: { singleProduct: Product }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [rating, setRating] = useState<number>(0);
   const [resetRating, setResetRating] = useState<boolean>(false);
@@ -207,7 +220,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
               infiniteLoop={true} // Enable infinite loop
               showStatus={false} // Hide the status bar
             >
-              {productImages.map((image: any, index: number) => (
+              {productImages.map((image: { url: string }, index: number) => (
                 <div key={index} className="relative">
                   <Image
                     src={image.url}
@@ -243,7 +256,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: any }) => {
                 &#x20B9;{singleProduct.product_MRP}
               </p>
               <p className="font-bold text-sm text-emerald-300">
-                ({parseFloat(singleProduct.product_discount).toFixed(2)}%)
+              ({singleProduct.product_discount.toFixed(2)}%)
               </p>
             </div>
           </div>

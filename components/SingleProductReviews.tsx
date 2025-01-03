@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
@@ -86,7 +86,7 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
           setReviews(reviewsWithProfiles);
           setFilteredReviews(reviewsWithProfiles);
         }
-      } catch (error) {
+      } catch {
         setError("Failed to load reviews");
       } finally {
         setLoading(false);
@@ -96,11 +96,8 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
     fetchReviewsWithProfiles();
   }, [productId]);
 
-  useEffect(() => {
-    filterReviews();
-  }, [selectedRating]);
 
-  const filterReviews = () => {
+  const filterReviews = useCallback(() => {
     let filtered = reviews;
 
     // Filter reviews based on the selected rating
@@ -109,7 +106,11 @@ const SingleProductReviews: React.FC<SingleProductReviewsProps> = ({
     }
 
     setFilteredReviews(filtered);
-  };
+  }, [reviews, selectedRating]);
+
+  useEffect(() => {
+    filterReviews();
+  }, [selectedRating, filterReviews]);
 
   // Render stars based on rating value
   const renderStars = (rating: number) => (
