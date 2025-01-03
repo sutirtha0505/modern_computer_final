@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { supabase } from "../supabaseClient";
+import { Product } from "@/app/types/types";
 
-interface Product {
-  product_id: string;
-  product_name: string;
-  product_description: string;
-  product_category: string;
-  // Add other fields based on your `products` table structure
-}
+// interface Product {
+//   product_id: string;
+//   product_name: string;
+//   product_description: string;
+//   product_category: string;
+//   // Add other fields based on your `products` table structure
+// }
 
 export const UseSupabase = () => {
   const [products, setProducts] = useState<Product[]>([]);

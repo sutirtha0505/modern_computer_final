@@ -3,16 +3,17 @@ import { Heart } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Product } from "@/app/types/types";
 
-
-interface Product {
-  product_id: string;
-  product_name: string;
-  product_image: { url: string }[];
-  product_SP: number; // Selling price
-  product_MRP: number; // Maximum retail price
-  product_amount: number; // Available stock
-}
+// interface Product {
+//   product_id: string;
+//   product_name: string;
+//   product_image: { url: string }[];
+//   product_SP: number; // Selling price
+//   product_MRP: number; // Maximum retail price
+//   product_amount: number; // Available stock
+//   show_product: string;
+// }
 const ProductCard = ({ products }: { products: Product }) => {
   const [isHeartFilled, setIsHeartFilled] = useState(false);
   const router = useRouter();

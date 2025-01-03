@@ -1,16 +1,6 @@
 import React from "react";
 import ProductCard from "./ProductCard";
-
-interface Product {
-  product_id: string;
-  product_name: string;
-  product_image: { url: string }[];
-  product_SP: number; // Selling price
-  product_MRP: number; // Maximum retail price
-  product_amount: number; // Available stock
-  show_product: string; // Display the product on the website or not
-}
-
+import { Product } from "@/app/types/types";
 const SearchResult = ({ filterData }: { filterData: Product[] }) => {
   // Filter products where show_product is true
   const filteredProducts = filterData.filter((product) => product.show_product);
