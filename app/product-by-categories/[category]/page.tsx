@@ -11,7 +11,7 @@ interface Product {
   product_amount: number;
   product_image: { url: string }[];
   product_name: string;
-  show_product: boolean;
+  show_product: string;
 }
 
 const ProductByCategoriesItemListPage = () => {
