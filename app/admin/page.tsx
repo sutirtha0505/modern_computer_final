@@ -1,16 +1,21 @@
-"use client"
-import Admin from '@/components/Admin';
-import PreventAdminAccess from '@/components/PreventAdminAccess';
-import { supabase } from '@/lib/supabaseClient';
-import { User } from '@supabase/supabase-js';
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { BlinkBlur } from "react-loading-indicators";
+import Admin from "@/components/Admin";
+import PreventAdminAccess from "@/components/PreventAdminAccess";
+import { supabase } from "@/lib/supabaseClient";
+import { User } from "@supabase/supabase-js";
 
 const AdminPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingTime, setLoadingTime] = useState<number | null>(null);
 
   useEffect(() => {
+    const start = performance.now(); // Start measuring time
+
     const getUserData = async () => {
       try {
         const {
@@ -20,20 +25,22 @@ const AdminPage = () => {
 
         if (user) {
           const { data: profile, error } = await supabase
-            .from('profile')
-            .select('role')
-            .eq('id', user.id)
+            .from("profile")
+            .select("role")
+            .eq("id", user.id)
             .single();
 
           if (profile) {
             setRole(profile.role);
           } else if (error) {
-            console.error('Error fetching profile:', error);
+            console.error("Error fetching profile:", error);
           }
         }
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       } finally {
+        const end = performance.now(); // End measuring time
+        setLoadingTime(end - start); // Calculate loading time
         setLoading(false);
       }
     };
@@ -42,19 +49,22 @@ const AdminPage = () => {
   }, []);
 
   if (loading) {
-    return <div className='pt-16 w-full h-screen flex justify-center items-center'><h1>Loading...</h1></div>;
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-screen">
+        <BlinkBlur color="#8a31cc" size="medium" text="Loading..." textColor="#8a31cc" />
+        {loadingTime && <p className="mt-4">Loading time: {loadingTime.toFixed(2)} ms</p>}
+      </div>
+    );
   }
 
-  if (user && role === 'admin') {
+  if (user && role === "admin") {
     return (
-      <div className='pt-16 w-full h-screen pl-4 pr-4 pb-4'>
-        <Admin/>
+      <div className="pt-16 w-full h-full pl-4 pr-4 pb-0">
+        <Admin />
       </div>
     );
   } else {
-    return (
-      <PreventAdminAccess />
-    );
+    return <PreventAdminAccess />;
   }
 };
 

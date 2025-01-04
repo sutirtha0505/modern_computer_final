@@ -83,7 +83,7 @@ const PreBuildTable = () => {
       )?.url;
       return imageUrl ? imageUrl : "default_image_url";
     } else {
-      return "default_image_url"; // replace with your default image URL
+      return "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/menu-icons/products.png"; // replace with your default image URL
     }
   };
 

@@ -98,7 +98,7 @@ const EditHeroSection: React.FC = () => {
 
   return (
     <div className="w-full h-screen flex flex-col justify-center items-center gap-4">
-      <h1 className="font-bold text-3xl">
+      <h1 className="font-bold text-3xl text-center">
         Update <span className="text-indigo-600">Hero section</span> from here
       </h1>
       <div className="w-80 h-[400px] flex flex-col justify-center items-center gap-5 rounded-lg bg-slate-700 p-4 relative">

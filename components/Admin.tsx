@@ -16,7 +16,7 @@ import AdUnitsIcon from '@mui/icons-material/AdUnits';
 const Admin = () => {
   const router = useRouter();
   return (
-    <div className=" w-full p-5 gap-3 h-full flex flex-col">
+    <div className=" w-full mb-60 p-5 gap-3 h-full flex flex-col">
       <h1 className="text-center text-5xl font-extrabold">
         Welcome to <span className="text-indigo-500">Admin page</span>
       </h1>

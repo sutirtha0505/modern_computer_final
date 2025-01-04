@@ -84,7 +84,7 @@ const CustomBuildTable = () => {
       )?.url;
       return imageUrl ? imageUrl : "default_image_url";
     } else {
-      return "default_image_url"; // replace with your default image URL
+      return "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/menu-icons/products.png"; // replace with your default image URL
     }
   };
 
@@ -124,22 +124,22 @@ const CustomBuildTable = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl mb-4 text-center">Custom PC Build Combinations</h1>
-      <div className="flex items-center justify-center">
-        <table className="scale-x-90">
+      <h1 className="text-2xl mb-4 text-center font-bold"><span className="text-indigo-600">Custom PC</span> Build Combinations</h1>
+      <div className="flex items-center justify-start overflow-x-auto">
+        <table className="">
           <thead>
             <tr>
-              <th className="py-2 border">Build Type</th>
-              <th className="py-2 border">Processor</th>
-              <th className="py-2 border">Motherboards</th>
-              <th className="py-2 border">RAM</th>
-              <th className="py-2 border">SSD</th>
-              <th className="py-2 border">Graphics Cards</th>
-              <th className="py-2 border">Cabinets</th>
-              <th className="py-2 border">PSU</th>
-              <th className="py-2 border">HDD</th>
-              <th className="py-2 border">Cooling Systems</th>
-              <th className="py-2 border">Actions</th>
+              <th className="py-2 border text-indigo-600">Build Type</th>
+              <th className="py-2 border text-indigo-600">Processor</th>
+              <th className="py-2 border text-indigo-600">Motherboards</th>
+              <th className="py-2 border text-indigo-600">RAM</th>
+              <th className="py-2 border text-indigo-600">SSD</th>
+              <th className="py-2 border text-indigo-600">Graphics Cards</th>
+              <th className="py-2 border text-indigo-600">Cabinets</th>
+              <th className="py-2 border text-indigo-600">PSU</th>
+              <th className="py-2 border text-indigo-600">HDD</th>
+              <th className="py-2 border text-indigo-600">Cooling Systems</th>
+              <th className="py-2 border text-indigo-600">Actions</th>
             </tr>
           </thead>
           <tbody>

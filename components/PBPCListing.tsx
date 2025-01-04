@@ -339,8 +339,8 @@ const PBPCListing = () => {
   return (
     <>
       <ToastContainer />
-      <div className="w-full max-w-3xl mt-5">
-        <div className="bg-white/50 p-8 rounded-lg shadow-md">
+      <div className="w-full mb-14 max-w-3xl mt-5">
+        <div className="bg-gray-800 p-8 rounded-lg shadow-md">
           <h1 className="text-3xl font-semibold mb-6 text-center">
             Create a <span className="text-indigo-500">Pre-Build PC</span>
           </h1>

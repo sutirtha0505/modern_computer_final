@@ -5,6 +5,7 @@ import RecentProducts from '@/components/RecentProducts';
 import { supabase } from '@/lib/supabaseClient';
 import { User } from '@supabase/supabase-js';
 import React, { useState, useEffect } from 'react';
+import { BlinkBlur } from 'react-loading-indicators';
 
 
 const EditBannerSectionPage = () => {
@@ -44,7 +45,16 @@ const EditBannerSectionPage = () => {
   }, []);
 
   if (loading) {
-    return <div className='pt-16 w-full h-screen flex justify-center items-center'><h1>Loading...</h1></div>;
+    return (
+    <div className='pt-16 w-full h-screen flex justify-center items-center'>
+      <BlinkBlur
+          color="#8a31cc"
+          size="medium"
+          text="Loading..."
+          textColor="#8a31cc"
+        />
+    </div>
+  );
   }
 
   if (user && role === 'admin') {
