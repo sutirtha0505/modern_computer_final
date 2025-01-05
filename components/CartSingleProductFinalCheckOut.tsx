@@ -216,6 +216,9 @@ const CartSingleProductFinalCheckOut: React.FC<
             response.razorpay_order_id,
             response.razorpay_payment_id
           );
+          setTimeout(() => {
+            router.push("/orders");
+          }, 3000);
         },
         prefill: {
           name: customerDetails?.customer_name,

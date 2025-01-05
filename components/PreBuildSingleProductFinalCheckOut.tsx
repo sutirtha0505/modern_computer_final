@@ -226,6 +226,9 @@ const PreBuildSingleProductFinalCheckOut: React.FC<
             response.razorpay_payment_id,
             payableAmount // Pass the actual amount charged
           );
+          setTimeout(() => {
+            router.push("/orders");
+          }, 3000);
         },
         prefill: {
           name: customerDetails?.customer_name,

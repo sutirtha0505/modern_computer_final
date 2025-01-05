@@ -218,7 +218,7 @@ const Header = () => {
 
           <div className="hidden md:flex gap-10">
             <div className="relative group">
-              <Link href="#" className="responsive-font font-bold">
+              <Link href="/#productbycategoriesslider" className="responsive-font font-bold">
                 Products
                 <span
                   className="block h-0.5 w-0 
@@ -257,7 +257,7 @@ const Header = () => {
               </div>
             </div>
             <div className="relative group">
-              <Link href="#pbpc" className="responsive-font font-bold">
+              <Link href="/#pbpc" className="responsive-font font-bold">
                 Pre-Build PC
                 <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
@@ -302,7 +302,7 @@ const Header = () => {
             </div>
 
             <div className="relative group">
-              <Link href="#cbpc" className="responsive-font font-bold">
+              <Link href="/#cbpc" className="responsive-font font-bold">
                 Custom-Build PC
                 <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
@@ -346,7 +346,7 @@ const Header = () => {
               </div>
             </div>
             <Link
-              href="#about"
+              href="/#about"
               className="relative group responsive-font font-bold"
             >
               About
