@@ -56,7 +56,8 @@ const CustomerReview: React.FC = () => {
           width={1000} 
           height={1000} 
           alt="Review Image" 
-          className='w-64 h-64 md:w-96 md:h-96' 
+          className='w-64 h-64 md:w-96 md:h-96'
+          unoptimized
         />
         <div className='flex flex-col p-4 w-full gap-3 h-64 md:w-96 md:h-96 rounded-md justify-between items-center'>
           <Rating onRatingChange={setRating} resetRating={resetRating} />
