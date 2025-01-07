@@ -181,115 +181,123 @@ const OrderedPreBuildPC: React.FC<OrderedPreBuildPCProps> = ({ userId }) => {
               : Infinity;
             return dateA - dateB;
           })
-          .map((order) => (
-            <div
-              key={order.order_id}
-              className="flex flex-col border p-4 rounded-md bg-slate-300 dark:bg-slate-700 custom-backdrop-filter gap-4"
-            >
-              <h2 className="font-extrabold text-center">
-                Order :{" "}
-                <span className="text-indigo-600">{order.order_id}</span>
-              </h2>
+          .map((order) => {
+            if (
+              order.expected_delivery_date &&
+              dayjs().isAfter(dayjs(order.expected_delivery_date), "day")
+            ) {
+              return null; // Skip rendering this div
+            }
+            return (
+              <div
+                key={order.order_id}
+                className="flex flex-col border p-4 rounded-md bg-slate-300 dark:bg-slate-700 custom-backdrop-filter gap-4"
+              >
+                <h2 className="font-extrabold text-center">
+                  Order :{" "}
+                  <span className="text-indigo-600">{order.order_id}</span>
+                </h2>
 
-              <div className="w-full flex flex-wrap items-center justify-between gap-10">
-                <ol className="w-auto list-decimal">
-                  {order.ordered_products.map((productId, idx) => {
-                    const productDetails = productsMap.get(productId);
-                    const firstImageUrl =
-                      productDetails &&
-                      getFirstImageUrl(productDetails.image_urls);
+                <div className="w-full flex flex-wrap items-center justify-between gap-10">
+                  <ol className="w-auto list-decimal">
+                    {order.ordered_products.map((productId, idx) => {
+                      const productDetails = productsMap.get(productId);
+                      const firstImageUrl =
+                        productDetails &&
+                        getFirstImageUrl(productDetails.image_urls);
 
-                    return (
-                      <li key={idx} className="flex gap-4 items-center">
-                        <div className="flex items-center justify-between gap-6 cursor-pointer">
-                          {firstImageUrl && (
-                            <Image
-                              src={firstImageUrl}
-                              alt="Product Image"
-                              className="w-16 h-16 object-cover"
-                              width={500}
-                              height={500}
-                            />
-                          )}
-                          <p className="text-sm font-semibold hover:text-indigo-600">
-                            {truncateString(
-                              productDetails?.build_name || "Unknown Product",
-                              30
-                            )}{" "}
-                            - {productDetails?.build_type}
-                          </p>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ol>
-                <div className="w-auto flex flex-col justify-center items-center gap-2">
-                  <div className="flex gap-2 justify-center items-center">
-                    <Image
-                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
-                      alt=""
-                      className="w-8 h-8"
-                      width={500}
-                      height={500}
-                    />
-                    <p className="text-sm font-semibold text-indigo-600">
-                      Order Status:
+                      return (
+                        <li key={idx} className="flex gap-4 items-center">
+                          <div className="flex items-center justify-between gap-6 cursor-pointer">
+                            {firstImageUrl && (
+                              <Image
+                                src={firstImageUrl}
+                                alt="Product Image"
+                                className="w-16 h-16 object-cover"
+                                width={500}
+                                height={500}
+                              />
+                            )}
+                            <p className="text-sm font-semibold hover:text-indigo-600">
+                              {truncateString(
+                                productDetails?.build_name || "Unknown Product",
+                                30
+                              )}{" "}
+                              - {productDetails?.build_type}
+                            </p>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  <div className="w-auto flex flex-col justify-center items-center gap-2">
+                    <div className="flex gap-2 justify-center items-center">
+                      <Image
+                        src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/order.png"
+                        alt=""
+                        className="w-8 h-8"
+                        width={500}
+                        height={500}
+                      />
+                      <p className="text-sm font-semibold text-indigo-600">
+                        Order Status:
+                      </p>
+                    </div>
+                    <p
+                      className={`text-sm font-semibold capitalize ${
+                        order.order_status === "Delivered"
+                          ? "text-green-600"
+                          : "text-yellow-500"
+                      }`}
+                    >
+                      {order.order_status}
                     </p>
                   </div>
-                  <p
-                    className={`text-sm font-semibold capitalize ${
-                      order.order_status === "Delivered"
-                        ? "text-green-600"
-                        : "text-yellow-500"
-                    }`}
-                  >
-                    {order.order_status}
-                  </p>
-                </div>
-                <div className="w-auto">
-                  <button
-                    onClick={() =>
-                      handleCancelOrder(order.order_id, order.order_status)
-                    }
-                    className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
-                      order.order_status === "ordered"
-                        ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
-                        : "border-gray-400 bg-gray-400 cursor-not-allowed"
-                    }`}
-                    disabled={
-                      order.order_status === "Shipped" ||
-                      order.order_status === "Cancelled" ||
-                      order.order_status === "Delivered" ||
-                      order.order_status === "Refunded"
-                    } // Disable if shipped or cancelled
-                  >
-                    <CircleX />
-                    Cancel Order
-                  </button>
-                </div>
+                  <div className="w-auto">
+                    <button
+                      onClick={() =>
+                        handleCancelOrder(order.order_id, order.order_status)
+                      }
+                      className={`p-4 flex flex-row md:flex-col justify-center items-center gap-2 border-2 text-xs rounded-md font-bold ${
+                        order.order_status === "ordered"
+                          ? "border-red-600 bg-red-600 hover:bg-transparent hover:text-red-600"
+                          : "border-gray-400 bg-gray-400 cursor-not-allowed"
+                      }`}
+                      disabled={
+                        order.order_status === "Shipped" ||
+                        order.order_status === "Cancelled" ||
+                        order.order_status === "Delivered" ||
+                        order.order_status === "Refunded"
+                      } // Disable if shipped or cancelled
+                    >
+                      <CircleX />
+                      Cancel Order
+                    </button>
+                  </div>
 
-                <div className="w-auto flex flex-col justify-center items-center gap-4">
-                  <div className="flex gap-2 justify-center items-center">
-                    <Image
-                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
-                      alt=""
-                      className="w-8 h-8"
-                      height={500}
-                      width={500}
-                    />
-                    <p className="text-sm font-semibold text-indigo-600">
-                      Expected Delivery Date:
+                  <div className="w-auto flex flex-col justify-center items-center gap-4">
+                    <div className="flex gap-2 justify-center items-center">
+                      <Image
+                        src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/delivery-truck.png"
+                        alt=""
+                        className="w-8 h-8"
+                        height={500}
+                        width={500}
+                      />
+                      <p className="text-sm font-semibold text-indigo-600">
+                        Expected Delivery Date:
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold">
+                      {dayjs(order.expected_delivery_date).format(
+                        "dddd, MMMM D, YYYY"
+                      )}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold">
-                    {dayjs(order.expected_delivery_date).format(
-                      "dddd, MMMM D, YYYY"
-                    )}
-                  </p>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
       </div>
       <ToastContainer />
     </div>
