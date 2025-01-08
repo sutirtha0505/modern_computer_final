@@ -7,5 +7,8 @@ export interface Product {
     product_MRP: number;
     product_amount: number;
     show_product: string;
+    product_description: string;
+    quantity: number;
+    product_discount: number;
   }
   

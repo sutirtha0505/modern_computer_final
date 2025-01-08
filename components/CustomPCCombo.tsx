@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
@@ -12,11 +11,11 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string;
+  discount: number;
 };
 type ProductImage = {
   url: string;
 };
-
 
 const CustomPCCombo = () => {
   const router = useRouter();
@@ -64,7 +63,6 @@ const CustomPCCombo = () => {
   const [coolerOptions, setCoolerOptions] = useState<DropdownOption[]>([]);
   const [resetDropdown, setResetDropdown] = useState(false);
 
-
   const fetchProductsByCategory = useCallback(
     async (
       category: string,
@@ -74,7 +72,7 @@ const CustomPCCombo = () => {
         const { data, error } = await supabase
           .from("products")
           .select(
-            "product_id, product_name, product_SP, product_category, product_image"
+            "product_id, product_name, product_SP, product_category, product_image, product_discount"
           )
           .eq("product_category", category);
 
@@ -88,6 +86,7 @@ const CustomPCCombo = () => {
             product_name: string;
             product_SP: number;
             product_image: ProductImage[];
+            product_discount: number;
           }) => ({
             id: product.product_id,
             name: product.product_name,
@@ -96,6 +95,7 @@ const CustomPCCombo = () => {
               product.product_image?.find((img: ProductImage) =>
                 img.url.includes("_first")
               )?.url || "",
+            discount: product.product_discount,
           })
         );
 
@@ -222,7 +222,15 @@ const CustomPCCombo = () => {
         // If a build with the same processor ID exists, show toast message
         toast.error(
           <div className="text-center">
-            <p>This build already exists. For adding Motherboards, RAMs etc. <button className="p-2 bg-indigo-400 hover:border-indigo-400 hover:text-indigo-400 hover:bg-transparent rounded-md" onClick={() => router.push("/admin/custom_build_table")}>Click here</button></p>
+            <p>
+              This build already exists. For adding Motherboards, RAMs etc.{" "}
+              <button
+                className="p-2 bg-indigo-400 hover:border-indigo-400 hover:text-indigo-400 hover:bg-transparent rounded-md"
+                onClick={() => router.push("/admin/custom_build_table")}
+              >
+                Click here
+              </button>
+            </p>
           </div>
         );
       } else {
@@ -260,26 +268,34 @@ const CustomPCCombo = () => {
   };
 
   return (
-    <div className={`pt-20 pb-20 w-full ${buildType ? 'h-full' : 'h-screen'} gap-3 flex flex-col items-center justify-center`}>
+    <div
+      className={`pt-20 pb-20 w-full ${
+        buildType ? "h-full" : "h-screen"
+      } gap-3 flex flex-col items-center justify-center`}
+    >
       <ToastContainer />
       <div className="w-[40%] flex items-center flex-col">
         <div className="w-full flex flex-col items-center justify-between">
-          <h2 className="text-indigo-600 text-2xl font-bold pb-9">Choose your build type</h2>
+          <h2 className="text-indigo-600 text-2xl font-bold pb-9">
+            Choose your build type
+          </h2>
           <Dropdown
             options={[
               {
-                id: 'AMD',
+                id: "AMD",
                 name: "AMD",
                 price: "",
                 image:
                   "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png",
+                discount: 0,
               },
               {
-                id: 'Intel',
+                id: "Intel",
                 name: "Intel",
                 price: "",
                 image:
                   "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png",
+                discount: 0,
               },
             ]}
             onSelect={(options) => handleBuildTypeSelect(options[0])}

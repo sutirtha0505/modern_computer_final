@@ -10,13 +10,13 @@ import Image from "next/image";
 const Footer = () => {
   const router = useRouter();
   return (
-    <div className="w-full p-4 px-20 mb-16 md:mb-0 flex justify-between items-center bg-slate-300 dark:bg-slate-900">
+    <div className="w-full p-4 px-8 md:px-20 mb-16 md:mb-0 flex justify-between items-center bg-slate-300 dark:bg-slate-900">
       <div className="flex flex-col justify-center items-center gap-5">
         <h1 className="text-sm md:text-xl font-bold text-center">
           All Rights Reseved by{" "}
           <span className="text-indigo-500">&copy;Modern Computer</span>, 2024
         </h1>
-        <div className="w-full justify-center items-center flex gap-4 invisible md:visible">
+        <div className="w-full justify-center items-center flex gap-4 flex-wrap">
         <div
           className="w-12 h-12 rounded-full bg-white cursor-pointer flex justify-center items-center border-2 border-green-500 hover:bg-transparent"
           onClick={() => {

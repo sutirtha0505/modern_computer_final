@@ -12,6 +12,7 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string;
+  discount: number;
 };
 
 const CPCIntelDisplay = () => {
@@ -61,21 +62,31 @@ const CPCIntelDisplay = () => {
   const [customBuildId, setCustomBuildId] = useState<string | null>(null);
 
   const [processorSP, setProcessorSP] = useState("");
+  const [processorDiscount, setProcessorDiscount] = useState(0);
   const [motherboardSP, setMotherboardSP] = useState("");
+  const [motherboardDiscount, setMotherboardDiscount] = useState(0);
   const [ramSP, setRamSP] = useState("");
+  const [ramDiscount, setRamDiscount] = useState(0);
   const [ramQuantity, setRamQuantity] = useState(1); // State for RAM quantity selection
   const [ssdSP, setSsdSP] = useState("");
+  const [ssdDiscount, setSsdDiscount] = useState(0);
   const [graphicsCardSP, setGraphicsCardSP] = useState("");
+  const [graphicsCardDiscount, setGraphicsCardDiscount] = useState(0);
   const [cabinetSP, setCabinetSP] = useState("");
+  const [cabinetDiscount, setCabinetDiscount] = useState(0);
   const [psuSP, setPsuSP] = useState("");
+  const [psuDiscount, setPsuDiscount] = useState(0);
   const [hddSP, setHddSP] = useState("");
+  const [hddDiscount, setHddDiscount] = useState(0);
   const [coolerSP, setCoolerSP] = useState("");
+  const [coolerDiscount, setCoolerDiscount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const excludeProductId = (options: DropdownOption[]) => {
-    return options.map(({ name, price, image }) => ({
+    return options.map(({ name, price, image, discount }) => ({
       name,
       price,
       image,
+      discount,
     }));
   };
 
@@ -106,7 +117,6 @@ const CPCIntelDisplay = () => {
     router.push(`/checkout-custom-build`);
   };
 
-
   const fetchProcessorProducts = useCallback(async () => {
     try {
       const { data, error } = await supabase
@@ -127,7 +137,7 @@ const CPCIntelDisplay = () => {
         (error as Error).message
       );
     }
-  },[]);
+  }, []);
 
   const fetchProductsByUUIDs = async (
     uuids: string[],
@@ -136,7 +146,9 @@ const CPCIntelDisplay = () => {
     try {
       const { data, error } = await supabase
         .from("products")
-        .select("product_id, product_name, product_SP, product_image")
+        .select(
+          "product_id, product_name, product_SP, product_image, product_discount"
+        )
         .in("product_id", uuids);
 
       if (error) {
@@ -150,6 +162,7 @@ const CPCIntelDisplay = () => {
         image: product.product_image?.find((img: { url?: string }) =>
           img.url?.includes("_first")
         )?.url,
+        discount: product.product_discount,
       }));
 
       setOptions(formattedOptions);
@@ -183,6 +196,7 @@ const CPCIntelDisplay = () => {
 
       setSelectedProcessorOptions([selectedOption]);
       setProcessorSP(selectedOption.price);
+      setProcessorDiscount(selectedOption.discount);
     } catch (error) {
       console.error("Error fetching build details:", (error as Error).message);
     }
@@ -191,10 +205,12 @@ const CPCIntelDisplay = () => {
   const handleSelect = (
     options: DropdownOption[],
     setSelectedOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>,
-    setSP: React.Dispatch<React.SetStateAction<string>>
+    setSP: React.Dispatch<React.SetStateAction<string>>,
+    setDiscount: React.Dispatch<React.SetStateAction<number>>
   ) => {
     setSelectedOptions(options);
     setSP(options[0].price);
+    setDiscount(options[0].discount);
   };
 
   const handleSelectRamQuantity = (quantity: number) => {
@@ -213,15 +229,53 @@ const CPCIntelDisplay = () => {
       Number(hddSP) +
       Number(coolerSP);
     setTotalPrice(total);
-  },[processorSP,motherboardSP,ramSP,ramQuantity,graphicsCardSP, cabinetSP, coolerSP,psuSP, hddSP,ssdSP]);
+  }, [
+    processorSP,
+    motherboardSP,
+    ramSP,
+    ramQuantity,
+    graphicsCardSP,
+    cabinetSP,
+    coolerSP,
+    psuSP,
+    hddSP,
+    ssdSP,
+  ]);
 
   useEffect(() => {
-      fetchProcessorProducts();
-    }, [fetchProcessorProducts]);
-  
-    useEffect(() => {
-      calculateTotalPrice();
-    }, [calculateTotalPrice]);
+    fetchProcessorProducts();
+  }, [fetchProcessorProducts]);
+
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [calculateTotalPrice]);
+  const processorOffer = Math.round(
+    (Number(processorSP) * processorDiscount) / 100
+  );
+  const motherboardOffer = Math.round(
+    (Number(motherboardSP) * motherboardDiscount) / 100
+  );
+  const ramOffer = Math.round(
+    (Number(ramSP) * ramQuantity * ramDiscount) / 100
+  );
+  const ssdOffer = Math.round((Number(ssdSP) * ssdDiscount) / 100);
+  const graphicsCardOffer = Math.round(
+    (Number(graphicsCardSP) * graphicsCardDiscount) / 100
+  );
+  const cabinetOffer = Math.round((Number(cabinetSP) * cabinetDiscount) / 100);
+  const psuOffer = Math.round((Number(psuSP) * psuDiscount) / 100);
+  const hddOffer = Math.round((Number(hddSP) * hddDiscount) / 100);
+  const coolerOffer = Math.round((Number(coolerSP) * coolerDiscount) / 100);
+  const totalDiscount =
+    processorOffer +
+    motherboardOffer +
+    ssdOffer +
+    graphicsCardOffer +
+    hddOffer +
+    ramOffer +
+    cabinetOffer +
+    psuOffer +
+    coolerOffer;
 
   return (
     <div className="w-full h-full flex-wrap p-4 justify-center items-center flex">
@@ -365,6 +419,21 @@ const CPCIntelDisplay = () => {
                   alt="Processor icon"
                 />
                 <h1 className="text-xl font-bold">Processor: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="processor"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{processorOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({processorDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
@@ -388,6 +457,21 @@ const CPCIntelDisplay = () => {
                   alt="Motherboard icon"
                 />
                 <h1 className="text-xl font-bold">Motherboard: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="motherboard"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{motherboardOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({motherboardDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between gap-5 items-center">
                 <Dropdown
@@ -396,7 +480,8 @@ const CPCIntelDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedMotherboardOptions,
-                      setMotherboardSP
+                      setMotherboardSP,
+                      setMotherboardDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -417,12 +502,32 @@ const CPCIntelDisplay = () => {
                   alt="RAM icon"
                 />
                 <h1 className="text-xl font-bold">RAM: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="RAM"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{ramOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({ramDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="w-full flex justify-between gap- items-center">
                 <Dropdown
                   options={ramOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedRAMOptions, setRamSP)
+                    handleSelect(
+                      options,
+                      setSelectedRAMOptions,
+                      setRamSP,
+                      setRamDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -458,12 +563,32 @@ const CPCIntelDisplay = () => {
                   alt="SSD icon"
                 />
                 <h1 className="text-xl font-bold">SSD: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="ssd"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{ssdOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({ssdDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
                   options={ssdOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedSSDOptions, setSsdSP)
+                    handleSelect(
+                      options,
+                      setSelectedSSDOptions,
+                      setSsdSP,
+                      setSsdDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -483,6 +608,21 @@ const CPCIntelDisplay = () => {
                   alt="Graphics Card icon"
                 />
                 <h1 className="text-xl font-bold">Graphics Card: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="graphicsCard"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{graphicsCardOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({graphicsCardDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
@@ -491,7 +631,8 @@ const CPCIntelDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedGraphicsCardOptions,
-                      setGraphicsCardSP
+                      setGraphicsCardSP,
+                      setGraphicsCardDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -512,6 +653,21 @@ const CPCIntelDisplay = () => {
                   alt="Cabinet icon"
                 />
                 <h1 className="text-xl font-bold">Cabinet: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="cabinet"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{cabinetOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({cabinetDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
@@ -520,7 +676,8 @@ const CPCIntelDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedCabinetOptions,
-                      setCabinetSP
+                      setCabinetSP,
+                      setCabinetDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -542,12 +699,32 @@ const CPCIntelDisplay = () => {
                   alt="Power Supply icon"
                 />
                 <h1 className="text-xl font-bold">Power Supply: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="psu"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{psuOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({psuDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
                   options={psuOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedPSUOptions, setPsuSP)
+                    handleSelect(
+                      options,
+                      setSelectedPSUOptions,
+                      setPsuSP,
+                      setPsuDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -567,12 +744,32 @@ const CPCIntelDisplay = () => {
                   alt="Hard Disk icon"
                 />
                 <h1 className="text-xl font-bold">Hard Disk: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="hdd"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{hddOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({hddDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
                   options={hddOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedHDDOptions, setHddSP)
+                    handleSelect(
+                      options,
+                      setSelectedHDDOptions,
+                      setHddSP,
+                      setHddDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -592,12 +789,32 @@ const CPCIntelDisplay = () => {
                   alt="Cooler icon"
                 />
                 <h1 className="text-xl font-bold">Cooling System: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="cooler"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{coolerOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({coolerDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-between items-center gap-5">
                 <Dropdown
                   options={coolerOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedCoolerOptions, setCoolerSP)
+                    handleSelect(
+                      options,
+                      setSelectedCoolerOptions,
+                      setCoolerSP,
+                      setCoolerDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -609,8 +826,14 @@ const CPCIntelDisplay = () => {
             </div>
           </div>
 
-          <div className="text-xl font-bold">
-            Total Price: ₹{totalPrice.toLocaleString()}
+          <div className="flex justify-center items-center gap-x-10 w-full">
+            <h1 className="text-xl font-bold">
+              <span className="text-indigo-500">Total Price:</span> ₹
+              {totalPrice.toLocaleString()}
+            </h1>
+            <h1 className="text-xl font-bold text-green-500">
+              ₹{totalDiscount} off
+            </h1>
           </div>
           <button
             onClick={handleBuyNow}

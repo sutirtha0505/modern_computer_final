@@ -15,7 +15,7 @@ import SingleProductReviews from "./SingleProductReviews";
 import { User } from "@supabase/supabase-js";
 
 
-interface Product {
+interface SingleProduct {
   product_id: string;
   product_name: string;
   product_SP: number;
@@ -26,7 +26,7 @@ interface Product {
   product_discount: number;
 }
 
-const SingleProduct = ({ singleProduct }: { singleProduct: Product }) => {
+const SingleProduct = ({ singleProduct }: { singleProduct: SingleProduct | null }) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [isHeartFilled, setIsHeartFilled] = useState(false);
@@ -35,6 +35,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: Product }) => {
   const [rating, setRating] = useState<number>(0);
   const [resetRating, setResetRating] = useState<boolean>(false);
   const [averageRating, setAverageRating] = useState<number | null>(null); // State for average rating
+
   // Star Component
   const Star = ({
     color = "#fa9302",

@@ -86,7 +86,7 @@ const CPCAMDDisplay = () => {
       name,
       price,
       image,
-      discount
+      discount,
     }));
   };
 
@@ -146,7 +146,9 @@ const CPCAMDDisplay = () => {
     try {
       const { data, error } = await supabase
         .from("products")
-        .select("product_id, product_name, product_SP, product_image, product_discount")
+        .select(
+          "product_id, product_name, product_SP, product_image, product_discount"
+        )
         .in("product_id", uuids);
 
       if (error) {
@@ -159,8 +161,8 @@ const CPCAMDDisplay = () => {
         price: product.product_SP,
         image: product.product_image?.find((img: { url?: string }) =>
           img.url?.includes("_first")
-        )?.url, 
-        discount: product.product_discount       
+        )?.url,
+        discount: product.product_discount,
       }));
 
       setOptions(formattedOptions);
@@ -227,7 +229,18 @@ const CPCAMDDisplay = () => {
       Number(hddSP) +
       Number(coolerSP);
     setTotalPrice(total);
-  },[processorSP,motherboardSP,ramSP,ramQuantity,graphicsCardSP, cabinetSP, coolerSP,psuSP, hddSP,ssdSP]);
+  }, [
+    processorSP,
+    motherboardSP,
+    ramSP,
+    ramQuantity,
+    graphicsCardSP,
+    cabinetSP,
+    coolerSP,
+    psuSP,
+    hddSP,
+    ssdSP,
+  ]);
 
   useEffect(() => {
     fetchProcessorProducts();
@@ -236,6 +249,33 @@ const CPCAMDDisplay = () => {
   useEffect(() => {
     calculateTotalPrice();
   }, [calculateTotalPrice]);
+  const processorOffer = Math.round(
+    (Number(processorSP) * processorDiscount) / 100
+  );
+  const motherboardOffer = Math.round(
+    (Number(motherboardSP) * motherboardDiscount) / 100
+  );
+  const ramOffer = Math.round(
+    (Number(ramSP) * ramQuantity * ramDiscount) / 100
+  );
+  const ssdOffer = Math.round((Number(ssdSP) * ssdDiscount) / 100);
+  const graphicsCardOffer = Math.round(
+    (Number(graphicsCardSP) * graphicsCardDiscount) / 100
+  );
+  const cabinetOffer = Math.round((Number(cabinetSP) * cabinetDiscount) / 100);
+  const psuOffer = Math.round((Number(psuSP) * psuDiscount) / 100);
+  const hddOffer = Math.round((Number(hddSP) * hddDiscount) / 100);
+  const coolerOffer = Math.round((Number(coolerSP) * coolerDiscount) / 100);
+  const totalDiscount =
+    processorOffer +
+    motherboardOffer +
+    ssdOffer +
+    graphicsCardOffer +
+    hddOffer +
+    ramOffer +
+    cabinetOffer +
+    psuOffer +
+    coolerOffer;
 
   return (
     <div className="w-full h-full flex-wrap p-4 justify-center items-center flex">
@@ -370,7 +410,7 @@ const CPCAMDDisplay = () => {
             </h1>
             <div className="w-full flex flex-col">
               <div className="w-full flex flex-col gap-2 justify-between items-start">
-                <div className="flex justify-center items-center gap-2">
+                <div className="flex justify-center items-center gap-4">
                   <Image
                     src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/processor/processor.png"
                     className="w-8 h-8"
@@ -379,6 +419,21 @@ const CPCAMDDisplay = () => {
                     alt="processor"
                   />
                   <h1 className="text-xl font-bold">Processor: </h1>
+                  <div className="flex justify-center items-center gap-2">
+                    <Image
+                      src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                      className="w-6 h-6"
+                      height={512}
+                      width={512}
+                      alt="processor"
+                    />
+                    <h1 className="text-lg font-semibold text-indigo-500">
+                      ₹{processorOffer} off
+                    </h1>
+                    <h1 className="text-sm font-semibold text-green-500">
+                      ({processorDiscount}%)
+                    </h1>
+                  </div>
                 </div>
                 <div className="flex w-full justify-center gap-5 items-center">
                   <Dropdown
@@ -390,12 +445,11 @@ const CPCAMDDisplay = () => {
                   <h2 className="text-xs text-emerald-300">
                     ₹{processorSP.toLocaleString()}
                   </h2>
-                  <h1>{processorDiscount}</h1>
                 </div>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
-              <div className="flex justify-center items-center gap-2">
+              <div className="flex justify-center items-center gap-4">
                 <Image
                   src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/pre-build/motherboard/motherboard.png"
                   className="w-8 h-8"
@@ -404,6 +458,21 @@ const CPCAMDDisplay = () => {
                   alt="motherboard"
                 />
                 <h1 className="text-xl font-bold">Motherboard: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="motherboard"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{motherboardOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({motherboardDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
@@ -412,7 +481,8 @@ const CPCAMDDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedMotherboardOptions,
-                      setMotherboardSP, setMotherboardDiscount
+                      setMotherboardSP,
+                      setMotherboardDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -421,7 +491,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{motherboardSP.toLocaleString()}
                 </h2>
-                <h2>{motherboardDiscount}</h2>
               </div>
             </div>
             <div className="flex w-full justify-center gap-5 items-center"></div>
@@ -435,12 +504,32 @@ const CPCAMDDisplay = () => {
                   alt="RAM"
                 />
                 <h1 className="text-xl font-bold">RAM: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="RAM"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{ramOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({ramDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={ramOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedRAMOptions, setRamSP, setRamDiscount)
+                    handleSelect(
+                      options,
+                      setSelectedRAMOptions,
+                      setRamSP,
+                      setRamDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -464,7 +553,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{(Number(ramSP) * ramQuantity).toLocaleString()}
                 </h2>
-                <h3>{ramDiscount}</h3>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -477,12 +565,32 @@ const CPCAMDDisplay = () => {
                   alt="SSD"
                 />
                 <h1 className="text-xl font-bold">SSD: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="ssd"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{ssdOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({ssdDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={ssdOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedSSDOptions, setSsdSP, setSsdDiscount)
+                    handleSelect(
+                      options,
+                      setSelectedSSDOptions,
+                      setSsdSP,
+                      setSsdDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -490,7 +598,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{ssdSP.toLocaleString()}
                 </h2>
-                <h2>{ssdDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -503,6 +610,21 @@ const CPCAMDDisplay = () => {
                   alt="Graphics Card"
                 />
                 <h1 className="text-xl font-bold">Graphics Card: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="graphicsCard"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{graphicsCardOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({graphicsCardDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
@@ -521,7 +643,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{graphicsCardSP.toLocaleString()}
                 </h2>
-                <h2>{graphicsCardDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -534,6 +655,21 @@ const CPCAMDDisplay = () => {
                   alt="Cabinet"
                 />
                 <h1 className="text-xl font-bold">Cabinet: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="cabinet"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{cabinetOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({cabinetDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
@@ -552,7 +688,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{cabinetSP.toLocaleString()}
                 </h2>
-                <h2>{cabinetDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -565,12 +700,32 @@ const CPCAMDDisplay = () => {
                   alt="Power Supply"
                 />
                 <h1 className="text-xl font-bold">Power Supply: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="psu"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{psuOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({psuDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={psuOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedPSUOptions, setPsuSP, setPsuDiscount)
+                    handleSelect(
+                      options,
+                      setSelectedPSUOptions,
+                      setPsuSP,
+                      setPsuDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -578,7 +733,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{psuSP.toLocaleString()}
                 </h2>
-                <h2>{psuDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -591,12 +745,32 @@ const CPCAMDDisplay = () => {
                   alt="Hard Disk"
                 />
                 <h1 className="text-xl font-bold">Hard Disk: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="hdd"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{hddOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({hddDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={hddOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedHDDOptions, setHddSP, setHddDiscount)
+                    handleSelect(
+                      options,
+                      setSelectedHDDOptions,
+                      setHddSP,
+                      setHddDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -604,7 +778,6 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{hddSP.toLocaleString()}
                 </h2>
-                <h2>{hddDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -617,12 +790,32 @@ const CPCAMDDisplay = () => {
                   alt="Cooler"
                 />
                 <h1 className="text-xl font-bold">Cooling System: </h1>
+                <div className="flex justify-center items-center gap-2">
+                  <Image
+                    src="https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/Logo_Social/gift.png"
+                    className="w-6 h-6"
+                    height={512}
+                    width={512}
+                    alt="cooler"
+                  />
+                  <h1 className="text-lg font-semibold text-indigo-500">
+                    ₹{coolerOffer} off
+                  </h1>
+                  <h1 className="text-sm font-semibold text-green-500">
+                    ({coolerDiscount}%)
+                  </h1>
+                </div>
               </div>
               <div className="flex w-full justify-center gap-5 items-center">
                 <Dropdown
                   options={coolerOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedCoolerOptions, setCoolerSP, setCoolerDiscount)
+                    handleSelect(
+                      options,
+                      setSelectedCoolerOptions,
+                      setCoolerSP,
+                      setCoolerDiscount
+                    )
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -630,13 +823,19 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{coolerSP.toLocaleString()}
                 </h2>
-                <h2>{coolerDiscount}</h2>
               </div>
             </div>
           </div>
-          <div className="text-xl font-bold">
-            Total Price: ₹{totalPrice.toLocaleString()}
+          <div className="flex justify-center items-center gap-x-10 w-full">
+            <h1 className="text-xl font-bold">
+              <span className="text-indigo-500">Total Price:</span> ₹
+              {totalPrice.toLocaleString()}
+            </h1>
+            <h1 className="text-xl font-bold text-green-500">
+              ₹{totalDiscount} off
+            </h1>
           </div>
+
           <button
             onClick={handleBuyNow}
             disabled={

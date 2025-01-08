@@ -15,6 +15,7 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string;
+  discount: number;
 };
 
 interface ProductImage {
@@ -91,7 +92,7 @@ const PBPCListing = () => {
       try {
         const { data, error } = await supabase
           .from("products")
-          .select("product_id, product_name, product_SP, product_image")
+          .select("product_id, product_name, product_SP, product_image, product_discount")
           .eq("product_category", category);
 
         if (error) {
@@ -104,11 +105,13 @@ const PBPCListing = () => {
             product_name: string;
             product_SP: number;
             product_image: ProductImage[];
+            product_discount: number;
           }) => ({
             id: product.product_id,
             name: product.product_name,
             price: `₹${product.product_SP.toLocaleString()}`,
             image: product.product_image?.find((img) => img.url.includes("_first"))?.url || "",
+            discount: product.product_discount,
           })
         );
 
@@ -137,7 +140,7 @@ const PBPCListing = () => {
 
       const { data, error } = await supabase
         .from("products")
-        .select("product_id, product_name, product_SP, product_image")
+        .select("product_id, product_name, product_SP, product_image, product_discount")
         .not("product_category", "in", `(${excludedCategories.join(",")})`);
 
       if (error) {
@@ -150,11 +153,13 @@ const PBPCListing = () => {
           product_name: string;
           product_SP: number;
           product_image: ProductImage[];
+          product_discount: number;
         }) => ({
           id: product.product_id,
           name: product.product_name,
           price: `₹${product.product_SP.toLocaleString()}`,
           image: product.product_image?.find((img) => img.url.includes("_first"))?.url || "",
+          discount: 0,
         })
       );
 
@@ -357,6 +362,7 @@ const PBPCListing = () => {
                     price: "",
                     image:
                       "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/amd.png",
+                      discount: 0
                   },
                   {
                     id: "INTEL",
@@ -364,6 +370,7 @@ const PBPCListing = () => {
                     price: "",
                     image:
                       "https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/item_icon/intel.png",
+                      discount: 0
                   },
                 ]}
                 onSelect={(options) => handleBuildTypeSelect(options[0])}
