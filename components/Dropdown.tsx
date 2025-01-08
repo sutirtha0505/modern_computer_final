@@ -9,6 +9,7 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string; // Add the image property
+  discount: number;
 };
 
 type DropdownProps = {

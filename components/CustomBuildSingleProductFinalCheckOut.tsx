@@ -604,7 +604,7 @@ const CustomBuildSingleProductFinalCheckOut: React.FC<
               <p className="text-sm font-extrabold">
                 If you cancel your{" "}
                 <span className="text-indigo-500"> Custom Build PC</span> order{" "}
-                <span className="text-green-400">30%</span> of the price will be
+                <span className="text-green-400">5%</span> of the price will be
                 deducted as penalty
               </p>
             </div>

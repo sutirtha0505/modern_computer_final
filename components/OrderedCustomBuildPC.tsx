@@ -254,7 +254,7 @@ const OrderedCustomBuildPC: React.FC<OrderedCustomBuildPCProps> = ({
                           {" "}
                           Custom Build PC
                         </span>{" "}
-                        order <span className="text-green-400">30%</span> of the
+                        order <span className="text-green-400">5%</span> of the
                         price will be deducted as penalty
                       </p>
                     </div>

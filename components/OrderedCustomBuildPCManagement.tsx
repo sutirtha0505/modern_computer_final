@@ -592,7 +592,7 @@ const OrderedCustomBuildPCManagement = () => {
                           const orderId = order.order_id; // Get order ID
                           const paymentId = order.payment_id; // Get payment ID
                           const totalAmount = order.payment_amount; // Total payment amount
-                          const amount = Math.round(totalAmount * 0.7 * 100); // Calculate 70% of the amount (in paise)
+                          const amount = Math.round(totalAmount * 0.95 * 100); // Calculate 95% of the amount (in paise)
 
                           try {
                             const response = await fetch("/api/refund", {
@@ -611,7 +611,7 @@ const OrderedCustomBuildPCManagement = () => {
 
                             if (response.ok) {
                               toast.success(
-                                "70% 0f price's Refund processed successfully!"
+                                "95% 0f price's Refund processed successfully!"
                               );
                               // Optionally, refresh the orders list or update the state
                             } else {

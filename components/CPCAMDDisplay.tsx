@@ -12,6 +12,7 @@ type DropdownOption = {
   name: string;
   price: string;
   image: string;
+  discount: number;
 };
 
 const CPCAMDDisplay = () => {
@@ -61,21 +62,31 @@ const CPCAMDDisplay = () => {
   const [customBuildId, setCustomBuildId] = useState<string | null>(null);
 
   const [processorSP, setProcessorSP] = useState("");
+  const [processorDiscount, setProcessorDiscount] = useState(0);
   const [motherboardSP, setMotherboardSP] = useState("");
+  const [motherboardDiscount, setMotherboardDiscount] = useState(0);
   const [ramSP, setRamSP] = useState("");
+  const [ramDiscount, setRamDiscount] = useState(0);
   const [ramQuantity, setRamQuantity] = useState(1); // State for RAM quantity selection
   const [ssdSP, setSsdSP] = useState("");
+  const [ssdDiscount, setSsdDiscount] = useState(0);
   const [graphicsCardSP, setGraphicsCardSP] = useState("");
+  const [graphicsCardDiscount, setGraphicsCardDiscount] = useState(0);
   const [cabinetSP, setCabinetSP] = useState("");
+  const [cabinetDiscount, setCabinetDiscount] = useState(0);
   const [psuSP, setPsuSP] = useState("");
+  const [psuDiscount, setPsuDiscount] = useState(0);
   const [hddSP, setHddSP] = useState("");
+  const [hddDiscount, setHddDiscount] = useState(0);
   const [coolerSP, setCoolerSP] = useState("");
+  const [coolerDiscount, setCoolerDiscount] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const excludeProductId = (options: DropdownOption[]) => {
-    return options.map(({ name, price, image }) => ({
+    return options.map(({ name, price, image, discount }) => ({
       name,
       price,
       image,
+      discount
     }));
   };
 
@@ -135,7 +146,7 @@ const CPCAMDDisplay = () => {
     try {
       const { data, error } = await supabase
         .from("products")
-        .select("product_id, product_name, product_SP, product_image")
+        .select("product_id, product_name, product_SP, product_image, product_discount")
         .in("product_id", uuids);
 
       if (error) {
@@ -148,7 +159,8 @@ const CPCAMDDisplay = () => {
         price: product.product_SP,
         image: product.product_image?.find((img: { url?: string }) =>
           img.url?.includes("_first")
-        )?.url,        
+        )?.url, 
+        discount: product.product_discount       
       }));
 
       setOptions(formattedOptions);
@@ -182,6 +194,7 @@ const CPCAMDDisplay = () => {
 
       setSelectedProcessorOptions([selectedOption]);
       setProcessorSP(selectedOption.price);
+      setProcessorDiscount(selectedOption.discount);
     } catch (error) {
       console.error("Error fetching build details:", (error as Error).message);
     }
@@ -190,10 +203,12 @@ const CPCAMDDisplay = () => {
   const handleSelect = (
     options: DropdownOption[],
     setSelectedOptions: React.Dispatch<React.SetStateAction<DropdownOption[]>>,
-    setSP: React.Dispatch<React.SetStateAction<string>>
+    setSP: React.Dispatch<React.SetStateAction<string>>,
+    setDiscount: React.Dispatch<React.SetStateAction<number>>
   ) => {
     setSelectedOptions(options);
     setSP(options[0].price);
+    setDiscount(options[0].discount);
   };
 
   const handleSelectRamQuantity = (quantity: number) => {
@@ -300,7 +315,7 @@ const CPCAMDDisplay = () => {
               <Image
                 src={selectedPSUOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
-                  selectedCoolerOptions.length ? "" : "invisible"
+                  selectedPSUOptions.length ? "" : "invisible"
                 }`}
                 width={512}
                 height={512}
@@ -311,7 +326,7 @@ const CPCAMDDisplay = () => {
               <Image
                 src={selectedProcessorOptions[0]?.image || ""}
                 className={`w-full h-full object-contain ${
-                  selectedPSUOptions.length ? "" : "invisible"
+                  selectedProcessorOptions.length ? "" : "invisible"
                 }`}
                 width={512}
                 height={512}
@@ -375,6 +390,7 @@ const CPCAMDDisplay = () => {
                   <h2 className="text-xs text-emerald-300">
                     ₹{processorSP.toLocaleString()}
                   </h2>
+                  <h1>{processorDiscount}</h1>
                 </div>
               </div>
             </div>
@@ -396,7 +412,7 @@ const CPCAMDDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedMotherboardOptions,
-                      setMotherboardSP
+                      setMotherboardSP, setMotherboardDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -405,6 +421,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{motherboardSP.toLocaleString()}
                 </h2>
+                <h2>{motherboardDiscount}</h2>
               </div>
             </div>
             <div className="flex w-full justify-center gap-5 items-center"></div>
@@ -423,7 +440,7 @@ const CPCAMDDisplay = () => {
                 <Dropdown
                   options={ramOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedRAMOptions, setRamSP)
+                    handleSelect(options, setSelectedRAMOptions, setRamSP, setRamDiscount)
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -447,6 +464,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{(Number(ramSP) * ramQuantity).toLocaleString()}
                 </h2>
+                <h3>{ramDiscount}</h3>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -464,7 +482,7 @@ const CPCAMDDisplay = () => {
                 <Dropdown
                   options={ssdOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedSSDOptions, setSsdSP)
+                    handleSelect(options, setSelectedSSDOptions, setSsdSP, setSsdDiscount)
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -472,6 +490,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{ssdSP.toLocaleString()}
                 </h2>
+                <h2>{ssdDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -492,7 +511,8 @@ const CPCAMDDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedGraphicsCardOptions,
-                      setGraphicsCardSP
+                      setGraphicsCardSP,
+                      setGraphicsCardDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -501,6 +521,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{graphicsCardSP.toLocaleString()}
                 </h2>
+                <h2>{graphicsCardDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -521,7 +542,8 @@ const CPCAMDDisplay = () => {
                     handleSelect(
                       options,
                       setSelectedCabinetOptions,
-                      setCabinetSP
+                      setCabinetSP,
+                      setCabinetDiscount
                     )
                   }
                   reset={resetDropdown}
@@ -530,6 +552,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{cabinetSP.toLocaleString()}
                 </h2>
+                <h2>{cabinetDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -547,7 +570,7 @@ const CPCAMDDisplay = () => {
                 <Dropdown
                   options={psuOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedPSUOptions, setPsuSP)
+                    handleSelect(options, setSelectedPSUOptions, setPsuSP, setPsuDiscount)
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -555,6 +578,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{psuSP.toLocaleString()}
                 </h2>
+                <h2>{psuDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -572,7 +596,7 @@ const CPCAMDDisplay = () => {
                 <Dropdown
                   options={hddOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedHDDOptions, setHddSP)
+                    handleSelect(options, setSelectedHDDOptions, setHddSP, setHddDiscount)
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -580,6 +604,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{hddSP.toLocaleString()}
                 </h2>
+                <h2>{hddDiscount}</h2>
               </div>
             </div>
             <div className="w-full flex flex-col gap-2 justify-between items-start">
@@ -597,7 +622,7 @@ const CPCAMDDisplay = () => {
                 <Dropdown
                   options={coolerOptions}
                   onSelect={(options) =>
-                    handleSelect(options, setSelectedCoolerOptions, setCoolerSP)
+                    handleSelect(options, setSelectedCoolerOptions, setCoolerSP, setCoolerDiscount)
                   }
                   reset={resetDropdown}
                   multiple={false}
@@ -605,6 +630,7 @@ const CPCAMDDisplay = () => {
                 <h2 className="text-xs text-emerald-300">
                   ₹{coolerSP.toLocaleString()}
                 </h2>
+                <h2>{coolerDiscount}</h2>
               </div>
             </div>
           </div>
