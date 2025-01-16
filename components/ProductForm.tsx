@@ -46,11 +46,11 @@ const ProductUploadForm: React.FC = () => {
     }
 
     // Check if any image filename ends with _first
-    const hasFirstImage = images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
-    if (!hasFirstImage) {
-      toast.error("You forgot to mention the first image. Make sure one image ends with '_first'.");
-      return null;
-    }
+    // const hasFirstImage = images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
+    // if (!hasFirstImage) {
+    //   toast.error("You forgot to mention the first image. Make sure one image ends with '_first'.");
+    //   return null;
+    // }
 
     const productDiscount = ((productMRP - productSP) / productMRP) * 100;
 
