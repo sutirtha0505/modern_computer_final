@@ -130,13 +130,13 @@ const RecentProductsShow: React.FC = () => {
           </h1>
           <div className="embla">
             <div className="embla__viewport" ref={emblaRef}>
-              <div className="embla__container">
+              <div className="embla__container h-52 md:h-auto">
                 {galleryImages.map((image, index) => (
-                  <div className="embla__slide" key={index}>
+                  <div className="embla__slide w-2/3 md:w-auto object-scale-down" key={index}>
                     <Image
                       src={image.url}
                       alt={image.name}
-                      className="embla__slide__number object-cover"
+                      className="embla__slide__number"
                       width={500}
                       height={500}
                     />

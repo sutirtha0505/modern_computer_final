@@ -8,6 +8,7 @@ import {
   LucideLogIn,
   Search,
   UserPlus,
+  ArrowLeft
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
@@ -167,6 +168,7 @@ const Header = () => {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       searchHandler();
+      setSuggestions([]);
     } else if (event.key === "Escape") {
       // Clear the suggestions when Escape is pressed
       setSuggestions([]);
@@ -354,7 +356,19 @@ const Header = () => {
             </Link>
           </div>
 
-          <div className="flex relative">
+          <div className="flex relative w-fit items-center justify-start">
+          {/* Conditionally render the back button */}
+            {query && (
+              <button
+                onClick={() => {
+                  setSuggestions([]);
+                  setQuery(""); // Optionally clear the query
+                }}
+                className="absolute p-2"
+              >
+                <ArrowLeft className="text-black" /> {/* Replace with your desired icon from lucid-react */}
+              </button>
+            )}
             <input
               type="text"
               value={query}
@@ -365,7 +379,7 @@ const Header = () => {
             />
             {suggestions.length > 0 && (
               <ul
-                className="absolute bg-slate-300 dark:bg-slate-900 border border-black dark:border-gray-300 w-full mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide p-6
+                className="absolute bg-slate-300 dark:bg-slate-900 border border-black dark:border-gray-300 w-auto mt-1 max-h-48 overflow-y-auto z-10 top-10 scrollbar-hide p-6
               "
               >
                 {suggestions.map((product) => (
@@ -439,8 +453,8 @@ const Header = () => {
                           {customerName
                             ? customerName // Render customer_name if it exists
                             : user?.user_metadata?.name
-                            ? user.user_metadata.name
-                            : user.email}
+                              ? user.user_metadata.name
+                              : user.email}
                         </h1>
                       </div>
                       {role === "admin" && (
@@ -492,20 +506,26 @@ const Header = () => {
                     </>
                   ) : (
                     <>
-                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md">
+                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md" onClick={()=>{
+                        router.push('/SignIn')
+                      }}>
                         <LucideLogIn className="text-indigo-500" />
                         <Link
                           href="/SignIn"
                           className="text-white cursor-pointer hover:text-indigo-600"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           LogIn
                         </Link>
                       </div>
-                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md">
+                      <div className="flex justify-start gap-3 px-4 py-2 hover:bg-slate-300 dark:hover:bg-white/30 hover:rounded-md" onClick={()=>{
+                        router.push('/SignUp')
+                      }}>
                         <UserPlus className=" text-emerald-400" />
                         <Link
                           href="/SignUp"
                           className="text-white cursor-pointer hover:text-emerald-400"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           SignUp
                         </Link>
@@ -530,9 +550,8 @@ const Header = () => {
           <div
             className="fixed top-0 left-0 w-8 h-8 bg-indigo-500 rounded-full blur-md pointer-events-none"
             style={{
-              transform: `translate(${mousePosition.x - 16}px, ${
-                mousePosition.y - 16
-              }px)`,
+              transform: `translate(${mousePosition.x - 16}px, ${mousePosition.y - 16
+                }px)`,
             }}
           ></div>
         )}

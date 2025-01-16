@@ -228,7 +228,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: SingleProduct | null 
                     alt={`Product Image ${index}`}
                     width={500} // Adjust width and height as needed
                     height={500}
-                    className="rounded-lg"
+                    className="rounded-lg h-[400px] w-[400px] object-contain"
                   />
                 </div>
               ))}
