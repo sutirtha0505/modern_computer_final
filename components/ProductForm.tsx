@@ -34,67 +34,67 @@ const ProductUploadForm: React.FC = () => {
     event.preventDefault();
 
     if (
-        !productName ||
-        !productDescription ||
-        productMRP === 0 ||
-        productSP === 0 ||
-        !productCategory ||
-        images.length === 0
+      !productName ||
+      !productDescription ||
+      productMRP === 0 ||
+      productSP === 0 ||
+      !productCategory ||
+      images.length === 0
     ) {
-        toast.error("Please fill all the fields and upload at least one image");
-        return;
+      toast.error("Please fill all the fields and upload at least one image");
+      return;
     }
 
     // Check if any image filename ends with _first
     const hasFirstImage = images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
     if (!hasFirstImage) {
       toast.error("You forgot to mention the first image. Make sure one image ends with '_first'.");
-      return;
+      return null;
     }
 
     const productDiscount = ((productMRP - productSP) / productMRP) * 100;
 
     // Check for duplicate product name
     const { data: existingProducts, error: checkError } = await supabase
-        .from("products")
-        .select("product_name")
-        .eq("product_name", productName);
+      .from("products")
+      .select("product_name")
+      .eq("product_name", productName);
 
     if (checkError) {
-        console.error("Error checking product name:", checkError.message);
-        toast.error(`Error checking product name: ${checkError.message}`);
-        return;
+      console.error("Error checking product name:", checkError.message);
+      toast.error(`Error checking product name: ${checkError.message}`);
+      return;
     }
 
     if (existingProducts && existingProducts.length > 0) {
-        toast.error("Already this product is listed");
-        return;
+      toast.error("Already this product is listed");
+      return;
     }
 
     const productId = uuidv4();
     const imageUrls: { url: string }[] = []; // Replace `any[]` with a proper type
     const uploadPromises = images.map(async (image) => {
-        const filePath = `${productId}/${uuidv4()}_${image.name}`;
-        const { error: uploadError } = await supabase.storage
-            .from("product-image")
-            .upload(filePath, image);
+      const filePath = `${productId}/${uuidv4()}_${image.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("product-image")
+        .upload(filePath, image);
 
-        if (uploadError) {
-            console.error("Error uploading image:", uploadError.message);
-            toast.error(`Error uploading image: ${uploadError.message}`);
-            return;
-        }
+      if (uploadError) {
+        console.error("Error uploading image:", uploadError.message);
+        toast.error(`Error uploading image: ${uploadError.message}`);
+        return;
+      }
 
-        const { data: publicUrlData } = await supabase.storage
-            .from("product-image")
-            .getPublicUrl(filePath);
+      const { data: publicUrlData } = await supabase.storage
+        .from("product-image")
+        .getPublicUrl(filePath);
 
-        if (publicUrlData) {
-            imageUrls.push({ url: publicUrlData.publicUrl });
-        } else {
-            console.error("Error getting public URL");
-            toast.error("Error getting public URL");
-        }
+      if (publicUrlData) {
+        imageUrls.push({ url: publicUrlData.publicUrl });
+      } else {
+        console.error("Error getting public URL");
+        toast.error("Error getting public URL");
+      }
     });
 
     await Promise.all(uploadPromises);
@@ -102,25 +102,25 @@ const ProductUploadForm: React.FC = () => {
     const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
 
     const { error: insertError } = await supabase
-        .from("products")
-        .insert([
-            {
-                product_id: productId,
-                product_image: imageUrls,
-                product_name: productName,
-                product_description: productDescription,
-                product_MRP: Number(productMRP),
-                product_discount: Number(productDiscount),
-                product_SP: Number(calculatedSP), // Use calculatedSP here
-                product_amount: 100, // Initial amount, can be adjusted later
-                product_category: productCategory, // Include the category
-            },
-        ]);
+      .from("products")
+      .insert([
+        {
+          product_id: productId,
+          product_image: imageUrls,
+          product_name: productName,
+          product_description: productDescription,
+          product_MRP: Number(productMRP),
+          product_discount: Number(productDiscount),
+          product_SP: Number(calculatedSP), // Use calculatedSP here
+          product_amount: 100, // Initial amount, can be adjusted later
+          product_category: productCategory, // Include the category
+        },
+      ]);
 
     if (insertError) {
-        console.error("Error adding product:", insertError.message);
-        toast.error(`Error adding product: ${insertError.message}`);
-        return;
+      console.error("Error adding product:", insertError.message);
+      toast.error(`Error adding product: ${insertError.message}`);
+      return;
     }
 
     toast.success("Product added successfully!");
@@ -130,7 +130,7 @@ const ProductUploadForm: React.FC = () => {
     setProductSP(0); // Reset product selling price
     setProductCategory(""); // Reset category
     setImages([]);
-};
+  };
 
 
   return (
