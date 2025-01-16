@@ -162,13 +162,10 @@ const About: React.FC = () => {
       <div className="text-center flex flex-col justify-center items-center">
         <div className="w-80 h-80 flex justify-center items-center rounded-full rotator">
           {aboutData.about_image && (
-            <Image
+            <img
               src={aboutData.about_image}
               alt="About"
               className="mx-auto w-60 h-60 rounded-full absolute z-[3]"
-              width={1000}
-              height={1000}
-              unoptimized
             />
           )}
         </div>
@@ -215,6 +212,7 @@ const About: React.FC = () => {
                 frameBorder="0"
                 allowFullScreen
                 loading="lazy"
+                title="Modern Computer's location here..."
               ></iframe>
             </div>
           </div>

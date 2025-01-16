@@ -80,9 +80,10 @@ const BannerSection: React.FC = () => {
                     <Image
                       src={image.url}
                       alt={image.name}
-                      className="w-full h-64 object-scale-down rounded-lg shadow-lg" // Use object-cover for better image fit
+                      className="w-full h-64 object-cover rounded-lg shadow-lg" // Use object-cover for better image fit
                       width={1920}
                       height={1080}
+                      priority
                     />
                   </div>
                 </div>

@@ -136,7 +136,7 @@ const RecentProductsShow: React.FC = () => {
                     <Image
                       src={image.url}
                       alt={image.name}
-                      className="embla__slide__number"
+                      className="embla__slide__number object-cover"
                       width={500}
                       height={500}
                     />
