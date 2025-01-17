@@ -1,6 +1,5 @@
 // components/LoadingScreen.tsx
 import { BlinkBlur } from "react-loading-indicators";
-import Image from "next/image";
 
 export default function LoadingScreen() {
   return (
