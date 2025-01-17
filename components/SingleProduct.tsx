@@ -215,7 +215,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: SingleProduct | null 
           {/* Carousel to display product images */}
           {productImages.length > 0 && (
             <Carousel
-              showThumbs={true} // Enable the thumbnails
+              showThumbs={false} // Enable the thumbnails
               autoPlay={true} // Enable auto play
               interval={3000} // Interval between slides in milliseconds (3 seconds)
               infiniteLoop={true} // Enable infinite loop
@@ -228,7 +228,7 @@ const SingleProduct = ({ singleProduct }: { singleProduct: SingleProduct | null 
                     alt={`Product Image ${index}`}
                     width={500} // Adjust width and height as needed
                     height={500}
-                    className="rounded-lg h-[400px] w-[400px] object-contain"
+                    className="rounded-lg h-[500px] w-[500px] object-contain"
                   />
                 </div>
               ))}
