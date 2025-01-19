@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { v4 as uuidv4 } from "uuid";
 import { supabase } from "../lib/supabaseClient";
@@ -8,17 +8,52 @@ import { BadgeInfo, CloudUpload } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 
 const ProductUploadForm: React.FC = () => {
   const [productName, setProductName] = useState<string>("");
   const [productSP, setProductSP] = useState<number>(0);
   const [productDescription, setProductDescription] = useState<string>("");
   const [productMRP, setProductMRP] = useState<number>(0);
+  const [productMainCategory, setProductMainCategory] = useState("");
   const [productCategory, setProductCategory] = useState<string>(""); // New state for category
   const [images, setImages] = useState<File[]>([]);
+  const [suggestions, setSuggestions] = useState<
+    { category: string; image: string }[]
+  >([]);
+  const [categoryImageUrl, setCategoryImageUrl] = useState<string>("");
   const [isTooltipVisible, setIsTooltipVisible] = useState<boolean>(false);
-  const [isSuggestionVisible, setIsSuggestionVisible] =
-    useState<boolean>(false); // State for tooltip visibility
+  const [isSuggestionVisible, setIsSuggestionVisible] = useState<boolean>(false); // State for tooltip visibility
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("product_main_category, category_product_image");
+
+      if (error) {
+        console.error("Error fetching suggestions:", error.message);
+        return;
+      }
+
+      if (data) {
+        // Filter duplicates based on 'product_main_category'
+        const uniqueSuggestions = Array.from(
+          new Map(
+            data.map((item) => [item.product_main_category, item])
+          ).values()
+        ).map((item) => ({
+          category: item.product_main_category,
+          image: item.category_product_image,
+        }));
+
+        setSuggestions(uniqueSuggestions);
+      }
+    };
+
+    fetchSuggestions();
+  }, []);
 
   const onDrop = (acceptedFiles: File[]) => {
     setImages([...images, ...acceptedFiles]);
@@ -38,6 +73,7 @@ const ProductUploadForm: React.FC = () => {
       !productDescription ||
       productMRP === 0 ||
       productSP === 0 ||
+      !productMainCategory ||
       !productCategory ||
       images.length === 0
     ) {
@@ -52,8 +88,67 @@ const ProductUploadForm: React.FC = () => {
       return null;
     }
 
-    const productDiscount = ((productMRP - productSP) / productMRP) * 100;
+    if (!categoryImageUrl) {
+      // Check if folder exists for the product category
+      const { data: listData, error: listError } = await supabase.storage
+        .from("product-image")
+        .list(`product_by_category/${productCategory}`);
+    
+      if (listError) {
+        console.error("Error checking category folder:", listError.message);
+        toast.error(`Error checking category folder: ${listError.message}`);
+        return;
+      }
+    
+      if (listData && listData.length > 0) {
+        // Folder exists, retrieve the first image URL
+        const firstImage = listData[0];
+        const { data: publicUrlData } = await supabase.storage
+          .from("product-image")
+          .getPublicUrl(`product_by_category/${productCategory}/${firstImage.name}`);
+    
+        if (publicUrlData) {
+          setCategoryImageUrl(publicUrlData.publicUrl);
+        } else {
+          console.error("Error getting public URL from existing folder");
+          toast.error("Error getting public URL from existing folder");
+        }
+      } else {
+        // Folder does not exist, create a new folder and upload the image
+        const uploadPromises = images.map(async (image) => {
+          const filePath = `product_by_category/${productCategory}/${uuidv4()}_${image.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from("product-image")
+            .upload(filePath, image);
+    
+          if (uploadError) {
+            console.error("Error uploading image:", uploadError.message);
+            toast.error(`Error uploading image: ${uploadError.message}`);
+            return;
+          }
+    
+          const { data: publicUrlData } = await supabase.storage
+            .from("product-image")
+            .getPublicUrl(filePath);
+    
+          if (publicUrlData) {
+            setCategoryImageUrl(publicUrlData.publicUrl);
+          } else {
+            console.error("Error getting public URL after upload");
+            toast.error("Error getting public URL after upload");
+          }
+        });
+    
+        await Promise.all(uploadPromises);
+      }
+    }
+    
 
+
+    const productDiscount = Math.round(((productMRP - productSP) / productMRP) * 100);
+
+
+    
     // Check for duplicate product name
     const { data: existingProducts, error: checkError } = await supabase
       .from("products")
@@ -114,6 +209,8 @@ const ProductUploadForm: React.FC = () => {
           product_SP: Number(calculatedSP), // Use calculatedSP here
           product_amount: 100, // Initial amount, can be adjusted later
           product_category: productCategory, // Include the category
+          product_main_category: productMainCategory, // Include the category
+          category_product_image: categoryImageUrl
         },
       ]);
 
@@ -129,6 +226,7 @@ const ProductUploadForm: React.FC = () => {
     setProductMRP(0); // Reset to 0
     setProductSP(0); // Reset product selling price
     setProductCategory(""); // Reset category
+    setProductMainCategory(""); // Reset main category
     setImages([]);
   };
 
@@ -141,6 +239,84 @@ const ProductUploadForm: React.FC = () => {
         onSubmit={handleSubmit}
         className="bg-white/50 flex flex-col rounded-md gap-5 items-center justify-between py-4 px-6"
       >
+        <div className="flex flex-col w-full">
+          <Autocomplete
+            freeSolo
+            options={suggestions}
+            getOptionLabel={(option) => (typeof option === "string" ? option : option.category)}
+            renderOption={(props, option) => (
+              <Box
+                component="li"
+                {...props}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  padding: 1,
+                }}
+              >
+                {option.image && (
+                  <Image
+                    src={option.image}
+                    alt={option.category}
+                    width={40}
+                    height={40}
+                    className="rounded-md"
+                  />
+                )}
+                <span>{typeof option === "string" ? option : option.category}</span>
+              </Box>
+            )}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Type Product Category"
+                variant="standard"
+                required
+              />
+            )}
+            onChange={(event, newValue) => {
+              if (typeof newValue === "string") {
+                setProductMainCategory(newValue);
+              } else if (newValue?.category) {
+                setProductMainCategory(newValue.category);
+              }
+            }}
+            onInputChange={(event, newInputValue) => {
+              setProductMainCategory(newInputValue);
+            }}
+            className="w-full"
+          />
+        </div>
+        <div className="flex flex-col justify-center items-center w-full">
+          <label>Category Image:</label>
+          {suggestions.some(suggestion => suggestion.category === productMainCategory) ? (
+            <div className="flex flex-col items-center gap-4">
+              <Image
+                src={
+                  suggestions.find(
+                    suggestion => suggestion.category === productMainCategory
+                  )?.image || ""
+                }
+                alt={`Image for ${productMainCategory}`}
+                width={100}
+                height={100}
+                className="rounded-md"
+              />
+              <span>Image already exists for this category.</span>
+            </div>
+          ) : (
+            <div
+              {...getRootProps()}
+              className="border-2 border-dashed p-4 rounded-md flex items-center justify-center"
+            >
+              <input {...getInputProps()} accept="image/*" />
+              <CloudUpload />
+              <p className="text-center">Upload image for this category</p>
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-col relative">
           <div
             className="flex justify-between items-center"
