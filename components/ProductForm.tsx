@@ -92,7 +92,7 @@ const ProductUploadForm: React.FC = () => {
       // Check if folder exists for the product category
       const { data: listData, error: listError } = await supabase.storage
         .from("product-image")
-        .list(`product_by_category/${productCategory}`);
+        .list(`product_by_category/${productMainCategory}`);
     
       if (listError) {
         console.error("Error checking category folder:", listError.message);
@@ -105,7 +105,7 @@ const ProductUploadForm: React.FC = () => {
         const firstImage = listData[0];
         const { data: publicUrlData } = await supabase.storage
           .from("product-image")
-          .getPublicUrl(`product_by_category/${productCategory}/${firstImage.name}`);
+          .getPublicUrl(`product_by_category/${productMainCategory}/${firstImage.name}`);
     
         if (publicUrlData) {
           setCategoryImageUrl(publicUrlData.publicUrl);
@@ -116,7 +116,7 @@ const ProductUploadForm: React.FC = () => {
       } else {
         // Folder does not exist, create a new folder and upload the image
         const uploadPromises = images.map(async (image) => {
-          const filePath = `product_by_category/${productCategory}/${uuidv4()}_${image.name}`;
+          const filePath = `product_by_category/${productMainCategory}/${uuidv4()}_${image.name}`;
           const { error: uploadError } = await supabase.storage
             .from("product-image")
             .upload(filePath, image);
