@@ -65,6 +65,31 @@ const ProductUploadForm: React.FC = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+  
+    if (file) {
+      if (file.type !== "image/png") {
+        toast.error("Only PNG images are allowed.");
+        return;
+      }
+  
+      if (file.name !== "image.png") {
+        toast.error("The image name must be 'image.png'.");
+        return;
+      }
+  
+      // Only allow one file
+      if (images.length > 0) {
+        toast.error("You can upload only one image.");
+        return;
+      }
+  
+      setImages([file]); // Set the uploaded image
+    }
+  };
+  
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -88,67 +113,69 @@ const ProductUploadForm: React.FC = () => {
       return null;
     }
 
-    if (!categoryImageUrl) {
-      // Check if folder exists for the product category
-      const { data: listData, error: listError } = await supabase.storage
-        .from("product-image")
-        .list(`product_by_category/${productMainCategory}`);
-    
-      if (listError) {
-        console.error("Error checking category folder:", listError.message);
-        toast.error(`Error checking category folder: ${listError.message}`);
-        return;
-      }
-    
-      if (listData && listData.length > 0) {
-        // Folder exists, retrieve the first image URL
-        const firstImage = listData[0];
-        const { data: publicUrlData } = await supabase.storage
-          .from("product-image")
-          .getPublicUrl(`product_by_category/${productMainCategory}/${firstImage.name}`);
-    
-        if (publicUrlData) {
-          setCategoryImageUrl(publicUrlData.publicUrl);
-        } else {
-          console.error("Error getting public URL from existing folder");
-          toast.error("Error getting public URL from existing folder");
-        }
-      } else {
-        // Folder does not exist, create a new folder and upload the image
-        const uploadPromises = images.map(async (image) => {
-          const filePath = `product_by_category/${productMainCategory}/${uuidv4()}_${image.name}`;
-          const { error: uploadError } = await supabase.storage
-            .from("product-image")
-            .upload(filePath, image);
-    
-          if (uploadError) {
-            console.error("Error uploading image:", uploadError.message);
-            toast.error(`Error uploading image: ${uploadError.message}`);
-            return;
-          }
-    
-          const { data: publicUrlData } = await supabase.storage
-            .from("product-image")
-            .getPublicUrl(filePath);
-    
-          if (publicUrlData) {
-            setCategoryImageUrl(publicUrlData.publicUrl);
-          } else {
-            console.error("Error getting public URL after upload");
-            toast.error("Error getting public URL after upload");
-          }
-        });
-    
-        await Promise.all(uploadPromises);
-      }
-    }
-    
+    // if (!categoryImageUrl) {
+    //   // Check if folder exists for the product category
+    //   const { data: listData, error: listError } = await supabase.storage
+    //     .from("product-image")
+    //     .list(`product_by_category/${productMainCategory}`);
+
+    //   if (listError) {
+    //     console.error("Error checking category folder:", listError.message);
+    //     toast.error(`Error checking category folder: ${listError.message}`);
+    //     return;
+    //   }
+
+    //   if (listData && listData.length > 0) {
+    //     // Folder exists, retrieve the first image URL
+    //     const firstImage = listData[0];
+    //     const { data: publicUrlData } = await supabase.storage
+    //       .from("product-image")
+    //       .getPublicUrl(`product_by_category/${productMainCategory}/${firstImage.name}`);
+
+    //     if (publicUrlData) {
+    //       setCategoryImageUrl(publicUrlData.publicUrl);
+    //     } else {
+    //       console.error("Error getting public URL from existing folder");
+    //       toast.error("Error getting public URL from existing folder");
+    //     }
+    //   } else {
+    //     // Folder does not exist, create a new folder and upload the image
+    //     const uploadPromises = images.map(async (image) => {
+    //       const filePath = `product_by_category/${productMainCategory}/${uuidv4()}_${image.name}`;
+    //       const { error: uploadError } = await supabase.storage
+    //         .from("product-image")
+    //         .upload(filePath, image);
+
+    //       if (uploadError) {
+    //         console.error("Error uploading image:", uploadError.message);
+    //         toast.error(`Error uploading image: ${uploadError.message}`);
+    //         return;
+    //       }
+
+    //       const { data: publicUrlData } = await supabase.storage
+    //         .from("product-image")
+    //         .getPublicUrl(filePath);
+
+    //       if (publicUrlData) {
+    //         setCategoryImageUrl(publicUrlData.publicUrl);
+    //       } else {
+    //         console.error("Error getting public URL after upload");
+    //         toast.error("Error getting public URL after upload");
+    //       }
+    //     });
+
+    //     await Promise.all(uploadPromises);
+    //   }
+    // }
+    const encodedProductMainCategory = encodeURIComponent(productMainCategory);
+    const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`
+
 
 
     const productDiscount = Math.round(((productMRP - productSP) / productMRP) * 100);
 
 
-    
+
     // Check for duplicate product name
     const { data: existingProducts, error: checkError } = await supabase
       .from("products")
@@ -210,7 +237,7 @@ const ProductUploadForm: React.FC = () => {
           product_amount: 100, // Initial amount, can be adjusted later
           product_category: productCategory, // Include the category
           product_main_category: productMainCategory, // Include the category
-          category_product_image: categoryImageUrl
+          category_product_image: categoryImageUrl,
         },
       ]);
 
@@ -310,12 +337,18 @@ const ProductUploadForm: React.FC = () => {
               {...getRootProps()}
               className="border-2 border-dashed p-4 rounded-md flex items-center justify-center"
             >
-              <input {...getInputProps()} accept="image/*" />
+              <input
+                {...getInputProps()}
+                accept="image/png"
+                onChange={handleFileChange}
+              />
               <CloudUpload />
               <p className="text-center">Upload image for this category</p>
             </div>
           )}
         </div>
+
+
 
         <div className="flex flex-col relative">
           <div
