@@ -24,7 +24,7 @@ const ProductUploadForm: React.FC = () => {
   const [suggestions, setSuggestions] = useState<
     { category: string; image: string }[]
   >([]);
-  const [categoryImageUrl, setCategoryImageUrl] = useState<string>("");
+  // const [categoryImageUrl, setCategoryImageUrl] = useState<string>("");
   const [isTooltipVisible, setIsTooltipVisible] = useState<boolean>(false);
   const [isSuggestionVisible, setIsSuggestionVisible] = useState<boolean>(false); // State for tooltip visibility
   useEffect(() => {
@@ -108,7 +108,7 @@ const ProductUploadForm: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+  
     if (
       !productName ||
       !productDescription ||
@@ -121,99 +121,89 @@ const ProductUploadForm: React.FC = () => {
       toast.error("Please fill all the fields and upload at least one image");
       return;
     }
-
+  
     // Check if any image filename ends with _first
-    const hasFirstImage = dropzone2Images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
+    const hasFirstImage = dropzone2Images.some((image) =>
+      image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i)
+    );
     if (!hasFirstImage) {
       toast.error("You forgot to mention the first image. Make sure one image ends with '_first'.");
-      return null;
+      return;
     }
-
+  
+    // Encode the main category and construct the image URL
     const encodedProductMainCategory = encodeURIComponent(productMainCategory);
     const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
-    setCategoryImageUrl(categoryImageUrl);
-
-    if (!categoryImageUrl) {
-      // Check if folder exists for the product category
-      const { data: listData, error: listError } = await supabase.storage
-        .from("product-image")
-        .list(`product_by_category/${productMainCategory}`);
-
-      if (listError) {
-        console.error("Error checking category folder:", listError.message);
-        toast.error(`Error checking category folder: ${listError.message}`);
-        return;
-      }
-
-      if (listData && listData.length > 0) {
-        // Folder exists, set the category image URL
-        const encodedProductMainCategory = encodeURIComponent(productMainCategory);
-        const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
-        setCategoryImageUrl(categoryImageUrl);
-      } else {
-        // Folder does not exist, create a new folder and upload the image
-        const uploadPromises = dropzone1Images.map(async (image) => {
-          const filePath = `product_by_category/${productMainCategory}/${image.name}`;
-          const { error: uploadError } = await supabase.storage
-            .from("product-image")
-            .upload(filePath, image);
-
-          if (uploadError) {
-            console.error("Error uploading image:", uploadError.message);
-            toast.error(`Error uploading image: ${uploadError.message}`);
-            return;
-          }
-
-          const encodedProductMainCategory = encodeURIComponent(productMainCategory);
-          const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
-          setCategoryImageUrl(categoryImageUrl);
-        });
-
-        await Promise.all(uploadPromises);
-      }
-
+  
+    // Check if folder exists for the product category
+    const { data: listData, error: listError } = await supabase.storage
+      .from("product-image")
+      .list(`product_by_category/${productMainCategory}`);
+  
+    if (listError) {
+      console.error("Error checking category folder:", listError.message);
+      toast.error(`Error checking category folder: ${listError.message}`);
+      return;
     }
-
-
+  
+    if (!listData || listData.length === 0) {
+      // Folder does not exist, upload category images
+      const uploadPromises = dropzone1Images.map(async (image) => {
+        const filePath = `product_by_category/${productMainCategory}/${image.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("product-image")
+          .upload(filePath, image);
+  
+        if (uploadError) {
+          console.error("Error uploading image:", uploadError.message);
+          toast.error(`Error uploading image: ${uploadError.message}`);
+          return;
+        }
+      });
+  
+      await Promise.all(uploadPromises);
+    }
+  
+    // Calculate product discount
     const productDiscount = Math.round(((productMRP - productSP) / productMRP) * 100);
-
-
-
+  
     // Check for duplicate product name
     const { data: existingProducts, error: checkError } = await supabase
       .from("products")
       .select("product_name")
       .eq("product_name", productName);
-
+  
     if (checkError) {
       console.error("Error checking product name:", checkError.message);
       toast.error(`Error checking product name: ${checkError.message}`);
       return;
     }
-
+  
     if (existingProducts && existingProducts.length > 0) {
       toast.error("Already this product is listed");
       return;
     }
-
+  
     const productId = uuidv4();
     const imageUrls: { url: string }[] = []; // Replace `any[]` with a proper type
+  
+    // Upload product images
     const uploadPromises = dropzone2Images.map(async (image) => {
       const filePath = `${productId}/${uuidv4()}_${image.name}`;
       const { error: uploadError } = await supabase.storage
         .from("product-image")
         .upload(filePath, image);
-
+  
       if (uploadError) {
         console.error("Error uploading image:", uploadError.message);
         toast.error(`Error uploading image: ${uploadError.message}`);
         return;
       }
-
+  
       const { data: publicUrlData } = await supabase.storage
         .from("product-image")
         .getPublicUrl(filePath);
-
+  
       if (publicUrlData) {
         imageUrls.push({ url: publicUrlData.publicUrl });
       } else {
@@ -221,11 +211,12 @@ const ProductUploadForm: React.FC = () => {
         toast.error("Error getting public URL");
       }
     });
-
+  
     await Promise.all(uploadPromises);
-
+  
     const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
-
+  
+    // Insert product into the database
     const { error: insertError } = await supabase
       .from("products")
       .insert([
@@ -236,29 +227,30 @@ const ProductUploadForm: React.FC = () => {
           product_description: productDescription,
           product_MRP: Number(productMRP),
           product_discount: Number(productDiscount),
-          product_SP: Number(calculatedSP), // Use calculatedSP here
-          product_amount: 100, // Initial amount, can be adjusted later
-          product_category: productCategory, // Include the category
-          product_main_category: productMainCategory, // Include the category
+          product_SP: Number(calculatedSP),
+          product_amount: 100,
+          product_category: productCategory,
+          product_main_category: productMainCategory,
           category_product_image: categoryImageUrl,
         },
       ]);
-
+  
     if (insertError) {
       console.error("Error adding product:", insertError.message);
       toast.error(`Error adding product: ${insertError.message}`);
       return;
     }
-
+  
     toast.success("Product added successfully!");
     setProductName("");
     setProductDescription("");
-    setProductMRP(0); // Reset to 0
-    setProductSP(0); // Reset product selling price
-    setProductCategory(""); // Reset category
-    setProductMainCategory(""); // Reset main category
+    setProductMRP(0);
+    setProductSP(0);
+    setProductCategory("");
+    setProductMainCategory("");
     setDropzone2Images([]);
   };
+  
 
 
   return (
