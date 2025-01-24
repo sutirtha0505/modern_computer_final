@@ -19,7 +19,8 @@ const ProductUploadForm: React.FC = () => {
   const [productMRP, setProductMRP] = useState<number>(0);
   const [productMainCategory, setProductMainCategory] = useState("");
   const [productCategory, setProductCategory] = useState<string>(""); // New state for category
-  const [images, setImages] = useState<File[]>([]);
+  const [dropzone1Images, setDropzone1Images] = useState<File[]>([]);
+  const [dropzone2Images, setDropzone2Images] = useState<File[]>([]);
   const [suggestions, setSuggestions] = useState<
     { category: string; image: string }[]
   >([]);
@@ -55,40 +56,55 @@ const ProductUploadForm: React.FC = () => {
     fetchSuggestions();
   }, []);
 
-  const onDrop = (acceptedFiles: File[]) => {
-    setImages([...images, ...acceptedFiles]);
+  const handleDropzone1Drop = (acceptedFiles: File[]) => {
+    setDropzone1Images([...dropzone1Images, ...acceptedFiles]);
   };
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop });
-
-  const handleRemoveImage = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const handleDropzone2Drop = (acceptedFiles: File[]) => {
+    setDropzone2Images([...dropzone2Images, ...acceptedFiles]);
   };
+
+  const { getRootProps: getRootProps1, getInputProps: getInputProps1 } = useDropzone({
+    onDrop: handleDropzone1Drop,
+  });
+
+  const { getRootProps: getRootProps2, getInputProps: getInputProps2 } = useDropzone({
+    onDrop: handleDropzone2Drop,
+  });
+
+  const handleRemoveImage = (index: number, dropzone: "dropzone1" | "dropzone2") => {
+    if (dropzone === "dropzone1") {
+      setDropzone1Images(dropzone1Images.filter((_, i) => i !== index));
+    } else {
+      setDropzone2Images(dropzone2Images.filter((_, i) => i !== index));
+    }
+  };
+
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-  
+
     if (file) {
       if (file.type !== "image/png") {
         toast.error("Only PNG images are allowed.");
         return;
       }
-  
+
       if (file.name !== "image.png") {
         toast.error("The image name must be 'image.png'.");
         return;
       }
-  
+
       // Only allow one file
-      if (images.length > 0) {
+      if (dropzone1Images.length > 0) {
         toast.error("You can upload only one image.");
         return;
       }
-  
-      setImages([file]); // Set the uploaded image
+
+      setDropzone1Images([file]); // Set the uploaded image
     }
   };
-  
+
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -100,76 +116,63 @@ const ProductUploadForm: React.FC = () => {
       productSP === 0 ||
       !productMainCategory ||
       !productCategory ||
-      images.length === 0
+      dropzone2Images.length === 0
     ) {
       toast.error("Please fill all the fields and upload at least one image");
       return;
     }
 
     // Check if any image filename ends with _first
-    const hasFirstImage = images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
+    const hasFirstImage = dropzone2Images.some((image) => image.name.match(/_first\.(png|jpeg|webp|jpg|gif)$/i));
     if (!hasFirstImage) {
       toast.error("You forgot to mention the first image. Make sure one image ends with '_first'.");
       return null;
     }
 
-    // if (!categoryImageUrl) {
-    //   // Check if folder exists for the product category
-    //   const { data: listData, error: listError } = await supabase.storage
-    //     .from("product-image")
-    //     .list(`product_by_category/${productMainCategory}`);
-
-    //   if (listError) {
-    //     console.error("Error checking category folder:", listError.message);
-    //     toast.error(`Error checking category folder: ${listError.message}`);
-    //     return;
-    //   }
-
-    //   if (listData && listData.length > 0) {
-    //     // Folder exists, retrieve the first image URL
-    //     const firstImage = listData[0];
-    //     const { data: publicUrlData } = await supabase.storage
-    //       .from("product-image")
-    //       .getPublicUrl(`product_by_category/${productMainCategory}/${firstImage.name}`);
-
-    //     if (publicUrlData) {
-    //       setCategoryImageUrl(publicUrlData.publicUrl);
-    //     } else {
-    //       console.error("Error getting public URL from existing folder");
-    //       toast.error("Error getting public URL from existing folder");
-    //     }
-    //   } else {
-    //     // Folder does not exist, create a new folder and upload the image
-    //     const uploadPromises = images.map(async (image) => {
-    //       const filePath = `product_by_category/${productMainCategory}/${uuidv4()}_${image.name}`;
-    //       const { error: uploadError } = await supabase.storage
-    //         .from("product-image")
-    //         .upload(filePath, image);
-
-    //       if (uploadError) {
-    //         console.error("Error uploading image:", uploadError.message);
-    //         toast.error(`Error uploading image: ${uploadError.message}`);
-    //         return;
-    //       }
-
-    //       const { data: publicUrlData } = await supabase.storage
-    //         .from("product-image")
-    //         .getPublicUrl(filePath);
-
-    //       if (publicUrlData) {
-    //         setCategoryImageUrl(publicUrlData.publicUrl);
-    //       } else {
-    //         console.error("Error getting public URL after upload");
-    //         toast.error("Error getting public URL after upload");
-    //       }
-    //     });
-
-    //     await Promise.all(uploadPromises);
-    //   }
-    // }
     const encodedProductMainCategory = encodeURIComponent(productMainCategory);
-    const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`
+    const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
+    setCategoryImageUrl(categoryImageUrl);
 
+    if (!categoryImageUrl) {
+      // Check if folder exists for the product category
+      const { data: listData, error: listError } = await supabase.storage
+        .from("product-image")
+        .list(`product_by_category/${productMainCategory}`);
+
+      if (listError) {
+        console.error("Error checking category folder:", listError.message);
+        toast.error(`Error checking category folder: ${listError.message}`);
+        return;
+      }
+
+      if (listData && listData.length > 0) {
+        // Folder exists, set the category image URL
+        const encodedProductMainCategory = encodeURIComponent(productMainCategory);
+        const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
+        setCategoryImageUrl(categoryImageUrl);
+      } else {
+        // Folder does not exist, create a new folder and upload the image
+        const uploadPromises = dropzone1Images.map(async (image) => {
+          const filePath = `product_by_category/${productMainCategory}/${image.name}`;
+          const { error: uploadError } = await supabase.storage
+            .from("product-image")
+            .upload(filePath, image);
+
+          if (uploadError) {
+            console.error("Error uploading image:", uploadError.message);
+            toast.error(`Error uploading image: ${uploadError.message}`);
+            return;
+          }
+
+          const encodedProductMainCategory = encodeURIComponent(productMainCategory);
+          const categoryImageUrl = `https://keteyxipukiawzwjhpjn.supabase.co/storage/v1/object/public/product-image/product_by_category/${encodedProductMainCategory}/image.png`;
+          setCategoryImageUrl(categoryImageUrl);
+        });
+
+        await Promise.all(uploadPromises);
+      }
+
+    }
 
 
     const productDiscount = Math.round(((productMRP - productSP) / productMRP) * 100);
@@ -195,7 +198,7 @@ const ProductUploadForm: React.FC = () => {
 
     const productId = uuidv4();
     const imageUrls: { url: string }[] = []; // Replace `any[]` with a proper type
-    const uploadPromises = images.map(async (image) => {
+    const uploadPromises = dropzone2Images.map(async (image) => {
       const filePath = `${productId}/${uuidv4()}_${image.name}`;
       const { error: uploadError } = await supabase.storage
         .from("product-image")
@@ -254,7 +257,7 @@ const ProductUploadForm: React.FC = () => {
     setProductSP(0); // Reset product selling price
     setProductCategory(""); // Reset category
     setProductMainCategory(""); // Reset main category
-    setImages([]);
+    setDropzone2Images([]);
   };
 
 
@@ -333,18 +336,38 @@ const ProductUploadForm: React.FC = () => {
               <span>Image already exists for this category.</span>
             </div>
           ) : (
-            <div
-              {...getRootProps()}
-              className="border-2 border-dashed p-4 rounded-md flex items-center justify-center"
-            >
-              <input
-                {...getInputProps()}
-                accept="image/png"
-                onChange={handleFileChange}
-              />
-              <CloudUpload />
-              <p className="text-center">Upload image for this category</p>
-            </div>
+            <>
+              <div
+                {...getRootProps1()}
+                className="border-2 border-white rounded-md bg-transparent p-4 flex-col flex items-center border-dashed"
+              >
+                <input {...getInputProps1()} onChange={handleFileChange} />
+                <CloudUpload />
+                <p className="text-center">Upload category image here</p>
+              </div>
+              <div className="flex flex-wrap">
+                {dropzone1Images.map((file, index) => (
+                  <div key={index} className="relative">
+                    <div className="w-24 h-24 border-2 border-dashed rounded-full flex items-center justify-center overflow-hidden m-2">
+                      <Image
+                        src={URL.createObjectURL(file)} // Display preview of uploaded image
+                        alt={`Product Image ${index}`}
+                        width={96} // Adjust size for circular image
+                        height={96}
+                        className="object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index, "dropzone1")}
+                      className="absolute top-0 right-0 bg-black text-white rounded-full w-6 h-6 flex items-center justify-center"
+                    >
+                      &times;
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -515,15 +538,15 @@ const ProductUploadForm: React.FC = () => {
             </div>
           )}
           <div
-            {...getRootProps()}
+            {...getRootProps2()}
             className="border-2 border-white rounded-md bg-transparent p-4 flex-col flex items-center border-dashed"
           >
-            <input {...getInputProps()} multiple />
+            <input {...getInputProps2()} multiple />
             <CloudUpload />
             <p className="text-center">Upload product image here</p>
           </div>
           <div className="flex flex-wrap">
-            {images.map((file, index) => (
+            {dropzone2Images.map((file, index) => (
               <div key={index} className="relative">
                 <Image
                   src={URL.createObjectURL(file)}
@@ -534,7 +557,7 @@ const ProductUploadForm: React.FC = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => handleRemoveImage(index)}
+                  onClick={() => handleRemoveImage(index, "dropzone2")}
                   className="absolute top-0 right-0 bg-black text-white rounded-full w-6 h-6 flex items-center justify-center"
                 >
                   &times;
