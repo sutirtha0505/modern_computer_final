@@ -509,7 +509,7 @@ const ProductUploadForm: React.FC = () => {
             <BadgeInfo className="hover:text-indigo-500 cursor-help" />
           </div>
           {isSuggestionVisible && (
-            <div className="absolute z-[2] top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter">
+            <div className="absolute z-[2] top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter w-full">
               <h1 className="text-center text-indigo-500 font-bold">
                 Cheatlist for Uploading Image
               </h1>
