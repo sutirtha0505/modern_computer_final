@@ -214,7 +214,7 @@ const ProductUploadForm: React.FC = () => {
   
     await Promise.all(uploadPromises);
   
-    const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
+    // const calculatedSP = productMRP - (productMRP * productDiscount) / 100;
   
     // Insert product into the database
     const { error: insertError } = await supabase
@@ -227,7 +227,7 @@ const ProductUploadForm: React.FC = () => {
           product_description: productDescription,
           product_MRP: Number(productMRP),
           product_discount: Number(productDiscount),
-          product_SP: Number(calculatedSP),
+          product_SP: Number(productSP),
           product_amount: 100,
           product_category: productCategory,
           product_main_category: productMainCategory,
