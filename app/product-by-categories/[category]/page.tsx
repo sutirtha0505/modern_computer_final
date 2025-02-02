@@ -41,7 +41,7 @@ const ProductByCategoriesItemListPage = () => {
   }, [decodedCategory]);
 
   return (
-    <div className="pt-16 w-full h-full flex flex-col justify-center items-center">
+    <div className="pt-16 mb-16 w-full h-full flex flex-col justify-center items-center">
       <h1 className="font-extrabold bg-gradient-to-br from-pink-500 to-orange-400 text-center text-transparent inline-block text-3xl bg-clip-text m-10">
         {decodedCategory}
       </h1>
