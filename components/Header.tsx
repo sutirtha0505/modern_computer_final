@@ -227,7 +227,7 @@ const Header = () => {
                 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"
                 ></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+              <div className="absolute -left-7 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4 h-96 scrollbar-hide overflow-y-auto">
                 <ul className="py-2 text-gray-800">
                   {products.map((category, index) => (
                     <div
@@ -263,7 +263,7 @@ const Header = () => {
                 Pre-Build PC
                 <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
+              <div className="absolute -left-7 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
                     <Image
@@ -308,7 +308,7 @@ const Header = () => {
                 Custom-Build PC
                 <span className="block h-0.5 w-0 bg-black dark:bg-white absolute bottom-0 left-0 group-hover:w-full transition-all duration-500"></span>
               </Link>
-              <div className="absolute -left-7 mt-2 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
+              <div className="absolute -left-7 w-48 bg-slate-300 dark:bg-slate-800 shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:transition-opacity group-hover:duration-300 p-4">
                 <ul className="py-2 text-gray-800">
                   <div className="flex items-center justify-start">
                     <Image

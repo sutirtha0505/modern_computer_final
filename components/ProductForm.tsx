@@ -254,12 +254,12 @@ const ProductUploadForm: React.FC = () => {
 
 
   return (
-    <div className="w-full h-[100vh] flex gap-2 flex-col justify-center items-center">
+    <div className="w-full h-full flex gap-2 flex-col justify-center items-center">
       <ToastContainer />
       <h1 className="text-center text-2xl font-bold">Add Products Here</h1>
       <form
         onSubmit={handleSubmit}
-        className="bg-white/50 flex flex-col rounded-md gap-5 items-center justify-between py-4 px-6"
+        className="bg-gray-800 w-4/5 flex flex-col rounded-md gap-5 items-center justify-between py-4 px-6"
       >
         <div className="flex flex-col w-full">
           <Autocomplete
@@ -310,8 +310,8 @@ const ProductUploadForm: React.FC = () => {
             className="w-full"
           />
         </div>
-        <div className="flex flex-col justify-center items-center w-full">
-          <label>Category Image:</label>
+        <div className="flex flex-col justify-center items-center w-full gap-6">
+          <label className="font-semibold">Category Image:</label>
           {suggestions.some(suggestion => suggestion.category === productMainCategory) ? (
             <div className="flex flex-col items-center gap-4">
               <Image
@@ -331,7 +331,7 @@ const ProductUploadForm: React.FC = () => {
             <>
               <div
                 {...getRootProps1()}
-                className="border-2 border-white rounded-md bg-transparent p-4 flex-col flex items-center border-dashed"
+                className="border-2 border-white rounded-md bg-transparent p-4 flex-col flex items-center border-dashed w-full"
               >
                 <input {...getInputProps1()} onChange={handleFileChange} />
                 <CloudUpload />
@@ -365,21 +365,21 @@ const ProductUploadForm: React.FC = () => {
 
 
 
-        <div className="flex flex-col relative">
+        <div className="flex flex-col relative w-full">
           <div
             className="flex justify-between items-center"
             onMouseOver={() => setIsTooltipVisible(true)}
             onMouseOut={() => setIsTooltipVisible(false)}
           >
-            <label>Product Category:</label>
+            <label className="font-semibold">Product Category Code:</label>
             <BadgeInfo className=" hover:text-indigo-500 cursor-help" />
           </div>
           {isTooltipVisible && (
-            <div className="absolute z-[2] top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter">
+            <div className="absolute z-[2] w-full top-6 left-0 bg-white/50 text-white text-sm p-2 rounded custom-backdrop-filter">
               <h1 className="text-center text-indigo-500 font-bold">
                 Cheatlist for Product Category
               </h1>
-              <table className="border-black text-black">
+              <table className="border-black text-black w-full p-4 text-center">
                 <thead>
                   <tr>
                     <th className="border">Product</th>
@@ -456,56 +456,56 @@ const ProductUploadForm: React.FC = () => {
             value={productCategory}
             onChange={(e) => setProductCategory(e.target.value)}
             required
-            className="border-2 border-white rounded-md bg-transparent outline-none pl-1"
+            className="border-b-2 border-white bg-transparent outline-none pl-1 h-10"
           />
         </div>
-        <div className="flex flex-col">
-          <label>Product Name:</label>
+        <div className="flex flex-col w-full">
+          <label className="font-semibold">Product Name:</label>
           <input
             type="text"
             value={productName}
             onChange={(e) => setProductName(e.target.value)}
             required
-            className="border-2 border-white rounded-md bg-transparent outline-none pl-1"
+            className="border-b-2 h-10 border-white bg-transparent outline-none pl-1"
           />
         </div>
-        <div className="flex flex-col">
-          <label>Product Description:</label>
+        <div className="flex flex-col w-full">
+          <label className="font-semibold">Product Description:</label>
           <input
             type="text"
             value={productDescription}
             onChange={(e) => setProductDescription(e.target.value)}
             required
-            className="border-2 border-white rounded-md bg-transparent outline-none pl-1"
+            className="border-b-2 border-white  bg-transparent outline-none pl-1"
           />
         </div>
-        <div className="flex flex-col">
-          <label>Product MRP:</label>
+        <div className="flex flex-col w-full">
+          <label className="font-semibold">Product MRP:</label>
           <input
             type="number"
             value={productMRP}
             onChange={(e) => setProductMRP(Number(e.target.value))}
             required
-            className="border-2 border-white rounded-md bg-transparent pl-1 outline-none"
+            className="border-b-2 border-white  bg-transparent pl-1 outline-none"
           />
         </div>
-        <div className="flex flex-col">
-          <label>Product Selling Price:</label>
+        <div className="flex flex-col w-full">
+          <label className="font-semibold">Product Selling Price:</label>
           <input
             type="number"
             value={productSP}
             onChange={(e) => setProductSP(Number(e.target.value))}
             required
-            className="border-2 border-white rounded-md bg-transparent pl-1 outline-none"
+            className="border-b-2 border-white  bg-transparent pl-1 outline-none"
           />
         </div>
-        <div className="flex flex-col relative">
+        <div className="flex flex-col relative w-full gap-6">
           <div
             className="flex justify-between items-center"
             onMouseOver={() => setIsSuggestionVisible(true)}
             onMouseOut={() => setIsSuggestionVisible(false)}
           >
-            <label>Product Images:</label>
+            <label className="font-semibold">Product Images:</label>
             <BadgeInfo className="hover:text-indigo-500 cursor-help" />
           </div>
           {isSuggestionVisible && (
